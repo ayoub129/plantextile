@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\ProductPlanController;
+use App\Http\Controllers\SystemconstantController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -18,16 +20,31 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/models/{id}', [ModelController::class, 'destroy']);
 
     // Get users
-    Route::get('users', [AuthController::class, 'index']);
+    Route::get('/users', [AuthController::class, 'index']);
     // Get a single user
-    Route::get('users/{id}', [AuthController::class, 'show']);
+    Route::get('/users/{id}', [AuthController::class, 'show']);
     // Create a new user
-    Route::post('users', [AuthController::class, 'store']);
+    Route::post('/users', [AuthController::class, 'store']);
     // update a user
-    Route::put('users/{id}', [AuthController::class, 'update']);
+    Route::put('/users/{id}', [AuthController::class, 'update']);
     // delete a user
-    Route::delete('users/{id}', [AuthController::class, 'destroy']);
+    Route::delete('/users/{id}', [AuthController::class, 'destroy']);
 
+    // Get Companies
+    Route::get('/companies', [CompanyController::class, 'index']);
+    // Create a new company
+    Route::post('/companies', [CompanyController::class, 'store']);
+    // Delete company
+    Route::delete('companies/{id}', [CompanyController::class, 'destroy']);
+
+    // System Constants 
+    Route::post('/system_constants', [SystemconstantController::class, 'store']);
+    // Update System Constants
+    Route::put('/system_constants/{id}', [SystemconstantController::class, 'update']);
+    // get one
+    Route::get('/system_constants/{id}', [SystemconstantController::class, 'show']); 
+    // get all system constants
+    Route::get('/system_constants', [SystemconstantController::class, 'index']); 
 
     Route::get('product_plans', [ProductPlanController::class, 'index']);
 

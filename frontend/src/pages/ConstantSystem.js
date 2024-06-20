@@ -1,16 +1,16 @@
 import React from 'react'
 import Header from '../components/ui/Header'
 import Sidebar from '../components/ui/Sidebar'
-import AddUserForm from '../components/users/AddUserForm'
+import AddConstantSystem from '../components/ui/AddConstantSystem'
 
-const AddUser = () => {
+const ConstantSystem = () => {
   return (
     <div>
         <Header />
         <Sidebar />
-        <AddUserForm />
+        <AddConstantSystem />
     </div>
   )
 }
 
-export default AddUser
+export default ConstantSystem

@@ -3,11 +3,13 @@ import LinkIcon from './LinkIcon'
 
 const Sidebar = () => {
   return (
-    <div className='w-full md:w-1/6 bg-white fixed  md:h-full'>
+    <div className='w-full md:w-1/6 mt-20 bg-white fixed  md:h-full'>
       <LinkIcon link={'/dashboard'} text={"Dashboard"} icon={"gauge"} />
       <LinkIcon link={'/products'} text={"Products"} icon={"shop"} />
       <LinkIcon link={'/users'} text={"Users"} icon={"user"} />
       <LinkIcon link={'/planning'} text={"Planification"} icon={"brain"} />
+      <LinkIcon link={'/addconstantSystem'} text={"Add System Constant"} icon={"gear"} />
+      <LinkIcon link={'/constantSystem'} text={"System Constant"} icon={"wrench"} />
       {/* <LinkIcon link={'/calendar'} text={"Calendar"} icon={"calendar"} />
       <LinkIcon link={'/data'} text={"Real Data"} icon={"database"} />
       <LinkIcon link={'/working'} text={"Effective planifier"} icon={"brain"} />

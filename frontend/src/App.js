@@ -8,6 +8,8 @@ import ProductPlan from './pages/ProductPlan';
 import Login from './pages/Login';
 import Users from './pages/Users'; 
 import AddUser from './pages/AddUser';
+import ConstantSystem from './pages/ConstantSystem';
+import GetConstantSystem from './pages/GetConstantSystem';
 
 const App = () => {
   return (
@@ -18,6 +20,9 @@ const App = () => {
         <Route path="/users" element={<Users />} />
         <Route path="/adduser" element={<AddUser />} />
         <Route path="/users/:id" element={<AddUser />} />
+        <Route path="/constantSystem" element={<GetConstantSystem />} />
+        <Route path="/addconstantSystem" element={<ConstantSystem />} />
+        <Route path="/update-constant/:id" element={<ConstantSystem />} />
         <Route path="/products" element={<Products />} />
         <Route path="/addproducts" element={<AddProducts />} />
         <Route path="/products/:id" element={<AddProducts />} />

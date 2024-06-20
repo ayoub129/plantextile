@@ -41,7 +41,7 @@ const AddProductForm = () => {
   useEffect(() => {
     if (id) {
       setIsEdit(true);
-      api.get(`/products/${id}`)
+      api.get(`/models/${id}`)
         .then(response => {
             setProducts(response.data);
         })
@@ -52,10 +52,10 @@ const AddProductForm = () => {
   }, [id]);
 
 
-  const onChange = (e, key) => {
+  const onChange = (name, value) => {
     setProducts({
       ...products,
-      [key]: e.target.value
+      [name]: value
     });
   };
 
@@ -128,13 +128,13 @@ const AddProductForm = () => {
 
     try {
       if (isEdit) {
-        await api.put(`/products/${id}`, formData,  {
+        await api.put(`/models/${id}`, formData,  {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
       } else {
-        await api.post('/products', formData ,  {
+        await api.post('/models', formData ,  {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -156,41 +156,41 @@ const AddProductForm = () => {
         <h4 className='mb-5 text-[#4E4A4A] font-bold pt-7 text-xl'>Créer un produit</h4>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div className='mb-4'>
-            <Input label="Nom du produit" id="name" handleChange={(e) => onChange(e, 'name')} text={products.name} />
+            <Input label="Nom du produit" id="name" handleChange={(name , value) => onChange('name' , value)} text={products.name} />
           </div>
           <div className='mb-4'>
-            <Input label="Modèle" id="modele" handleChange={(e) => onChange(e, 'modele')} text={products.modele} />
+            <Input label="Modèle" id="modele" handleChange={(name , value) => onChange('modele' , value)} text={products.modele} />
           </div>
         </div>
         <div className='mb-4'>
-          <Input label="Description du produit" id="description" handleChange={(e) => onChange(e, 'description')} text={products.description} bigInput />
+          <Input label="Description du produit" id="description" handleChange={(name , value) => onChange('description', value)} text={products.description} bigInput />
         </div>
         <div className='mb-4'>
           <ImageInput label="Photos" handleFileChange={handleFileChange}  />
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div className='mb-4'>
-            <Input label="Catégorie" id="category" handleChange={(e) => onChange(e, 'category')} text={products.category} />
+            <Input label="Catégorie" id="category" handleChange={(name , value) => onChange('category' , value)} text={products.category} />
           </div>
           <div className='mb-4'>
-            <Input label="Client" id="client" handleChange={(e) => onChange(e, 'client')} text={products.client} />
-          </div>
-        </div>
-        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          <div className='mb-4'>
-            <Input label="Quantité demandée" id="quantityRequested" handleChange={(e) => onChange(e, 'quantityRequested')} text={products.quantityRequested} />
-          </div>
-          <div className='mb-4'>
-            <Input label="Quantité reçue" id="quantityReceived" handleChange={(e) => onChange(e, 'quantityReceived')} text={products.quantityReceived} />
+            <Input label="Client" id="client" handleChange={(name , value) => onChange('client' , value)} text={products.client} />
           </div>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div className='mb-4'>
-            <Input label="Qte enterprise" id="qteCasual" handleChange={(e) => onChange(e, 'qteCasual')} text={products.qteCasual} />
+            <Input label="Quantité demandée" id="quantityRequested" handleChange={(name , value) => onChange('quantityRequested' , value)} text={products.quantityRequested} />
+          </div>
+          <div className='mb-4'>
+            <Input label="Quantité reçue" id="quantityReceived" handleChange={(name , value) => onChange('quantityReceived' , value)} text={products.quantityReceived} />
+          </div>
+        </div>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <div className='mb-4'>
+            <Input label="Qte enterprise" id="qteCasual" handleChange={(name , value) => onChange('qteCasual' , value)} text={products.qteCasual} />
           </div>
           <div className='mb-4 flex items-center '>
-            <Input container={"w-[80%]"} label="Prix M' OVR" id="prixMOver" handleChange={(e) => onChange(e, 'prixMOver')} text={products.prixMOver} />
-            <select className='w-[20%] mt-8' onChange={(e) => onChange(e, 'devise')} defaultValue="">
+            <Input container={"w-[80%]"} label="Prix M' OVR" id="prixMOver" handleChange={(name , value) => onChange('prixMOver' , value)} text={products.prixMOver} />
+            <select className='w-[20%] mt-8' onChange={(name , value) => onChange('devise' , value)} defaultValue="">
               <option value="" disabled>choisir devise</option>
               <option value="MAD">MAD</option>
               <option value="USD">USD</option>
@@ -201,7 +201,7 @@ const AddProductForm = () => {
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div className='mb-4'>
-            <Input label="Prix facture" id="prixFacture" handleChange={(e) => onChange(e, 'prixFacture')} text={products.prixFacture} />
+            <Input label="Prix facture" id="prixFacture" handleChange={(name , value) => onChange('prixFacture' , value)} text={products.prixFacture} />
           </div>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -215,7 +215,7 @@ const AddProductForm = () => {
             />
           </div>
           <div className='mb-4'>
-            <Input label="Cours devise étude" id="coursDeviseEtude" handleChange={(e) => onChange(e, 'coursDeviseEtude')} text={products.coursDeviseEtude} />
+            <Input label="Cours devise étude" id="coursDeviseEtude" handleChange={(name , value) => onChange('coursDeviseEtude' , value)} text={products.coursDeviseEtude} />
           </div>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -229,7 +229,7 @@ const AddProductForm = () => {
             />
           </div>
           <div className='mb-4'>
-            <Input label="Cours devise import" id="coursDeviseImport" handleChange={(e) => onChange(e, 'coursDeviseImport')} text={products.coursDeviseImport} />
+            <Input label="Cours devise import" id="coursDeviseImport" handleChange={(name , value) => onChange('coursDeviseImport', value)} text={products.coursDeviseImport} />
           </div>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -243,19 +243,19 @@ const AddProductForm = () => {
             />
           </div>
           <div className='mb-4'>
-            <Input label="Cons. Standard fil" id="consStandardFil" handleChange={(e) => onChange(e, 'consStandardFil')} text={products.consStandardFil} />
+            <Input label="Cons. Standard fil" id="consStandardFil" handleChange={(name , value) => onChange('consStandardFil' , value)} text={products.consStandardFil} />
           </div>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div className='mb-4'>
-            <Input label="Cons. reelle fil" id="consReelleFil" handleChange={(e) => onChange(e, 'consReelleFil')} text={products.consReelleFil} />
+            <Input label="Cons. reelle fil" id="consReelleFil" handleChange={(name , value) => onChange('consReelleFil' , value)} text={products.consReelleFil} />
           </div>
           <div className='mb-4'>
-            <Input label="Conso. Standard Plastique" id="consoStandardPlastique" handleChange={(e) => onChange(e, 'consoStandardPlastique')} text={products.consoStandardPlastique} />
+            <Input label="Conso. Standard Plastique" id="consoStandardPlastique" handleChange={(name , value) => onChange( 'consoStandardPlastique' , value)} text={products.consoStandardPlastique} />
           </div>
         </div>
         <div className='mb-4'>
-          <Input label="Cons. reelle plastique" id="consReellePlastique" handleChange={(e) => onChange(e, 'consReellePlastique')} text={products.consReellePlastique} />
+          <Input label="Cons. reelle plastique" id="consReellePlastique" handleChange={(name , value) => onChange( 'consReellePlastique' , value)} text={products.consReellePlastique} />
         </div>
         <Button container="mt-4" classes="bg-blue-500" handlePress={handleSubmit}>
          {loading ? "submitting ..." : isEdit ? "Modifie le produit" : "Créer le produit"}

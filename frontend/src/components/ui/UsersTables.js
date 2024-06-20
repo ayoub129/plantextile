@@ -1,9 +1,7 @@
 import React from 'react';
 
 const UsersTables = ({title , data , header}) => {
-  data.map((item) => {
-    console.log(item.id)
-  })
+
   return (
     <div className='w-full h-full'>
       <h2 className='font-bold text-lg mb-2'>{title}</h2>

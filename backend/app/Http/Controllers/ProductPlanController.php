@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\ProductPlan;
 use App\Models\ProductPlanHour;
-use App\Models\Model;
 use Illuminate\Support\Facades\Auth;
 
 class ProductPlanController extends Controller

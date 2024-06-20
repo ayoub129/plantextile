@@ -13,35 +13,40 @@ class SystemconstantController extends Controller
      */
     public function index()
     {
+        $this->authorize(['admin' , 'developer' , 'superadmin' ]);
+
         return SystemConstant::all();
     }
 
     public function store(Request $request)
     {
-        $this->authorize(['admin' , 'developer']);
+        $this->authorize(['admin','developer','superadmin']);
 
         $request->validate([
-            'Taux_horaire_SMIG_16,29' => 'required|string|max:255',
-            'Taux_horaire_17,00' => 'required|string|max:255',
-            'Taux_horaire_17,50' => 'required|string|max:255',
-            'Masse_salariale_16,29' => 'required|integer',
-            'Masse_salariale_17.00' => 'required|integer',
-            'Masse_salariale_17.50' => 'required|integer',
-            'Capacité_par_unité_transport' => 'required|numeric',
-            'Coût_par_trajet' => 'required|string|max:255',
-            'Coût_énergie_journalier' => 'required|date',
-            'Coût_charges_fixes_journalier' => 'required|numeric',
-            'Coupe' => 'required|numeric',
-            'Production'  => 'required|numeric',
-            'Repassage_final'  => 'required|numeric',
-            'Contrôle_final'  => 'required|numeric',
-            'Magasin_final' => 'required|numeric',
-            'Magasin_fournitures' => 'required|numeric',
-            'Achats_Logistique' => 'required|numeric',
-            'Transit' => 'required|numeric',
-            'Comptabilité_Finances' => 'required|numeric',
-            'RH' => 'required|numeric',
-            'Ménage'  => 'required|numeric'   
+            'Nombre_d_heures_par_jour' => 'nullable|integer|max:255',
+            'Taux_horaire_SMIG_16_29' => 'nullable|integer|max:255',
+            'Taux_horaire_17_00' => 'nullable|integer|max:255',
+            'Taux_horaire_17_50' => 'nullable|integer|max:255',
+            'Masse_salariale_16_29' => 'nullable|integer',
+            'Masse_salariale_17_00' => 'nullable|integer',
+            'Masse_salariale_17_50' => 'nullable|integer',
+            'Capacité_par_unité_transport' => 'nullable|numeric',
+            'cotisation_entroprise_trans' => 'nullable|numeric',
+            'Total_prime_par_modèle' => 'nullable|numeric',
+            'Coût_par_trajet' => 'nullable|integer|max:255',
+            'Coût_énergie_journalier' => 'nullable|integer',
+            'Coût_charges_fixes_journalier' => 'nullable|numeric',
+            'Coupe' => 'nullable|numeric',
+            'Production'  => 'nullable|numeric',
+            'Repassage_final'  => 'nullable|numeric',
+            'Contrôle_final'  => 'nullable|numeric',
+            'Magasin_final' => 'nullable|numeric',
+            'Magasin_fournitures' => 'nullable|numeric',
+            'Achats_Logistique' => 'nullable|numeric',
+            'Transit' => 'nullable|numeric',
+            'Comptabilité_Finances' => 'nullable|numeric',
+            'RH' => 'nullable|numeric',
+            'Ménage'  => 'nullable|numeric'   
         ]);
 
         $model = new SystemConstant($request->all());
@@ -53,48 +58,51 @@ class SystemconstantController extends Controller
 
     public function show($id)
     {
-        $this->authorize(['logistique' , 'HR' , 'developer' , 'admin' , 'super-admin']);
+        $this->authorize([ 'developer' , 'admin' , 'superadmin']);
 
         return SystemConstant::findOrFail($id);
     }
 
     public function update(Request $request, $id)
     {
-        $this->authorize(['logistique' , 'developer' ]);
-
-        $model = SystemConstant::findOrFail($id);
+        $this->authorize(['admin' , 'developer' , 'superadmin']);
 
         $request->validate([
-            'Taux_horaire_SMIG_16,29' => 'required|string|max:255',
-            'Taux_horaire_17,00' => 'required|string|max:255',
-            'Taux_horaire_17,50' => 'required|string|max:255',
-            'Masse_salariale_16,29' => 'required|integer',
-            'Masse_salariale_17.00' => 'required|integer',
-            'Masse_salariale_17.50' => 'required|integer',
-            'Capacité_par_unité_transport' => 'required|numeric',
-            'Coût_par_trajet' => 'required|string|max:255',
-            'Coût_énergie_journalier' => 'required|date',
-            'Coût_charges_fixes_journalier' => 'required|numeric',
+            'Nombre_d_heures_par_jour' => 'nullable|integer|max:255',
+            'Taux_horaire_SMIG_16_29' => 'nullable|integer|max:255',
+            'Taux_horaire_17_00' => 'nullable|integer|max:255',
+            'Taux_horaire_17_50' => 'nullable|integer|max:255',
+            'Masse_salariale_16_29' => 'nullable|integer',
+            'Masse_salariale_17_00' => 'nullable|integer',
+            'Masse_salariale_17_50' => 'nullable|integer',
+            'Capacité_par_unité_transport' => 'nullable|numeric',
+            'cotisation_entroprise_trans' => 'nullable|numeric',
+            'Total_prime_par_modèle' => 'nullable|numeric',
+            'Coût_par_trajet' => 'nullable|integer|max:255',
+            'Coût_énergie_journalier' => 'nullable|integer',
+            'Coût_charges_fixes_journalier' => 'nullable|numeric',
+            'Coupe' => 'nullable|numeric',
+            'Production'  => 'nullable|numeric',
+            'Repassage_final'  => 'nullable|numeric',
+            'Contrôle_final'  => 'nullable|numeric',
+            'Magasin_final' => 'nullable|numeric',
+            'Magasin_fournitures' => 'nullable|numeric',
+            'Achats_Logistique' => 'nullable|numeric',
+            'Transit' => 'nullable|numeric',
+            'Comptabilité_Finances' => 'nullable|numeric',
+            'RH' => 'nullable|numeric',
+            'Ménage'  => 'nullable|numeric'   
         ]);
 
+        $model = SystemConstant::findOrFail($id);
         $model->update($request->all());
 
         return response()->json($model, 200);
     }
 
-    public function destroy($id)
-    {
-        $this->authorize(['developer' , 'admin' ,  'super-admin']);
-
-        $model = SystemConstant::findOrFail($id);
-        $model->delete();
-
-        return response()->json(null, 204);
-    }
-
     private function authorize(array $roles)
     {
-        if (!in_array(Auth::user()->authorization_level, $roles)) {
+        if (!in_array(Auth::user()->role, $roles)) {
             abort(403, 'Unauthorized action.');
         }
     }

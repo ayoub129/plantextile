@@ -22,14 +22,16 @@ const Login = () => {
 
             const { token, user } = response.data;
             localStorage.setItem('token', token);
-            localStorage.setItem('authorization_level', user.authorization_level);
+            localStorage.setItem('role', user.role);
 
-            if(user.authorization_level === 'Logistique') {
+            if(user.role === 'Logistique') {
                 navigate("/products")
-            } else if(user.authorization_level === 'RH') {
+            } else if(user.role === 'RH') {
                 navigate("/users")
-            } else if(user.authorization_level === 'production') {
-                navigate("/dashboard")
+            } else if(user.role === 'production') {
+                navigate("/product-real")
+            } else if(user.role === 'Method') {
+                navigate("/effective-standard")
             } else {
                 navigate("/dashboard")
             }
@@ -52,7 +54,7 @@ const Login = () => {
                         id="email"
                         type="email"
                         placeholder="Enter your email"
-                        handleChange={(e) => setEmail(e.target.value)}
+                        handleChange={(name , value) => setEmail(value)}
                         text={email}
                     />
                     <Input
@@ -61,7 +63,7 @@ const Login = () => {
                         id="password"
                         type="password"
                         placeholder="Enter your password"
-                        handleChange={(e) => setPassword(e.target.value)}
+                        handleChange={(name , value) => setPassword(value)}
                         text={password}
                     />
                     <Button

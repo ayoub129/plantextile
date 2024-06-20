@@ -95,7 +95,7 @@ class ModelController extends Controller
 
     private function authorize(array $roles)
     {
-        if (!in_array(Auth::user()->authorization_level, $roles)) {
+        if (!in_array(Auth::user()->role, $roles)) {
             abort(403, 'Unauthorized action.');
         }
     }
