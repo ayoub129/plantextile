@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Card = ({title , icon , newData , oldData}) => {
+const Card = ({price , lowBetter = false , title , icon , newData , oldData}) => {
     const calculatePercentageDifference = (oldData, newData) => {
         const difference = newData - oldData;
         const percentage = ((difference / oldData) * 100).toFixed(2);
@@ -8,7 +8,11 @@ const Card = ({title , icon , newData , oldData}) => {
     };
 
     const percentage = calculatePercentageDifference(oldData, newData);
-    const isPositive = parseFloat(percentage) > 0;
+    let isPositive = parseFloat(percentage) > 0;
+
+    if(lowBetter) {
+        isPositive = true;
+    }
 
     return (
         <div>
@@ -26,9 +30,9 @@ const Card = ({title , icon , newData , oldData}) => {
                 <hr className='bg-gray-400 pt-[1px] my-5 w-[90%] mx-auto' />
                 <div className='flex items-center justify-between w-[90%] mx-auto pb-[16px]'>
                     <p className='text-gray-600 font-bold'>
-                        {newData} <i className={`fa-solid fa-arrow-${isPositive ? "up" : "down"} text-${isPositive ? "[#54CC96]" : "[#FF5560]"}`}></i>
+                        {newData} {price} <i className={`fa-solid fa-arrow-${isPositive ? "up" : "down"} text-${isPositive ? "[#54CC96]" : "[#FF5560]"}`}></i>
                     </p>
-                    <p className='font-bold text-gray-600'>Last : {oldData}</p>
+                    <p className='font-bold text-gray-600'>Last : {oldData} {price}</p>
                 </div>
             </div>
         </div>

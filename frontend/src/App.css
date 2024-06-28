@@ -60,3 +60,39 @@
     }
   }
   
+  .scroll { 
+    max-width: 200px;
+    max-height: 50px;
+    overflow-y: scroll; 
+  }
+
+/* styles.css or your preferred stylesheet */
+.responsive-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.responsive-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.responsive-table th, .responsive-table td {
+  padding: 0.5rem;
+  text-align: center;
+  border: 1px solid #ddd;
+  min-width: 200px; /* Set minimum width for each cell */
+}
+
+@media (max-width: 768px) {
+  .responsive-table th, .responsive-table td {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-table th, .responsive-table td {
+    white-space: nowrap;
+  }
+}
