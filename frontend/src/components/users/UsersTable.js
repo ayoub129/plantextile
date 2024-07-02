@@ -72,7 +72,7 @@ const UsersTable = () => {
               <tr key={user.id} className="bg-gray-50">
                 <td className='p-[2rem] text-center text-[#4E4A4A] font-semibold'>{user.name}</td>
                 <td className='p-[1rem]'>
-                  <img src={`/${user.image}`} alt={user.name} className='h-[100px] w-[100px] mx-auto' />
+                  <img src={`${user.image ? '/' + user.image : 'https://via.placeholder.com/40'}`} alt={user.name} className='h-[100px] w-[100px] mx-auto' />
                 </td>
                 <td className='p-[2rem] text-center text-[#4E4A4A] font-semibold'>{user.email}</td>
                 <td className='p-[2rem] text-center text-[#4E4A4A] font-semibold'>{user.role}</td>

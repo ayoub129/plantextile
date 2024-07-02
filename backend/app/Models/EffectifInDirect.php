@@ -10,7 +10,7 @@ class EffectifIndirect extends Model
     use HasFactory;
 
     protected $fillable = [
-        'effective_standard_id', 'mag_four', 'mag_fin', 'machines_sp_manuelle', 'cont_fin', 'mach_retouche', 'repassage', 
+        'modele' , 'chain' , 'mag_four', 'mag_fin', 'machines_sp_manuelle', 'cont_fin', 'mach_retouche', 'repassage', 
         'gabaret', 'preparation_stagieres', 'preparation', 'preparation_elastique'
     ];
 

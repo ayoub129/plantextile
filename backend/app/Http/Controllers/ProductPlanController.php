@@ -27,6 +27,7 @@ class ProductPlanController extends Controller
             'qte' => 'required|integer',
             'model_id' => 'required|exists:models,id',
             'chain' => 'required|string',
+            'Quenta' => 'required|string',
             'consummation_standard_fil' => 'required|integer',
             'consummation_standard_plastique' => 'required|integer',
         ]);
@@ -45,6 +46,19 @@ class ProductPlanController extends Controller
         return response()->json(['productPlan' => $productPlan, 'hours' => $hours]);
     }
 
+    public function getPlanningByModel($modelId)
+    {
+        $this->authorize(['developer', 'Method', 'admin']);
+
+        $productPlan = ProductPlan::where('model_id', $modelId)->first();
+
+        if (!$productPlan) {
+            return response()->json(['message' => 'No planning found for this model'], 404);
+        }
+
+        return response()->json($productPlan);
+    }
+
     public function update(Request $request, ProductPlan $productPlan)
     {
         $this->authorize(['developer' , 'Method' ,'admin']);
@@ -54,6 +68,7 @@ class ProductPlanController extends Controller
             'end_date' => 'date',
             'qte' => 'integer',
             'model_id' => 'exists:models,id',
+            'Quenta' => 'required|string',
             'chain' => 'string',
             'consummation_standard_fil' => 'integer',
             'consummation_standard_plastique' => 'integer',
@@ -103,7 +118,7 @@ class ProductPlanController extends Controller
 
     private function authorize(array $roles)
     {
-        if (!in_array(Auth::user()->authorization_level, $roles)) {
+        if (!in_array(Auth::user()->role, $roles)) {
             abort(403, 'Unauthorized action.');
         }
     }

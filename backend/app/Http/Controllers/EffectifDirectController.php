@@ -26,7 +26,8 @@ class EffectifDirectController extends Controller
         $this->authorize(['developer', 'method']);
 
         $request->validate([
-            'effective_standard_id' => 'required|exists:effective_standards,id',
+            'chain' => 'nullable|string',
+            'modele' => 'nullable|string',
             'machinistes' => 'nullable|integer',
             'machinistes_stagiaires' => 'nullable|integer',
             'repassage_preparation' => 'nullable|integer',
@@ -70,7 +71,8 @@ class EffectifDirectController extends Controller
         $effectifDirect = EffectifDirect::findOrFail($id);
 
         $request->validate([
-            'effective_standard_id' => 'required|exists:effective_standards,id',
+            'chain' => 'nullable|string',
+            'modele' => 'nullable|string',
             'machinistes' => 'nullable|integer',
             'machinistes_stagiaires' => 'nullable|integer',
             'repassage_preparation' => 'nullable|integer',

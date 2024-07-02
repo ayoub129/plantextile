@@ -8,8 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 class Models extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'modele',
+        'category',
+        'photos',
+        'client',
+        'quantite_demandee',
+        'quantityReceived',
+        'qte_societe',
+        'prixMOver',
+        'devise',
+        'prixFacture',
+        'dateEtude',
+        'cours_devise_etude',
+        'dateImport',
+        'cours_devise_import',
+        'dateExport',
+        'consStandardFil',
+        'consoStandardPlastique',
+    ];
 
     public function productPlans()
     {

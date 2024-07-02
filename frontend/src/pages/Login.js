@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          navigate('/dashboard'); 
+        }
+      }, []);
+    
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate()
 
     const handleLogin = async (e) => {
         setLoading(true);

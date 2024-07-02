@@ -15,6 +15,7 @@ class ProductPlan extends Model
         'qte',
         'model_id',
         'chain',
+        'Quenta',
         'consummation_standard_fil',
         'consummation_standard_plastique',
     ];

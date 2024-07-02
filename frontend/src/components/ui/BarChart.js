@@ -1,10 +1,28 @@
 import React from 'react';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
-const BarChart = ({ data, options }) => {
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+const BarChart = ({data , options}) => {
   return (
     <div>
-      <Bar data={data} options={options} />
+      <Bar options={options} data={data} />;    
     </div>
   );
 };

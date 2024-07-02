@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('system_constant', function (Blueprint $table) {
+        Schema::create('system_constants', function (Blueprint $table) {
             $table->id();
             $table->integer('Nombre_d_heures_par_jour');
             $table->integer('Taux_horaire_SMIG_16_29');
@@ -46,6 +46,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('system_constant');
+        Schema::dropIfExists('system_constants');
     }
 };

@@ -11,7 +11,6 @@ const Sidebar = ({ sidebar }) => {
       { link: '/users', text: 'Users' },
       { link: '/planning', text: 'Planification' },
       { link: '/addconstantSystem', text: 'Add System Constant' },
-      { link: '/constantSystem', text: 'System Constant' },
       { link: '/direct', text: 'Direct Effective Standard' },
       { link: '/indirect', text: 'InDirect Effective Standard' },
       { link: '/posts', text: 'Add posts' },
@@ -32,7 +31,6 @@ const Sidebar = ({ sidebar }) => {
       { link: '/users', text: 'Users' },
       { link: '/planning', text: 'Planification' },
       { link: '/addconstantSystem', text: 'Add System Constant' },
-      { link: '/constantSystem', text: 'System Constant' },
       { link: '/direct', text: 'Direct Effective Standard' },
       { link: '/indirect', text: 'InDirect Effective Standard' },
       { link: '/posts', text: 'Add posts' },
@@ -53,7 +51,6 @@ const Sidebar = ({ sidebar }) => {
       { link: '/users', text: 'Users' },
       { link: '/planning', text: 'Planification' },
       { link: '/addconstantSystem', text: 'Add System Constant' },
-      { link: '/constantSystem', text: 'System Constant' },
       { link: '/direct', text: 'Direct Effective Standard' },
       { link: '/indirect', text: 'InDirect Effective Standard' },
       { link: '/posts', text: 'Add posts' },
@@ -119,7 +116,7 @@ const Sidebar = ({ sidebar }) => {
   };
 
   return (
-    <div className={`w-1/2 md:w-1/6 mt-20 bg-white fixed ${sidebar ? 'left-0' : 'left-[-200%]'} md:left-0 pb-[5rem] md:h-full overflow-y-auto`}>
+    <div className={`w-1/2 md:w-1/6 mt-20 bg-white fixed ${sidebar ? 'left-0 shadow-lg shadow-gray-500' : 'left-[-200%]'} md:left-0 pb-[5rem] md:h-full overflow-y-auto`}>
       {renderLinks()}
     </div>
   );

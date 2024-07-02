@@ -34,7 +34,7 @@ class AuthController extends Controller
     public function index()
     {
         $this->authorize(['developer', 'superadmin', 'admin' , 'HR']);
-        $excludedRoles = ['developer', 'superadmin', 'admin', 'HR'];
+        $excludedRoles = ['developer', 'superadmin', 'admin'];
 
         $users = User::whereNotIn('role', $excludedRoles)->get();
         return response()->json($users);

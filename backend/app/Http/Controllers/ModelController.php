@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Models;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ModelController extends Controller
 {
@@ -18,34 +19,45 @@ class ModelController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorize(['logistique' , 'developer']);
-
+        $this->authorize(['logistique', 'developer']);
+    
         $request->validate([
-            'code' => 'required|string|max:255',
-            'categorie' => 'required|string|max:255',
+            'modele' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'photos' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             'client' => 'required|string|max:255',
             'quantite_demandee' => 'required|integer',
-            'quantite_recue' => 'required|integer',
+            'quantityReceived' => 'required|integer',
             'qte_societe' => 'required|integer',
-            'prix_unitaire' => 'required|numeric',
+            'prixMOver' => 'required|numeric',
             'devise' => 'required|string|max:255',
-            'date_import' => 'required|date',
+            'prixFacture' => 'required|numeric',
+            'dateEtude' => 'required|date',
+            'cours_devise_etude' => 'required|numeric',
+            'dateImport' => 'required|date',
             'cours_devise_import' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'dateExport' => 'required|date',
+            'consStandardFil' => 'required|numeric',
+            'consoStandardPlastique' => 'required|numeric',
         ]);
-
-        $model = new Models($request->all());
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('images', 'public');
-            $model->image = $imagePath;
+    
+        // Handle file upload if 'photos' field is present in the request
+        if ($request->hasFile('photos')) {
+            $imagePath = $request->file('photos')->store('images', 'public');
+        
+            // Get the public path of the stored image
+            $publicPath = Storage::disk('public')->url($imagePath);
+        
+            // Update the request with the public path
+            $request->merge(['photos' => $publicPath]);
         }
-
-        $model->save();
-
+            
+        // Create a new Models instance with validated data
+        $model = Models::create($request->all());
+    
         return response()->json($model, 201);
     }
-
+    
     public function show($id)
     {
         $this->authorize(['logistique' , 'developer' , 'admin' , 'super-admin']);
@@ -55,30 +67,36 @@ class ModelController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->authorize(['logistique' , 'developer' ]);
+        $this->authorize(['logistique', 'developer']);
 
         $model = Models::findOrFail($id);
 
-        $request->validate([
-            'code' => 'sometimes|required|string|max:255',
-            'categorie' => 'sometimes|required|string|max:255',
+        $validatedData = $request->validate([
+            'modele' => 'sometimes|required|string|max:255',
+            'category' => 'sometimes|required|string|max:255',
+            'photos' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             'client' => 'sometimes|required|string|max:255',
             'quantite_demandee' => 'sometimes|required|integer',
-            'quantite_recue' => 'sometimes|required|integer',
+            'quantityReceived' => 'sometimes|required|integer',
             'qte_societe' => 'sometimes|required|integer',
-            'prix_unitaire' => 'sometimes|required|numeric',
+            'prixMOver' => 'sometimes|required|numeric',
             'devise' => 'sometimes|required|string|max:255',
-            'date_import' => 'sometimes|required|date',
+            'prixFacture' => 'sometimes|required|numeric',
+            'dateEtude' => 'sometimes|required|date',
+            'cours_devise_etude' => 'sometimes|required|numeric',
+            'dateImport' => 'sometimes|required|date',
             'cours_devise_import' => 'sometimes|required|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'dateExport' => 'sometimes|required|date',
+            'consStandardFil' => 'sometimes|required|numeric',
+            'consoStandardPlastique' => 'sometimes|required|numeric',
         ]);
 
-        $model->update($request->all());
-
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('images', 'public');
-            $model->image = $imagePath;
+        if ($request->hasFile('photos')) {
+            $imagePath = $request->file('photos')->store('images', 'public');
+            $validatedData['photos'] = Storage::disk('public')->url($imagePath);
         }
+
+        $model->update($validatedData);
 
         return response()->json($model, 200);
     }

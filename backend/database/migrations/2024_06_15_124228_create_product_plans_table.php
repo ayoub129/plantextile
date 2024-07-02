@@ -14,6 +14,7 @@ class CreateProductPlansTable extends Migration
             $table->integer('qte');
             $table->unsignedBigInteger('model_id');
             $table->string('chain');
+            $table->string('Quenta');
             $table->integer('consummation_standard_fil');
             $table->integer('consummation_standard_plastique');
             $table->timestamps();

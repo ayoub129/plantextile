@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ModelController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductPlanController;
 use App\Http\Controllers\SystemconstantController;
 use Illuminate\Support\Facades\Route;
@@ -11,7 +12,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Get Model
     Route::get('/models', [ModelController::class,'index']);
     // Get singel Model
-    Route::get('/models/{id}', [ModelController::class,'model']);
+    Route::get('/models/{id}', [ModelController::class,'show']);
     // Create a new model
     Route::post('/models', [ModelController::class, 'store']);
     // Update a model
@@ -42,7 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Update System Constants
     Route::put('/system_constants/{id}', [SystemconstantController::class, 'update']);
     // get one
-    Route::get('/system_constants/{id}', [SystemconstantController::class, 'show']); 
+    Route::get('/system_constants_latest', [SystemconstantController::class, 'show']); 
     // get all system constants
     Route::get('/system_constants', [SystemconstantController::class, 'index']); 
 
@@ -59,6 +60,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('product_plans/{productPlan}/hours', [ProductPlanController::class, 'storeHour']);
     
     Route::get('product_plans/{productPlan}/hours', [ProductPlanController::class, 'getHours']);
+
+    Route::get('product_plans/{modelId}' , [ProductPlanController::class, 'getPlanningByModel']);
+
+    Route::get('/posts', [PostController::class,'index']);
+
+    Route::get('/posts/{id}', [PostController::class,'show']);
+    
+    Route::post('/posts', [PostController::class, 'store']);
+    
+    Route::put('/posts/{id}', [PostController::class, 'update']);
+    
+    Route::delete('/posts/{id}', [PostController::class, 'destroy']);
+
 });
 
 

@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/ui/Header';
 import Sidebar from '../components/ui/Sidebar';
 import CardsData from '../components/ui/CardsData';
 import LineChart from '../components/ui/LineChart';
 import BarChart from '../components/ui/BarChart';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [sidebar, setSidebar] = useState(false);
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/'); 
+    }
+  }, []);
+
 
   const lineChartData = {
     labels: ['2024-04-17', '2024-04-18', '2024-04-19', '2024-04-20', '2024-04-22', '2024-04-23'],
