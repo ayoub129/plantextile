@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('effectif_fix', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('effective_standard_id')->constrained()->onDelete('cascade');
             $table->integer('coupe')->nullable();
             $table->integer('Production')->nullable();
             $table->integer('Repassage_final')->nullable();

@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('effectif_indirects', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('effective_standard_id')->constrained()->onDelete('cascade');
             $table->integer('coupe')->nullable();
             $table->integer('matlasseurs')->nullable();
             $table->integer('coupeurs')->nullable();

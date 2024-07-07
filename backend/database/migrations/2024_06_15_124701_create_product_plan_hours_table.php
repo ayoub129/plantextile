@@ -11,7 +11,8 @@ class CreateProductPlanHoursTable extends Migration
         Schema::create('product_plan_hours', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_plan_id');
-            $table->integer('hour');
+            $table->string('hour');
+            $table->string('day');
             $table->integer('models_finished');
             $table->timestamps();
 

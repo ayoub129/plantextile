@@ -11,7 +11,7 @@ class Models extends Model
     protected $fillable = [
         'modele',
         'category',
-        'photos',
+        'image',
         'client',
         'quantite_demandee',
         'quantityReceived',

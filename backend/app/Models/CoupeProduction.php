@@ -5,19 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductPlanHour extends Model
+class CoupeProduction extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'product_plan_id',
-        'day', 
+        'model_id',
+        'day',
         'hour',
-        'models_finished',
+        'value',
     ];
 
-    public function productPlan()
+    public function model()
     {
-        return $this->belongsTo(ProductPlan::class);
+        return $this->belongsTo(Models::class);
     }
 }

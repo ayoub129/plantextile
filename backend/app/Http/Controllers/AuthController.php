@@ -6,62 +6,63 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
+    // login function 
     public function login(Request $request)
     {
+        // accept two parameters: email and password
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
 
+        // add them as a variable
         $credentials = request(['email', 'password']);
 
+        // attepmt to login the user with the credentials
         if (!Auth::attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
 
+        // if the user exist them login and send a token to the frontend
         $user = $request->user();
         $token = $user->createToken('token-name')->plainTextToken;
 
         return response()->json(['token' => $token, 'user' => $user]);
     }
 
-    /**
-     * Display a listing of the users.
-     */
+    public function getProfilePicture()
+    {
+        $user = Auth::user();
+
+        if ($user->image) {
+            return response()->json(['image' => $user->image]);
+        } else {
+            return response()->json(['message' => 'No profile picture found'], 404);
+        }
+    }
+
     public function index()
     {
-        $this->authorize(['developer', 'superadmin', 'admin' , 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
         $excludedRoles = ['developer', 'superadmin', 'admin'];
 
         $users = User::whereNotIn('role', $excludedRoles)->get();
         return response()->json($users);
     }
 
-    /**
-     * Display a single user.
-     */
     public function show($id)
     {
-        $this->authorize(['developer', 'superadmin', 'admin' , 'HR']);
-        $excludedRoles = ['developer', 'superadmin', 'admin', 'HR'];
         $user = User::findOrFail($id);
-
-        if (in_array($user->role, $excludedRoles)) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
-
         return response()->json($user);
     }
 
-    /**
-     * Create a new user.
-     */
     public function store(Request $request)
     {
-        $this->authorize(['developer', 'superadmin', 'admin' , 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -82,46 +83,40 @@ class AuthController extends Controller
         return response()->json($user, 201);
     }
 
-    /**
-     * Update an existing user.
-     */
     public function update(Request $request, $id)
     {
-        $this->authorize(['developer', 'superadmin', 'admin' , 'HR']);
-
         $user = User::findOrFail($id);
 
-        $request->validate([
+        $validatedData = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'sometimes|required|string|min:8|confirmed',
             'role' => 'sometimes|required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
         ]);
 
-        if ($request->has('name')) {
-            $user->name = $request->name;
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($user->image) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $user->image));
+            }
+            // Store the new image
+            $imagePath = $request->file('image')->store('images', 'public');
+            $validatedData['image'] = Storage::url($imagePath);
         }
-        if ($request->has('email')) {
-            $user->email = $request->email;
-        }
-        if ($request->has('password')) {
-            $user->password = Hash::make($request->password);
-        }
-        if ($request->has('role')) {
-            $user->role = $request->role;
-        }
+    
+        $user->update($validatedData);
 
-        $user->save();
-
-        return response()->json($user, 200);
+        return response()->json([
+            'message' => 'User updated successfully',
+            'user' => $user
+        ], 200);
     }
 
-    /**
-     * Delete a user.
-     */
     public function destroy($id)
     {
-        $this->authorize(['developer', 'superadmin', 'admin' , 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
 
         $user = User::findOrFail($id);
         $user->delete();
@@ -129,9 +124,29 @@ class AuthController extends Controller
         return response()->json(null, 204);
     }
 
-    /**
-     * Authorization check.
-     */
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        // Validate the new password
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        // Check if the current password is correct
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json(['message' => 'Current password is incorrect'], 400);
+        }
+
+        // Update the password
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['message' => 'Password updated successfully'], 200);
+    }
+
+
     private function authorize(array $roles)
     {
         if (!in_array(Auth::user()->role, $roles)) {
