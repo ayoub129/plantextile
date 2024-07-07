@@ -1,51 +1,122 @@
+// React Packages
 import React, { useEffect, useState } from 'react';
+// Custom Components
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
+// api and navigation
 import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-          navigate('/dashboard'); 
-        }
-      }, []);
-    
+    // state for the page 'Error - Email - Password - Loading'
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+    // navigation 
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        // if the token exist redirect to the dashboard
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+        // check which role the user belongs to and redirect
+        if (token) {
+            // redirect the logistique to the products page
+            if(role === 'Logistique') {
+                navigate("/products")
+            } 
+            // redirect the RH to the users page
+            else if(role === 'HR') {
+                navigate("/users")
+            } 
+            // redirect the production guys to there production speciality pages
+            else if(role === 'production_coupe') {
+                navigate("/coupe")
+            }
+            else if(role === 'production_chain') {
+                navigate("/production")
+            }
+            else if(role === 'production_repassage') {
+                navigate("/repassage")
+            }
+            else if(role === 'production_control') {
+                navigate("/control-final")
+            }
+            else if(role === 'production_magasin') {
+                navigate("/magasin")
+            }
+            // redirect the method to the effective standard
+            else if(role === 'Method') {
+                navigate("/effective-standard")
+            } 
+            // Redirect the Developer and the Admins to the Dashboard
+            else {
+                navigate("/dashboard")
+            }
+        }
+      }, [navigate]);
+    
+
+    // handle the login button clicked
     const handleLogin = async (e) => {
-        setLoading(true);
+        // prevent default of submitting form
         e.preventDefault();
+        // set loading to true
+        setLoading(true);
+        
         try {
+            // send a POST request to the /login endpoint with the email and password
             const response = await api.post('/login', {
                 email,
                 password,
             });
 
+            // get the token and the user from the backend
             const { token, user } = response.data;
+            // set the token and the role in the localstorage
             localStorage.setItem('token', token);
             localStorage.setItem('role', user.role);
-
+            localStorage.setItem('userId', user.id);
+            
+            // redirect the logistique to the products page
             if(user.role === 'Logistique') {
                 navigate("/products")
-            } else if(user.role === 'RH') {
+            } 
+            // redirect the RH to the users page
+            else if(user.role === 'HR') {
                 navigate("/users")
-            } else if(user.role === 'production') {
-                navigate("/product-real")
-            } else if(user.role === 'Method') {
-                navigate("/effective-standard")
-            } else {
+            } 
+            // redirect the production guys to there production speciality pages
+            else if(user.role === 'production_coupe') {
+                navigate("/coupe")
+            }
+            else if(user.role === 'production_chain') {
+                navigate("/production")
+            }
+            else if(user.role === 'production_repassage') {
+                navigate("/repassage")
+            }
+            else if(user.role === 'production_control') {
+                navigate("/control-final")
+            }
+            else if(user.role === 'production_magasin') {
+                navigate("/magasin")
+            }
+            // redirect the method to the effective standard
+            else if(user.role === 'Method') {
+                navigate("/planning")
+            } 
+            // Redirect the Developer and the Admins to the Dashboard
+            else {
                 navigate("/dashboard")
             }
         } catch (err) {
+            // catch any error and show this message
             setError('Invalid credentials. Please try again.');
         } finally {
+            // set the loading to false
             setLoading(false);
         }
     };

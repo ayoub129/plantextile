@@ -96,3 +96,7 @@
     white-space: nowrap;
   }
 }
+
+.grid-cols-16 {
+  grid-template-columns: repeat(16, 1fr);
+}

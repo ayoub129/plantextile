@@ -1,29 +1,35 @@
+// Import React components and Routers from React
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+// Import Custom components
 import Input from '../ui/Input';
 import ImageInput from '../ui/ImageInput';
 import Button from '../ui/Button';
+// import API and toasts 
 import api from '../../api/axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+// import DatePicker
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const AddProductForm = () => {
+  // handle navigation and get the id parameter
   const navigate = useNavigate();
   const { id } = useParams();
+  // handle loading, product and isEditable states  
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState({
     modele: '',
     category: '',
-    photos: '',
+    image: '',
     description: '',
     client: '',
     quantite_demandee: '',
     quantityReceived: '',
     qte_societe: '',
     prixMOver: '',
-    devise: '',
+    devise: 'MAD',
     prixFacture: '',
     dateEtude: '',
     cours_devise_etude: '',
@@ -34,20 +40,28 @@ const AddProductForm = () => {
     consoStandardPlastique: '',
   });
   const [isEdit, setIsEdit] = useState(false);
+  // handle conversion rates
+  const [conversionRate, setConversionRate] = useState(1);
 
   useEffect(() => {
-    if (id) {
-      setIsEdit(true);
-      api.get(`/models/${id}`)
-        .then(response => {
+    const updateModel = async () => {
+      // if the id exist then edit 
+      if (id) {
+        // set isEdit to true and get a single model
+        try {
+          setIsEdit(true);
+          const response = await api.get(`/models/${id}`);
           setProducts(response.data);
-        })
-        .catch(error => {
-          console.error('Error fetching product:', error);
-        });
-    }
+        } catch (error) {
+          toast.error('Error fetching product:', error);          
+        }
+      }
+    };
+
+    updateModel();
   }, [id]);
 
+  // handle change of the input field
   const onChange = (name, value) => {
     setProducts({
       ...products,
@@ -55,13 +69,15 @@ const AddProductForm = () => {
     });
   };
 
+  // handle file change event for the image input field
   const handleFileChange = (e) => {
     setProducts({
       ...products,
-      photos: e.target.files[0]
+      image: e.target.files[0]
     });
   };
 
+  // handle date change event for the date fields
   const handleDateChange = (date, key) => {
     setProducts({
       ...products,
@@ -69,10 +85,13 @@ const AddProductForm = () => {
     });
   };
 
-  const fetchExchangeRates = async (currency = 'USD', date = new Date().toISOString().slice(0, 10)) => {
+  // fetch exchange rates for the currency selected now 
+  const fetchExchangeRates = async (currency = 'USD') => {
+    // url to the exchange rates api endpoint
     const url = `https://v6.exchangerate-api.com/v6/44567619eec22c4875e3a8c0/latest/${currency}`;
 
     try {
+      // get the exchange rates and return it
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP status ${response.status}`);
@@ -85,33 +104,53 @@ const AddProductForm = () => {
   };
 
   useEffect(() => {
+    // check if product devise is available and not equal to MAD also the price and quantity society is available
     if (products.devise && products.devise !== "MAD" && products.prixMOver && products.qte_societe) {
-      fetchExchangeRates(products.devise).then(data => console.log(data));
+      fetchExchangeRates(products.devise).then(data => {
+        setConversionRate(data.conversion_rates.MAD); // Set conversion rate state
+      });
     }
   }, [products.devise, products.prixMOver, products.qte_societe]);
 
+  useEffect(() => {
+    // calculate the prix facture if conversionRate is available
+    if ( products.prixMOver && products.qte_societe) {
+      const prixFacture = products.prixMOver * conversionRate * products.qte_societe;
+      // assign the prix facture 
+      setProducts(prevProducts => ({ ...prevProducts, prixFacture }));
+    }
+  }, [conversionRate, products.prixMOver, products.qte_societe]);
+
+  // create or update product
   const handleSubmit = async (e) => {
+    // start loading state while saving the product
     setLoading(true);
     e.preventDefault();
 
+    // create FormData to send as request body with file data if exist
     const formData = new FormData();
     Object.keys(products).forEach(key => {
       if (products[key] instanceof Date) {
-        formData.append(key, products[key].toISOString().split('T')[0]); // Format date as 'YYYY-MM-DD'
+        // Format date as 'YYYY-MM-DD'
+        formData.append(key, products[key].toISOString().split('T')[0]); 
       } else if (products[key] && typeof products[key] === 'object' && 'toISOString' in products[key]) {
+        // Format date as 'YYYY-MM-DD'
         formData.append(key, products[key].toISOString().split('T')[0]);
-      } else if (key === 'photos' && products[key]) {
-        if (products.photos instanceof File) {
-          formData.append('photos', products.photos);
+      } else if (key === 'image' && products[key]) {
+        // append an image to the backend
+        if (products.image instanceof File) {
+          formData.append('image', products.image);
         }
       } else {
+        // append any other text
         formData.append(key, products[key]);
       }
     });
 
     try {
+      // check if edited then update if not then create a new model and after that navigate to the products page
       if (isEdit) {
-        await api.put(`/models/${id}`, formData, {
+        await api.post(`/models/${id}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -123,11 +162,12 @@ const AddProductForm = () => {
           },
         });
       }
-      navigate("/products")
+      navigate("/products");
     } catch (error) {
-      console.error('Error saving product:', error);
+      // show error message
       toast.error('Error saving product.');
     } finally {
+      // set the loading to false
       setLoading(false);
     }
   };
@@ -146,7 +186,7 @@ const AddProductForm = () => {
           </div>
         </div>
         <div className='mb-4'>
-          <ImageInput label="Photos" handleFileChange={handleFileChange} />
+          <ImageInput label="image" handleFileChange={handleFileChange} />
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div className='mb-4'>
@@ -176,7 +216,7 @@ const AddProductForm = () => {
             </select>
           </div>
           <div className='mb-4'>
-            <Input type='number' label="Prix facture" id="prixFacture" name={'prixFacture'} handleChange={(name, value) => onChange(name, value)} text={products.prixFacture} />
+            <Input type='number' disabled={true} label="Prix facture" id="prixFacture" name={'prixFacture'} handleChange={(name, value) => onChange(name, value)} text={products.prixFacture} />
           </div>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>

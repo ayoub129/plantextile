@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import FullCalendar from './FullCalendar';
 import api from '../../api/axios';
 
-const LaCoupe = () => {
+const RepassageProduction = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState('');
 
@@ -26,7 +26,7 @@ const LaCoupe = () => {
   return (
     <div className='ml-[19%] pt-[6rem]'>
       <div className='flex items-center justify-between'>
-        <h2 className='text-xl font-semibold'>La coupe</h2>
+        <h2 className='text-xl font-semibold'>Repassage</h2>
         <div className='ml-7 mb-4 pr-6'>
           <select
             className="block w-full mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
@@ -49,4 +49,4 @@ const LaCoupe = () => {
   );
 }
 
-export default LaCoupe;
+export default RepassageProduction;

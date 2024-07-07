@@ -20,33 +20,38 @@ import Repassage from './pages/Repassage';
 import ControlFinal from './pages/ControlFinal';
 import Production from './pages/Production';
 import Export from './pages/Export';
-import Result from './pages/Result';
+import Magasin from './pages/Magasin';
+import Profile from './pages/Profile';
+import UpdatePassword from './pages/UpdatePassword';
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/adduser" element={<AddUser />} />
         <Route path="/products" element={<Products />} />
         <Route path="/addproducts" element={<AddProducts />} />
         <Route path="/products/:id" element={<AddProducts />} />
+        <Route path="/profile/:id" element={<Profile />} />
+        <Route path="/update-password" element={<UpdatePassword />} />
+        <Route path="/chains" element={<Chains />} />
+        <Route path="/users/:id" element={<AddUser />} />
+
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/planning" element={<ProductPlan />} />
         <Route path='/direct' element={<StandardEffectiveDirect />} />
         <Route path='/indirect' element={<StandardEffectiveInDirect />} />
         <Route path='/posts' element={<Posts />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/adduser" element={<AddUser />} />
-        <Route path="/edituser/:id" element={<AddUser />} />
-        <Route path="/chains" element={<Chains />} />
         <Route path='/real-direct' element={<RealEffectiveDirect />} />
         <Route path='/real-indirect' element={<RealEffectiveInDirect />} />
         <Route path='/coupe' element={<Coupe />} />
         <Route path='/repassage' element={<Repassage />} />
         <Route path='/production' element={<Production />} />
         <Route path='/export' element={<Export />} />
-        <Route path='/result' element={<Result />} />
         <Route path='/control-final' element={<ControlFinal />} />
+        <Route path='/magasin' element={<Magasin />} />
         <Route path="/addconstantSystem" element={<ConstantSystem />} />
       </Routes>
     </BrowserRouter>

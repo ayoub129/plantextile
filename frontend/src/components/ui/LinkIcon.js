@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-const LinkIcon = ({link  , text}) => {
+const LinkIcon = ({link , text}) => {
   return (
     <Link to={link} className='py-5 px-4 flex items-center justify-between hover:bg-gray-100'>
         <div className='flex items-center'>

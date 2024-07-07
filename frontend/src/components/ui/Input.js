@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Input = ({ container, label, id, name, handleChange, order, text = '', placeholder = '', type = 'text', bigInput = false }) => {
+const Input = ({ container, label, id, name, handleChange, order, text = '', placeholder = '', type = 'text', bigInput = false , disabled = false }) => {
   return (
     <div className={`block ${container}`}>
       <label className={`block font-semibold ${order}`} htmlFor={id}>{label}</label>
@@ -19,6 +19,7 @@ const Input = ({ container, label, id, name, handleChange, order, text = '', pla
           className={`block ${type === "checkbox" ? "" : "w-full mt-4"} outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded`}
           type={type}
           id={id}
+          disabled={disabled}
           name={name}
           placeholder={placeholder}
           value={text}

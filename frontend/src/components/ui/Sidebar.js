@@ -1,9 +1,12 @@
-import React from 'react'
+// import the Link Icon
 import LinkIcon from './LinkIcon'
 
 const Sidebar = ({ sidebar }) => {
-  const role = localStorage.getItem('role'); // Assuming the role is stored in localStorage
+   // get the role from localStorage
+  const role = localStorage.getItem('role');
+  const userId = localStorage.getItem('userId');
 
+  // check base on the role what navigation bar you have 
   const links = {
     'developer': [
       { link: '/dashboard', text: 'Dashboard' },
@@ -18,12 +21,12 @@ const Sidebar = ({ sidebar }) => {
       { link: '/real-direct', text: 'Real Direct Effective' },
       { link: '/real-indirect', text: 'Real InDirect Effective' },
       { link: '/coupe', text: 'La Coupe' },
-      { link: '/repassage', text: 'Repassage' },
       { link: '/production', text: 'Production' },
-      { link: '/export', text: 'Export' },
-      { link: '/result', text: 'Result' },
-      { link: '/export', text: 'Export' },
+      { link: '/repassage', text: 'Repassage' },
       { link: '/control-final', text: 'Control Final' },
+      { link: '/magasin', text: 'Magasin' },
+      { link: `/profile/${userId}`, text: 'Profile' },
+      { link: '/export', text: 'Export' },
     ],
     'super-admin': [
       { link: '/dashboard', text: 'Dashboard' },
@@ -38,12 +41,12 @@ const Sidebar = ({ sidebar }) => {
       { link: '/real-direct', text: 'Real Direct Effective' },
       { link: '/real-indirect', text: 'Real InDirect Effective' },
       { link: '/coupe', text: 'La Coupe' },
-      { link: '/repassage', text: 'Repassage' },
       { link: '/production', text: 'Production' },
-      { link: '/export', text: 'Export' },
-      { link: '/result', text: 'Result' },
-      { link: '/export', text: 'Export' },
+      { link: '/repassage', text: 'Repassage' },
       { link: '/control-final', text: 'Control Final' },
+      { link: '/magasin', text: 'Magasin' },
+      { link: `/profile/${userId}`, text: 'Profile' },
+      { link: '/export', text: 'Export' },
     ],
     'admin': [
       { link: '/dashboard', text: 'Dashboard' },
@@ -58,56 +61,57 @@ const Sidebar = ({ sidebar }) => {
       { link: '/real-direct', text: 'Real Direct Effective' },
       { link: '/real-indirect', text: 'Real InDirect Effective' },
       { link: '/coupe', text: 'La Coupe' },
-      { link: '/repassage', text: 'Repassage' },
       { link: '/production', text: 'Production' },
-      { link: '/export', text: 'Export' },
-      { link: '/result', text: 'Result' },
-      { link: '/export', text: 'Export' },
+      { link: '/repassage', text: 'Repassage' },
       { link: '/control-final', text: 'Control Final' },
+      { link: '/magasin', text: 'Magasin' },
+      { link: `/profile/${userId}`, text: 'Profile' },
+      { link: '/export', text: 'Export' },
     ],
     'Logistique': [
       { link: '/products', text: 'Products' },
-      { link: '/result', text: 'Result' },
-      { link: '/export', text: 'Export' },
+      { link: '/addproducts', text: 'Add Product' },
+      { link: `/profile/${userId}`, text: 'Profile' },
     ],
     'Method': [
       { link: '/planning', text: 'Planification' },
       { link: '/direct', text: 'Direct Effective Standard' },
       { link: '/indirect', text: 'InDirect Effective Standard' },
       { link: '/posts', text: 'Add posts' },
-      { link: '/result', text: 'Result' },
-      { link: '/export', text: 'Export' },
+      { link: `/profile/${userId}`, text: 'Profile' },
     ],
-    'RH': [
+    'HR': [
       { link: '/users', text: 'Users' },
       { link: '/chains', text: 'Chains' },
       { link: '/real-direct', text: 'Real Direct Effective' },
       { link: '/real-indirect', text: 'Real InDirect Effective' },
-      { link: '/result', text: 'Result' },
-      { link: '/export', text: 'Export' },
+      { link: `/profile/${userId}`, text: 'Profile' },
     ],
-    'Production-coupe': [
+    'production_coupe': [
       { link: '/coupe', text: 'La Coupe' },
-      { link: '/result', text: 'Result' },
-      { link: '/export', text: 'Export' },
+      { link: `/profile/${userId}`, text: 'Profile' },
     ],
-    'Production-repassage' : [
+    'production_repassage' : [
       { link: '/repassage', text: 'Repassage' },
-      { link: '/result', text: 'Result' },
-      { link: '/export', text: 'Export' },
+      { link: `/profile/${userId}`, text: 'Profile' },
     ],
-    'Production' : [
+    'production_chain' : [
       { link: '/production', text: 'Production' },
-      { link: '/result', text: 'Result' },
+      { link: `/profile/${userId}`, text: 'Profile' },
+    ],
+    'production_control' : [
+      { link: '/control-final', text: 'Control Final' },
+      { link: `/profile/${userId}`, text: 'Profile' },
       { link: '/export', text: 'Export' },
     ],
-    'Production-control-final' : [
-      { link: '/control-final', text: 'Control Final' },
-      { link: '/result', text: 'Result' },
+    'production_magasin' : [
+      { link: '/magasin', text: 'Magasin' },
+      { link: `/profile/${userId}`, text: 'Profile' },
       { link: '/export', text: 'Export' },
     ]
   };
 
+  // render the links base on the logged in user
   const renderLinks = () => {
     const roleLinks = links[role] || [];
     return roleLinks.map((link, index) => (
@@ -116,7 +120,7 @@ const Sidebar = ({ sidebar }) => {
   };
 
   return (
-    <div className={`w-1/2 md:w-1/6 mt-20 bg-white fixed ${sidebar ? 'left-0 shadow-lg shadow-gray-500' : 'left-[-200%]'} md:left-0 pb-[5rem] md:h-full overflow-y-auto`}>
+    <div className={`w-1/2 md:w-1/6 mt-20 bg-white fixed ${sidebar ? 'left-0 shadow-lg shadow-gray-500' : 'left-[-200%]'} md:left-0 pb-[5rem] min-h-full overflow-y-auto`}>
       {renderLinks()}
     </div>
   );

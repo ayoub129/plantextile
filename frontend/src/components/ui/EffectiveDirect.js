@@ -1,10 +1,13 @@
+// import React components API and Toast components
 import React, { useState, useEffect } from 'react';
 import api from '../../api/axios';
 import { ToastContainer, toast } from 'react-toastify';
+// import the custom components
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 
 const EffectiveDirect = () => {
+  // import data
   const [data, setData] = useState({
     chain: '',
     modele: '',
@@ -23,7 +26,7 @@ const EffectiveDirect = () => {
     finition: '',
     transp_fin: ''
   });
-  const [chains, setChains] = useState(['Chain1', 'Chain2', 'Chain3']);
+  const [chains, setChains] = useState([]);
   const [models, setModels] = useState([]);
 
   useEffect(() => {
@@ -32,12 +35,23 @@ const EffectiveDirect = () => {
         const response = await api.get('/models');
         setModels(response.data);
       } catch (error) {
-        console.error('Error fetching models:', error);
+        // show error message
         toast.error('Error fetching models.');
       }
     };
 
+    const fetchChains = async () => {
+      try {
+        const response = await api.get('/chains');
+        setChains(response.data);
+      } catch (error) {
+        // show error message
+        toast.error('Error fetching chains.');
+      }
+    };
+
     fetchModels();
+    fetchChains();
   }, []);
 
   const onChange = (name, value) => {
@@ -50,13 +64,8 @@ const EffectiveDirect = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const formattedData = {
-      ...data,
-      // Additional formatting if needed
-    };
-
     try {
-      await api.post('/effective_direct', formattedData);
+      await api.post('/effective_direct', data);
       toast.success('Data saved successfully.');
       setData({
         chain: '',
@@ -95,8 +104,8 @@ const EffectiveDirect = () => {
           >
             <option value="">Select Chain</option>
             {chains.map((chain, index) => (
-              <option key={index} value={chain}>
-                {chain}
+              <option key={index} value={chain.name}>
+                {chain.name}
               </option>
             ))}
           </select>

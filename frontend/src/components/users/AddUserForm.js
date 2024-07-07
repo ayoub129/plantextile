@@ -1,34 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api/axios';
-import Input from '../ui/Input';
-import Button from '../ui/Button';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate, useParams } from 'react-router-dom';
+import Input from '../ui/Input';
+import Button from '../ui/Button';
 
 const AddUserForm = () => {
-  const { id } = useParams(); // Get the user ID from the URL
-  const currentUserRole = localStorage.getItem('role');
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    const userRoles = ["HR", "superadmin", "admin", "developer"];
-    if (userRoles.indexOf(currentUserRole) === -1) {
-      navigate('/dashboard');
-    }
-
-    // Fetch the user data if the ID is present in the URL
-    if (id) {
-      api.get(`/users/${id}`)
-        .then(response => {
-          setUser(response.data);
-        })
-        .catch(error => {
-          toast.error('Failed to fetch user data');
-        });
-    }
-  }, [currentUserRole, navigate, id]);
-
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({
     name: '',
@@ -38,44 +16,94 @@ const AddUserForm = () => {
     role: '',
   });
 
-  console.log(user)
+  const { id } = useParams();
+  const currentUserRole = localStorage.getItem('role');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkRoleAndFetchUser = async () => {
+      const userRoles = ["HR", "superadmin", "admin", "developer"];
+      if (userRoles.indexOf(currentUserRole) === -1) {
+        navigate('/dashboard');
+        return;
+      }
+
+      if (id) {
+        try {
+          const response = await api.get(`/users/${id}`);
+          setUser(response.data);
+        } catch (error) {
+          toast.error(`Failed to fetch user data: ${error}`);
+        }
+      }
+    };
+
+    checkRoleAndFetchUser();
+  }, [currentUserRole, navigate, id]);
 
   const roles = currentUserRole === 'HR'
-    ? ['HR', 'Logistique', 'Method', 'Production coupe', 'Production repassage', 'Production Control final', 'Production magasin']
-    : ['HR', 'admin', 'Logistique', 'Method', 'Production coupe', 'Production repassage', 'Production Control final', 'Production magasin'];
+    ? ['HR', 'Logistique', 'Method', 'production_chain', 'production_coupe', 'production_repassage', 'production_control', 'production_magasin']
+    : ['HR', 'admin', 'Logistique', 'Method', 'production_chain', 'production_coupe', 'production_repassage', 'production_control', 'production_magasin'];
 
   const onChange = (name, value) => {
     setUser({ ...user, [name]: value });
   };
 
-  const onSubmit = (e) => {
-    setLoading(true);
+  const validateForm = () => {
+    const { name, email, password, password_confirmation } = user;
+
+    if (!name) {
+      toast.error('Name is required');
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error('Invalid email address');
+      return false;
+    }
+
+    if (password.length < 5) {
+      toast.error('Password must be at least 5 characters long');
+      return false;
+    }
+
+    if (password !== password_confirmation) {
+      toast.error('Passwords do not match');
+      return false;
+    }
+
+    return true;
+  };
+
+  const onSubmit = async (e) => {
     e.preventDefault();
 
+    if (!validateForm()) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+
     if (id) {
-      // Update user
-      api.put(`/users/${id}`, user)
-        .then(response => {
-          setLoading(false);
-          navigate('/users');
-          toast.success('User updated successfully!');
-        })
-        .catch(error => {
-          setLoading(false);
-          toast.error('There was an error updating the user!' + error);
-        });
+      try {
+        await api.post(`/users/${id}`, user);
+        setLoading(false);
+        navigate('/users');
+      } catch (error) {
+        setLoading(false);
+        toast.error('There was an error updating the user!' + error);
+      }
     } else {
-      // Create user
-      api.post('/users', user)
-        .then(response => {
-          setLoading(false);
-          navigate('/users');
-          toast.success('User created successfully!');
-        })
-        .catch(error => {
-          setLoading(false);
-          toast.error('There was an error creating the user!' + error);
-        });
+      try {
+        await api.post('/users', user);
+        setLoading(false);
+        navigate('/users');
+      } catch (error) {
+        setLoading(false);
+        toast.error('There was an error creating the user!' + error);
+      }
     }
   };
 

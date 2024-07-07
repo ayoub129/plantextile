@@ -1,13 +1,13 @@
-// import React components and Routers
-import React, { useState , useEffect } from 'react'
+// import React component and Router
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 // import custom components
 import Header from '../components/ui/Header'
 import Sidebar from '../components/ui/Sidebar'
-import ChainsTable from '../components/ui/ChainsTable'
+import UpdatePass from '../components/users/UpdatePass'
 
-const Chains = () => {
-  // handle state change for the sidebar and redirect if not autorized
+const UpdatePassword = () => {
+  // handle sidebar state change and navigation
   const [sidebar, setSidebar] = useState(false);
   const navigate = useNavigate()
 
@@ -20,7 +20,7 @@ const Chains = () => {
       navigate('/');
     } else {
       // Check for the role
-      const allowedRoles = ['admin', 'superadmin', 'developer' , 'HR'];
+      const allowedRoles = ['admin', 'superadmin', 'developer' , 'Logistique'];
       if (!allowedRoles.includes(role)) {
         navigate('/dashboard');
       }
@@ -29,14 +29,14 @@ const Chains = () => {
 
   return (
     <div>
-      {/* header */}
+      {/* Header */}
       <Header sidebar={sidebar} setSidebar={setSidebar} />
-      {/* sidebar */}
+      {/* Sidebar */}
       <Sidebar sidebar={sidebar} />
-      {/* chains table */}
-      <ChainsTable />
+      {/* update password */}
+      <UpdatePass />
     </div>
   )
 }
 
-export default Chains
+export default UpdatePassword
