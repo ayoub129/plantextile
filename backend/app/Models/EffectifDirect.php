@@ -10,7 +10,7 @@ class EffectifDirect extends Model
     use HasFactory;
 
     protected $fillable = [
-        'modele' , 'chain' , 'machinistes', 'machinistes_stagiaires', 'repassage_preparation', 
+        'machinistes', 'machinistes_stagiaires', 'repassage_preparation', 
         'trassage', 'transport', 'chef', 'machines_speciales', 'trassage_special', 'controle_table', 
         'controle_final', 'machinistes_retouche', 'repassage_final', 'finition', 'transp_fin'
     ];
@@ -19,4 +19,10 @@ class EffectifDirect extends Model
     {
         return $this->belongsTo(EffectiveStandard::class);
     }
+
+    public function effectiveReal() 
+    {
+        return $this->belongsTo(EffectiveReal::class);
+    }
+
 }

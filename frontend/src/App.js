@@ -38,10 +38,10 @@ const App = () => {
         <Route path="/update-password" element={<UpdatePassword />} />
         <Route path="/chains" element={<Chains />} />
         <Route path="/users/:id" element={<AddUser />} />
+        <Route path='/direct' element={<StandardEffectiveDirect />} />
 
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/planning" element={<ProductPlan />} />
-        <Route path='/direct' element={<StandardEffectiveDirect />} />
         <Route path='/indirect' element={<StandardEffectiveInDirect />} />
         <Route path='/posts' element={<Posts />} />
         <Route path='/real-direct' element={<RealEffectiveDirect />} />

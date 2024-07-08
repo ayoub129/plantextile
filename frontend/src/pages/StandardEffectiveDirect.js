@@ -13,10 +13,20 @@ const StandardEffectiveDirect = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+
+    // redirect to home if not logged in
     if (!token) {
-      navigate('/dashboard'); 
+      navigate('/');
+    } else {
+      // Check for the role
+      const allowedRoles = ['admin', 'superadmin', 'developer' , 'Method'];
+      if (!allowedRoles.includes(role)) {
+        navigate('/dashboard');
+      }
     }
-  }, []);
+  }, [navigate]);
+
 
   return (
     <div>

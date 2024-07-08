@@ -10,14 +10,14 @@ class CoupeController extends Controller
 {
     public function index()
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'method']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
 
         return Coupe::all();
     }
 
     public function store(Request $request)
     {
-        $this->authorize(['developer', 'method']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
 
         $request->validate([
             'effectif_indirect_id' => 'required|exists:effectif_indirects,id',
@@ -35,14 +35,14 @@ class CoupeController extends Controller
 
     public function show($id)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'method']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
 
         return Coupe::findOrFail($id);
     }
 
     public function update(Request $request, $id)
     {
-        $this->authorize(['developer',  'method']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
 
         $coupe = Coupe::findOrFail($id);
 
@@ -60,7 +60,7 @@ class CoupeController extends Controller
 
     public function destroy($id)
     {
-        $this->authorize(['developer', 'super-admin', 'admin']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
 
         $coupe = Coupe::findOrFail($id);
         $coupe->delete();
@@ -70,7 +70,7 @@ class CoupeController extends Controller
 
     private function authorize(array $roles)
     {
-        if (!in_array(Auth::user()->authorization_level, $roles)) {
+        if (!in_array(Auth::user()->role, $roles)) {
             abort(403, 'Unauthorized action.');
         }
     }

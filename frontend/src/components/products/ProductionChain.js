@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import FullCalendar from './FullCalendar';
 import api from '../../api/axios';
 
 const ProductionChain = () => {
@@ -7,6 +6,9 @@ const ProductionChain = () => {
   const [chains, setChains] = useState([]);
   const [selectedModel, setSelectedModel] = useState('');
   const [selectedChain, setSelectedChain] = useState('');
+  const [selectedModelDetails, setSelectedModelDetails] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
+  const [isAddDisabled, setIsAddDisabled] = useState(false);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -32,11 +34,26 @@ const ProductionChain = () => {
   }, []);
 
   const handleModelChange = (e) => {
-    setSelectedModel(e.target.value);
+    const selectedModelId = e.target.value;
+    setSelectedModel(selectedModelId);
+    const modelDetails = models.find((model) => model.id === selectedModelId);
+    setSelectedModelDetails(modelDetails);
   };
 
   const handleChainChange = (e) => {
     setSelectedChain(e.target.value);
+  };
+
+  const handleAddToCart = () => {
+    if (selectedModelDetails && selectedChain) {
+      const item = {
+        ...selectedModelDetails,
+        chain: chains.find((chain) => chain.id === selectedChain).name,
+      };
+      setCartItems([...cartItems, item]);
+      setIsAddDisabled(true);
+      setTimeout(() => setIsAddDisabled(false), 3000); // Disable button for 3 seconds
+    }
   };
 
   return (
@@ -70,8 +87,34 @@ const ProductionChain = () => {
           </select>
         </div>
       </div>
-      {selectedModel && selectedChain && (
-        <FullCalendar url={'/productions'} selectedModel={selectedModel} selectedChain={selectedChain} />
+      {selectedModelDetails && (
+        <div className='mt-4 p-4 border rounded shadow'>
+          <h3 className='text-lg font-semibold'>{selectedModelDetails.modele}</h3>
+          <p>Category: {selectedModelDetails.category}</p>
+          <img src={selectedModelDetails.image} alt={selectedModelDetails.modele} className='mt-2' />
+          <button
+            className='mt-4 p-2 bg-blue-500 text-white rounded disabled:opacity-50'
+            onClick={handleAddToCart}
+            disabled={isAddDisabled}
+          >
+            Add to Cart
+          </button>
+        </div>
+      )}
+      {cartItems.length > 0 && (
+        <div className='mt-4'>
+          <h3 className='text-lg font-semibold'>Cart</h3>
+          <ul>
+            {cartItems.map((item, index) => (
+              <li key={index} className='mt-2 p-2 border rounded shadow'>
+                <p><strong>Model:</strong> {item.modele}</p>
+                <p><strong>Category:</strong> {item.category}</p>
+                <p><strong>Chain:</strong> {item.chain}</p>
+                <img src={item.image} alt={item.modele} className='mt-2' />
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );

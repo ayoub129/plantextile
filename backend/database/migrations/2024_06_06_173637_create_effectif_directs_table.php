@@ -13,8 +13,6 @@ return new class extends Migration
     {
         Schema::create('effectif_directs', function (Blueprint $table) {
             $table->id();
-            $table->string('modele')->nullable();
-            $table->string('chain')->nullable();
             $table->integer('machinistes')->nullable();
             $table->integer('machinistes_stagiaires')->nullable();
             $table->integer('repassage_preparation')->nullable();

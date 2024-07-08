@@ -5,29 +5,22 @@
     use App\Models\Coupe;
     use App\Models\EffectifDirect;
     use App\Models\EffectifIndirect;
-    use App\Models\EffectiveStandard;
+    use App\Models\EffectiveReal;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Auth;
     
     class EffectiveRealController extends Controller
     {
-        public function index()
-        {
-            $this->authorize(['developer', 'super-admin', 'admin', 'RH']);
-    
-            return EffectiveStandard::with(['effectifDirects', 'effectifIndirects'])->get();
-        }
-    
         public function store(Request $request)
         {
-            $this->authorize(['developer', 'RH']);
+            $this->authorize(['developer', 'super-admin', 'admin', 'HR']);
     
             $request->validate([
                 'chain' => 'required|string|max:255',
                 'model' => 'required|string|max:255',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date',
-                'cointa' => 'required|boolean',
+                'cointa' => 'required',
                 'price_by_part' => 'nullable|numeric',
                 'effectif_directs' => 'nullable|array',
                 'effectif_directs.*.machinistes' => 'nullable|integer',
@@ -57,23 +50,23 @@
                 'effectif_indirects.*.preparation_elastique' => 'nullable|integer',
             ]);
     
-            $effectiveStandard = new EffectiveStandard($request->all());
+            $effectivereal = new EffectiveReal($request->all());
     
             if (!$request->cointa) {
-                $effectiveStandard->price_by_part = null;
+                $effectivereal->price_by_part = null;
             }
     
-            $effectiveStandard->save();
+            $effectivereal->save();
     
             if ($request->has('effectif_directs')) {
                 foreach ($request->effectif_directs as $effectifDirect) {
-                    $effectiveStandard->effectifDirects()->create($effectifDirect);
+                    $effectivereal->effectifDirects()->create($effectifDirect);
                 }
             }
     
             if ($request->has('effectif_indirects')) {
                 foreach ($request->effectif_indirects as $effectifIndirectData) {
-                    $effectifIndirect = $effectiveStandard->effectifIndirects()->create($effectifIndirectData);
+                    $effectifIndirect = $effectivereal->effectifIndirects()->create($effectifIndirectData);
                     if (isset($effectifIndirectData['coupes'])) {
                         foreach ($effectifIndirectData['coupes'] as $coupeData) {
                             $effectifIndirect->coupes()->create($coupeData);
@@ -82,28 +75,36 @@
                 }
             }
         
-            return response()->json($effectiveStandard, 201);
+            return response()->json($effectivereal, 201);
         }
     
-        public function show($id)
+        public function getEffectiveByModel($modelId)
         {
-            $this->authorize(['developer', 'super-admin', 'admin', 'RH']);
-    
-            return EffectiveStandard::with(['effectifDirects', 'effectifIndirects'])->findOrFail($id);
+            $this->authorize(['developer', 'super-admin', 'admin', 'HR']);
+        
+            $effectivereal = EffectiveReal::with(['effectifDirects', 'effectifIndirects'])
+                ->where('model', $modelId)
+                ->first();
+        
+            if (!$effectivereal) {
+                return response()->json(['message' => 'No Effective found for this model'], 404);
+            }
+        
+            return response()->json($effectivereal);
         }
-    
+        
         public function update(Request $request, $id)
         {
-            $this->authorize(['developer',  'RH']);
+            $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
     
-            $effectiveStandard = EffectiveStandard::findOrFail($id);
+            $effectivereal = EffectiveReal::findOrFail($id);
     
             $request->validate([
-                'chain' => 'sometimes|required|string|max:255',
-                'model' => 'sometimes|required|string|max:255',
-                'start_date' => 'sometimes|required|date',
-                'end_date' => 'sometimes|required|date',
-                'cointa' => 'sometimes|required|boolean',
+                'chain' => 'sometimes|string|max:255',
+                'model' => 'required|string|max:255',
+                'start_date' => 'sometimes|date',
+                'end_date' => 'sometimes|date',
+                'cointa' => 'sometimes',
                 'price_by_part' => 'nullable|numeric',
                 'effectif_directs' => 'nullable|array',
                 'effectif_directs.*.machinistes' => 'nullable|integer',
@@ -139,10 +140,10 @@
             ]);
     
             if ($request->has('cointa') && !$request->cointa) {
-                $effectiveStandard->price_by_part = null;
+                $effectivereal->price_by_part = null;
             }
     
-            $effectiveStandard->update($request->all());
+            $effectivereal->update($request->all());
     
             if ($request->has('effectif_directs')) {
                 foreach ($request->effectif_directs as $effectifDirectData) {
@@ -150,7 +151,7 @@
                         $effectifDirect = EffectifDirect::find($effectifDirectData['id']);
                         $effectifDirect->update($effectifDirectData);
                     } else {
-                        $effectiveStandard->effectifDirects()->create($effectifDirectData);
+                        $effectivereal->effectifDirects()->create($effectifDirectData);
                     }
                 }
             }
@@ -172,7 +173,7 @@
                             }
                         }
                     } else {
-                        $newEffectifIndirect = $effectiveStandard->effectifIndirects()->create($effectifIndirectData);
+                        $newEffectifIndirect = $effectivereal->effectifIndirects()->create($effectifIndirectData);
                         
                         if (isset($effectifIndirectData['coupes'])) {
                             foreach ($effectifIndirectData['coupes'] as $coupeData) {
@@ -182,23 +183,24 @@
                     }
                 }
             }
-                return response()->json($effectiveStandard, 200);
-            }
+                return response()->json($effectivereal, 200);
+        }
         
-            public function destroy($id)
-            {
-                $this->authorize(['developer', 'super-admin']);
+        public function destroy($id)
+        {
+            $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
         
-                $effectiveStandard = EffectiveStandard::findOrFail($id);
-                $effectiveStandard->delete();
+            $effectivereal = EffectiveReal::findOrFail($id);
+            $effectivereal->delete();
         
-                return response()->json(null, 204);
-            }
-        
-            private function authorize(array $roles)
-            {
-                if (!in_array(Auth::user()->authorization_level, $roles)) {
-                    abort(403, 'Unauthorized action.');
-                }
+            return response()->json(null, 204);
+        }
+    
+        private function authorize(array $roles)
+        {
+            if (!in_array(Auth::user()->role, $roles)) {
+                abort(403, "Unauthorized action. hh");
             }
         }
+    
+}

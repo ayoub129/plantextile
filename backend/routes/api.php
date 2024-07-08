@@ -3,6 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChainsController;
 use App\Http\Controllers\CoupeProductionController;
+use App\Http\Controllers\EffectiveRealController;
+use App\Http\Controllers\EffectiveStandardController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductPlanController;
@@ -77,15 +79,35 @@ Route::middleware('auth:sanctum')->group(function () {
     // get the product plans by hour base on product plan id and hour and day
     Route::post('product_plans_hours/search', [ProductPlanController::class, 'search']);
     // update the product plans by hour base on id
-    Route::post('product_plans_hours/${id}', [ProductPlanController::class, 'updateHours']);
+    Route::post('product_plans_hours/{id}', [ProductPlanController::class, 'updateHours']);
     // delete the product plans by hour base on id
-    Route::delete('product_plans_hours/${id}', [ProductPlanController::class, 'deleteHours']);
+    Route::delete('product_plans_hours/{id}', [ProductPlanController::class, 'deleteHours']);
     // create a new product plan hours
     Route::post('product_plans_hours', [ProductPlanController::class, 'setHours']);
 
+    /**
+     * Effective Standard  
+     */
+    // create an effective standard 
+    Route::post('effective_standard', [EffectiveStandardController::class, 'store']);
+    // update effective standard 
+    Route::post('effective_standard/{id}', [EffectiveStandardController::class, 'update']);
+    // delete effective standard 
+    Route::delete('effective_standard/{id}', [EffectiveStandardController::class, 'destroy']);
+    // get the effective standard by model
+    Route::get('effective_standard/{modelId}', [EffectiveStandardController::class, 'getEffectiveByModel']);
 
-
-
+    /**
+     * Effective Real
+     */
+    // create an effective standard 
+    Route::post('effective_real', [EffectiveRealController::class, 'store']);
+    // update effective standard 
+    Route::post('effective_real/{id}', [EffectiveRealController::class, 'update']);
+    // delete effective standard 
+    Route::delete('effective_real/{id}', [EffectiveRealController::class, 'destroy']);
+    // get the effective standard by model
+    Route::get('effective_real/{modelId}', [EffectiveRealController::class, 'getEffectiveByModel']);
 
 
 

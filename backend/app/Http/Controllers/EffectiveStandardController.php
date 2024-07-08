@@ -11,23 +11,16 @@ use Illuminate\Support\Facades\Auth;
 
 class EffectiveStandardController extends Controller
 {
-    public function index()
-    {
-        $this->authorize(['developer', 'super-admin', 'admin', 'method']);
-
-        return EffectiveStandard::with(['effectifDirects', 'effectifIndirects'])->get();
-    }
-
     public function store(Request $request)
     {
-        $this->authorize(['developer', 'method']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method']);
 
         $request->validate([
             'chain' => 'required|string|max:255',
             'model' => 'required|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'cointa' => 'required|boolean',
+            'cointa' => 'required',
             'price_by_part' => 'nullable|numeric',
             'effectif_directs' => 'nullable|array',
             'effectif_directs.*.machinistes' => 'nullable|integer',
@@ -85,25 +78,33 @@ class EffectiveStandardController extends Controller
         return response()->json($effectiveStandard, 201);
     }
 
-    public function show($id)
+    public function getEffectiveByModel($modelId)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'method']);
-
-        return EffectiveStandard::with(['effectifDirects', 'effectifIndirects'])->findOrFail($id);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method']);
+    
+        $effectifStandard = EffectiveStandard::with(['effectifDirects', 'effectifIndirects'])
+            ->where('model', $modelId)
+            ->first();
+    
+        if (!$effectifStandard) {
+            return response()->json(['message' => 'No Effective found for this model'], 404);
+        }
+    
+        return response()->json($effectifStandard);
     }
-
+    
     public function update(Request $request, $id)
     {
-        $this->authorize(['developer',  'method']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method']);
 
         $effectiveStandard = EffectiveStandard::findOrFail($id);
 
         $request->validate([
-            'chain' => 'sometimes|required|string|max:255',
-            'model' => 'sometimes|required|string|max:255',
-            'start_date' => 'sometimes|required|date',
-            'end_date' => 'sometimes|required|date',
-            'cointa' => 'sometimes|required|boolean',
+            'chain' => 'sometimes|string|max:255',
+            'model' => 'required|string|max:255',
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date',
+            'cointa' => 'sometimes',
             'price_by_part' => 'nullable|numeric',
             'effectif_directs' => 'nullable|array',
             'effectif_directs.*.machinistes' => 'nullable|integer',
@@ -183,22 +184,22 @@ class EffectiveStandardController extends Controller
             }
         }
             return response()->json($effectiveStandard, 200);
-        }
+    }
     
-        public function destroy($id)
-        {
-            $this->authorize(['developer', 'super-admin']);
+    public function destroy($id)
+    {
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method']);
     
-            $effectiveStandard = EffectiveStandard::findOrFail($id);
-            $effectiveStandard->delete();
+        $effectiveStandard = EffectiveStandard::findOrFail($id);
+        $effectiveStandard->delete();
     
-            return response()->json(null, 204);
-        }
-    
-        private function authorize(array $roles)
-        {
-            if (!in_array(Auth::user()->authorization_level, $roles)) {
-                abort(403, 'Unauthorized action.');
-            }
+        return response()->json(null, 204);
+    }
+
+    private function authorize(array $roles)
+    {
+        if (!in_array(Auth::user()->role, $roles)) {
+            abort(403, 'Unauthorized action.');
         }
     }
+}

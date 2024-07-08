@@ -19,6 +19,11 @@ class EffectifIndirect extends Model
         return $this->belongsTo(EffectiveStandard::class);
     }
 
+    public function effectiveReal() 
+    {
+        return $this->belongsTo(EffectiveReal::class);
+    }
+
     public function coupes()
     {
         return $this->hasMany(Coupe::class);

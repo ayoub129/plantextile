@@ -13,7 +13,7 @@ class EffectifDirectController extends Controller
      */
     public function index()
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'method']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
 
         return EffectifDirect::all();
     }
@@ -23,11 +23,9 @@ class EffectifDirectController extends Controller
      */
     public function store(Request $request)
     {
-        $this->authorize(['developer', 'method']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
 
         $request->validate([
-            'chain' => 'nullable|string',
-            'modele' => 'nullable|string',
             'machinistes' => 'nullable|integer',
             'machinistes_stagiaires' => 'nullable|integer',
             'repassage_preparation' => 'nullable|integer',
@@ -55,7 +53,7 @@ class EffectifDirectController extends Controller
      */
     public function show($id)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'method']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
 
         return EffectifDirect::findOrFail($id);
     }
@@ -66,13 +64,11 @@ class EffectifDirectController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->authorize(['developer',  'method']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
 
         $effectifDirect = EffectifDirect::findOrFail($id);
 
         $request->validate([
-            'chain' => 'nullable|string',
-            'modele' => 'nullable|string',
             'machinistes' => 'nullable|integer',
             'machinistes_stagiaires' => 'nullable|integer',
             'repassage_preparation' => 'nullable|integer',
@@ -99,7 +95,7 @@ class EffectifDirectController extends Controller
      */
     public function destroy($id)
     {
-        $this->authorize(['developer', 'super-admin', 'admin']);
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
 
         $effectifDirect = EffectifDirect::findOrFail($id);
         $effectifDirect->delete();
@@ -109,7 +105,7 @@ class EffectifDirectController extends Controller
 
     private function authorize(array $roles)
     {
-        if (!in_array(Auth::user()->authorization_level, $roles)) {
+        if (!in_array(Auth::user()->role, $roles)) {
             abort(403, 'Unauthorized action.');
         }
     }
