@@ -1,12 +1,31 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from './Card'
+import api from '../../api/axios';
 
-const CardsData = () => {
+const CardsData = ({models}) => {
   const [selectedOption, setSelectedOption] = useState('Dashboard');
+  const [model , setModel] = useState(null)
+  const [productPlan , setProductPlan] = useState([])
 
   const handleSelectChange = (event) => {
     setSelectedOption(event.target.value);
+    const selectedModelData = models.find(model => model.id === parseInt(event.target.value));
+    
+    setModel(selectedModelData)
   };
+
+  const under = model && model.qte_societe * parseInt(model.prixMOver)
+
+  useEffect(() => {
+    const fetchPlan = async () => {
+      const product = await api.get(`product_plans_model/${model && model != null && model.id}`);
+      setProductPlan(product)
+    }
+
+    fetchPlan()
+
+    console.log(productPlan)
+  },[model]);
 
   return (
     <div className='bg-slate-200 ml-0 md:ml-[16.67%]'>
@@ -14,24 +33,22 @@ const CardsData = () => {
         <div className='flex justify-between'>
           <div>
             <label className='block font-semibold	mb-2'>Select a Model :</label>
-            <select 
-              value={selectedOption}
-              onChange={handleSelectChange}
-              className='text-[#4E4A4A] font-bold bg-white border border-gray-300 rounded-md p-2 scroll'
-              >
-              <option value="31-45ad">31-45ad</option>
-              <option value="32-45ad">32-45ad</option>
-              <option value="33-45ad">33-45ad</option>
-              <option value="34-45ad">34-45ad</option>
-              <option value="35-45ad">35-45ad</option>
-              <option value="36-45ad">36-45ad</option>
-              <option value="37-45ad">37-45ad</option>
-              <option value="38-45ad">38-45ad</option>
+            <select
+            className="block w-fit mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
+            value={selectedOption}
+            onChange={handleSelectChange}
+          >
+              <option value="">Select model</option>
+              {models && models.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.modele}
+                </option>
+              ))}
             </select>
           </div>
           <div className='mr-7'>
-            <div><strong>Cours de change: 10,90</strong></div>
-            <div><strong>Prix du modele: 3,40</strong></div>
+            <div><strong>Cours de change de {model && model.devise} : {model && model.prixFacture / under}</strong></div>
+            <div><strong>Prix du modele: {model && model.prixMOver}</strong></div>
           </div>
         </div>
       </div>

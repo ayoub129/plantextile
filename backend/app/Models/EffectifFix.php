@@ -10,13 +10,13 @@ class EffectifFix extends Model
     use HasFactory;
 
     protected $fillable = [
-        'effective_standard_id', 'coupe', 'Production', 'Repassage_final', 
+        'coupe', 'Production', 'Repassage_final', 
         'Contrôle_final', 'Magasin_final', 'Magasin_fournitures', 'Achats_Logistique', 'Transit', 'Comptabilité_Finances', 
         'RH', 'Ménage', 'Autres'
     ];
 
-    public function effectiveStandard()
+    public function systemConstant()
     {
-        return $this->belongsTo(EffectiveStandard::class);
+        return $this->belongsTo(SystemConstant::class);
     }
 }

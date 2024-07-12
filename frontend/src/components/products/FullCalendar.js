@@ -29,19 +29,23 @@ function FullCalendar({ url,  planningData }) {
 
   const fetchEvents = async () => {
     try {
-      // fetch events from the server based on the planing id
+      // fetch events from the server based on the planning id
       const response = await api.get(`${url}/${planningData.id}`);
-      console.log(response)
-      const fetchedEvents = response.data.reduce((acc, event) => {
+      
+      // Check if response.data is an array, if not, wrap it in an array
+      const eventsData = Array.isArray(response.data) ? response.data : [response.data];
+  
+      const fetchedEvents = eventsData.reduce((acc, event) => {
         acc[`${event.day}-${event.hour}`] = event.models_finished;
         return acc;
       }, {});
+      
       setEvents(fetchedEvents);
     } catch (error) {
-      toast.error('Error fetching events');
+      toast.error('Error fetching events: ' + error);
     }
   };
-
+  
   // handle double click and set the day and hour to the current selected input
   const handleDoubleClick = (day, hour) => {
     setEditingEvent({ day, hour });

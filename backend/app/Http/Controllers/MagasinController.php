@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CoupeProduction;
+use App\Models\ControlMagasin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class CoupeProductionController extends Controller
+class MagasinController extends Controller
 {
     // Fetch the CoupeProduction data for a specific model
     public function show($modelId)
     {
         $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
 
-        $coupeProduction = CoupeProduction::where('model_id', $modelId)->first();
+        $coupeProduction = ControlMagasin::where('model_id', $modelId)->first();
         if ($coupeProduction) {
             return response()->json($coupeProduction);
         } else {
@@ -30,7 +30,7 @@ class CoupeProductionController extends Controller
             'value' => 'required|integer'
         ]);
 
-        $coupeProduction = CoupeProduction::updateOrCreate(
+        $coupeProduction = ControlMagasin::updateOrCreate(
             ['model_id' => $modelId],
             ['value' => $request->value]
         );

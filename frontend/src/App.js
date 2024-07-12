@@ -11,7 +11,6 @@ import AddUser from './pages/AddUser';
 import ConstantSystem from './pages/ConstantSystem';
 import StandardEffectiveDirect from './pages/StandardEffectiveDirect';
 import StandardEffectiveInDirect from './pages/StandardEffectiveInDirect';
-import Posts from './pages/Posts';
 import Chains from './pages/Chains';
 import RealEffectiveInDirect from './pages/RealEffectiveInDirect';
 import RealEffectiveDirect from './pages/RealEffectiveDirect';
@@ -39,20 +38,18 @@ const App = () => {
         <Route path="/chains" element={<Chains />} />
         <Route path="/users/:id" element={<AddUser />} />
         <Route path='/direct' element={<StandardEffectiveDirect />} />
-
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/planning" element={<ProductPlan />} />
         <Route path='/indirect' element={<StandardEffectiveInDirect />} />
-        <Route path='/posts' element={<Posts />} />
         <Route path='/real-direct' element={<RealEffectiveDirect />} />
         <Route path='/real-indirect' element={<RealEffectiveInDirect />} />
+        <Route path="/addconstantSystem" element={<ConstantSystem />} />
         <Route path='/coupe' element={<Coupe />} />
-        <Route path='/repassage' element={<Repassage />} />
         <Route path='/production' element={<Production />} />
-        <Route path='/export' element={<Export />} />
+        <Route path='/repassage' element={<Repassage />} />
         <Route path='/control-final' element={<ControlFinal />} />
         <Route path='/magasin' element={<Magasin />} />
-        <Route path="/addconstantSystem" element={<ConstantSystem />} />
+        <Route path='/export' element={<Export />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>
   );

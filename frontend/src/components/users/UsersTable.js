@@ -10,11 +10,8 @@ import 'react-toastify/dist/ReactToastify.css';
 const UsersTable = () => {
   // users state
   const [users, setUsers] = useState([]);
-  // loading handler
   const [loading, setLoading] = useState(false);
-  // show modal and remove it
   const [showModal, setShowModal] = useState(false);
-  // choose a user to delete 
   const [userToDelete, setUserToDelete] = useState(null);
 
   // get the current user's role from local storage and redirect if not authorized
@@ -29,14 +26,11 @@ const UsersTable = () => {
 
     // fetch the users from the database
     const fetchUsers = async () => {
-      // set Loading
       setLoading(true);
       try {
-        // get all users in the app except the admins, super-admin and developer
         const response = await api.get('/users');
         setUsers(response.data);
       } catch (error) {
-        console.error('Error fetching users:', error);
         toast.error('Error fetching users.');
       } finally {
         setLoading(false);

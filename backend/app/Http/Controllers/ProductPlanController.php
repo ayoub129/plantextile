@@ -133,17 +133,18 @@ class ProductPlanController extends Controller
 
     public function getHours($id)
     {
-        $this->authorize(['developer', 'Method', 'admin' , 'superadmin']);
-
-        $productPlan = ProductPlanHour::where('product_plan_id', $id)->first();
-
-        if ($productPlan) {
-            return response()->json($productPlan);
+        $this->authorize(['developer', 'Method', 'admin', 'superadmin']);
+    
+        // Fetch all product plan hours for the given product plan id
+        $productPlanHours = ProductPlanHour::where('product_plan_id', $id)->get();
+    
+        if ($productPlanHours->isNotEmpty()) {
+            return response()->json($productPlanHours);
         } else {
             return response()->json([], 200);
         }
     }
-
+    
     public function search(Request $request)
     {
         $this->authorize(['developer', 'Method', 'admin', 'superadmin']);
@@ -157,9 +158,9 @@ class ProductPlanController extends Controller
         $productPlanHour = ProductPlanHour::where('hour', $validatedData['hour'])
             ->where('product_plan_id', $validatedData['product_plan_id'])
             ->where('day', $validatedData['day'])
-            ->first();
+            ->get();
     
-        if ($productPlanHour) {
+        if ($productPlanHour->isNotEmpty()) {
             return response()->json($productPlanHour);
         } else {
             return response()->json(['message' => 'No matching plan hour found'], 200);

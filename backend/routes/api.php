@@ -2,13 +2,16 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChainsController;
+use App\Http\Controllers\ControlFinalController;
 use App\Http\Controllers\CoupeProductionController;
 use App\Http\Controllers\EffectiveRealController;
 use App\Http\Controllers\EffectiveStandardController;
+use App\Http\Controllers\MagasinController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductPlanController;
-use App\Http\Controllers\SystemconstantController;
+use App\Http\Controllers\RepassageProductionController;
+use App\Http\Controllers\SystemConstController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -109,17 +112,54 @@ Route::middleware('auth:sanctum')->group(function () {
     // get the effective standard by model
     Route::get('effective_real/{modelId}', [EffectiveRealController::class, 'getEffectiveByModel']);
 
-
-
-
-    // System Constants 
-    Route::post('/system_constants', [SystemconstantController::class, 'store']);
-    // Update System Constants
-    Route::put('/system_constants/{id}', [SystemconstantController::class, 'update']);
+    /**
+     * System Constant
+     */
     // get one
-    Route::get('/system_constants_latest', [SystemconstantController::class, 'show']); 
-    // get all system constants
-    Route::get('/system_constants', [SystemconstantController::class, 'index']); 
+    Route::get('/system_constants_latest', [SystemConstController::class, 'show']); 
+    // Update System Constants
+    Route::post('/system_constants/{id}', [SystemConstController::class, 'update']);
+
+    /**
+     * Coupe Production
+     */
+    // get coupe production
+    Route::get('/coupe_production/{modelId}', [CoupeProductionController::class, 'show']);
+    // send coupe production
+    Route::post('/coupe_production/{modelId}', [CoupeProductionController::class, 'update']);
+
+    /**
+     * Chain Production
+     */
+    // get chain production
+    Route::get('/chain_production/{modelId}/{chainId}', [CoupeProductionController::class, 'show']);
+    // send chain production
+    Route::post('/chain_production/{modelId}/{chainId}', [CoupeProductionController::class, 'update']);
+
+    /**
+     * repassage Production
+     */
+    // get repassage production
+    Route::get('/repassage_production/{modelId}', [RepassageProductionController::class, 'show']);
+    // send repassage production
+    Route::post('/repassage_production/{modelId}', [RepassageProductionController::class, 'update']);
+
+    /**
+     * magasin Production
+     */
+    // get magasin production
+    Route::get('/magasin_production/{modelId}', [MagasinController::class, 'show']);
+    // send repassage production
+    Route::post('/magasin_production/{modelId}', [MagasinController::class, 'update']);
+
+    /**
+     * control Production
+     */
+    // get magasin production
+    Route::get('/control_production/{modelId}/{chainId}', [ControlFinalController::class, 'show']);
+    // send repassage production
+    Route::post('/control_production/{modelId}/{chainId}', [ControlFinalController::class, 'update']);
+
 
     Route::get('/posts', [PostController::class,'index']);
 

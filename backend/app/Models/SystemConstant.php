@@ -23,17 +23,6 @@ class SystemConstant extends Model
         'Coût_par_trajet',
         'Coût_charges_fixes_journalier' ,
         'Total_prime_par_modèle',
-        'Coupe',
-        'Production',
-        'Repassage_final',
-        'Contrôle_final',
-        'Magasin_final',
-        'Magasin_fournitures',
-        'Achats_Logistique',
-        'Transit',
-        'Comptabilité_Finances',
-        'RH',
-        'Ménage'
 ];
 
     public function effectifFix()

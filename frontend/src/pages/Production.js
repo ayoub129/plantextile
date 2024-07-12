@@ -7,16 +7,25 @@ import Sidebar from '../components/ui/Sidebar'
 import ProductionChain from '../components/products/ProductionChain'
 
 const Production = () => {
-  // work with states and redirect to dashboard
+  // handle state change for the sidebar and redirect if not autorized
   const [sidebar, setSidebar] = useState(false);
   const navigate = useNavigate()
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const role = localStorage.getItem('role');
+
+    // redirect to home if not logged in
     if (!token) {
-      navigate('/dashboard'); 
+      navigate('/');
+    } else {
+      // Check for the role
+      const allowedRoles = ['admin', 'superadmin', 'developer' , 'production_chain'];
+      if (!allowedRoles.includes(role)) {
+        navigate('/dashboard');
+      }
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <div>

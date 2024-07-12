@@ -13,7 +13,7 @@ class EffectifDirectController extends Controller
      */
     public function index()
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Method' , 'HR']);
 
         return EffectifDirect::all();
     }
@@ -23,7 +23,7 @@ class EffectifDirectController extends Controller
      */
     public function store(Request $request)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Method' , 'HR']);
 
         $request->validate([
             'machinistes' => 'nullable|integer',
@@ -53,7 +53,7 @@ class EffectifDirectController extends Controller
      */
     public function show($id)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Method' , 'HR']);
 
         return EffectifDirect::findOrFail($id);
     }
@@ -64,7 +64,7 @@ class EffectifDirectController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Method' , 'HR']);
 
         $effectifDirect = EffectifDirect::findOrFail($id);
 
@@ -95,7 +95,7 @@ class EffectifDirectController extends Controller
      */
     public function destroy($id)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'Method' , 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Method' , 'HR']);
 
         $effectifDirect = EffectifDirect::findOrFail($id);
         $effectifDirect->delete();

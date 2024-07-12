@@ -1,13 +1,16 @@
+// import React components, API and Toast
 import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import api from '../../api/axios';
+import { ToastContainer, toast } from 'react-toastify';
+// import custom components
 import FullCalendar from './FullCalendar';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
-import api from '../../api/axios';
-import { ToastContainer, toast } from 'react-toastify';
 
 function ProductPlanning() {
+  // handle planing data
   const [data, setData] = useState({
     model_id: '',
     chain: '',
@@ -19,15 +22,19 @@ function ProductPlanning() {
     consummation_standard_plastique: ''
   });
 
+  // get models and chain from the backend to choose from them
   const [models, setModels] = useState([]);
   const [chains, setChains] = useState([]);
+  // get the planning data as well as the loading and the error state
   const [planningData, setPlanningData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // handle modal showing and isEdit state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
+    // fetch models and chains
     const fetchModels = async () => {
       try {
         const response = await api.get('/models');
@@ -51,6 +58,7 @@ function ProductPlanning() {
   }, []);
 
   useEffect(() => {
+    // get planning base on the model ID
     const fetchPlanning = async () => {
       if (data.model_id) {
         setLoading(true);
@@ -72,6 +80,7 @@ function ProductPlanning() {
     fetchPlanning();
   }, [data.model_id]);
 
+  // handle creating a new plan
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -91,6 +100,7 @@ function ProductPlanning() {
     }
   };
 
+  // handle updating plans
   const handleUpdateSubmit = async (event) => {
     event.preventDefault();
 
@@ -111,6 +121,7 @@ function ProductPlanning() {
     }
   };
 
+  // reset form to free input values
   const resetForm = () => {
     setData({
       model_id: '',
@@ -125,6 +136,7 @@ function ProductPlanning() {
     setPlanningData(null);
   };
 
+  // handle input change
   const onChange = (name, value) => {
     setData({
       ...data,
@@ -132,6 +144,7 @@ function ProductPlanning() {
     });
   };
 
+  // handle date input change
   const handleDateChange = (date, name) => {
     setData({
       ...data,
@@ -139,6 +152,7 @@ function ProductPlanning() {
     });
   };
 
+  // get the single data to edit
   const handleEdit = async () => {
     if (planningData) {
       try {
@@ -160,12 +174,14 @@ function ProductPlanning() {
     }
   };
 
+  // show modal to delete
   const handleDelete = async () => {
     if (planningData) {
       setShowDeleteModal(true);
     }
   };
 
+  // confirm delete
   const confirmDelete = async () => {
     if (planningData) {
       try {
@@ -180,6 +196,7 @@ function ProductPlanning() {
     }
   };
 
+  // cancel delete
   const cancelDelete = () => {
     setShowDeleteModal(false);
   };

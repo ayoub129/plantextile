@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('effectif_fix', function (Blueprint $table) {
+        Schema::create('effectif_fixes', function (Blueprint $table) {
             $table->id();
-            $table->integer('coupe')->nullable();
+            $table->integer('Coupe')->nullable();
             $table->integer('Production')->nullable();
             $table->integer('Repassage_final')->nullable();
             $table->integer('Contrôle_final')->nullable();
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('effectif_fix');
+        Schema::dropIfExists('effectif_fixes');
     }
 };

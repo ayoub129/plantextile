@@ -16,7 +16,6 @@ const Sidebar = ({ sidebar }) => {
       { link: '/addconstantSystem', text: 'Add System Constant' },
       { link: '/direct', text: 'Direct Effective Standard' },
       { link: '/indirect', text: 'InDirect Effective Standard' },
-      { link: '/posts', text: 'Add posts' },
       { link: '/chains', text: 'Chains' },
       { link: '/real-direct', text: 'Real Direct Effective' },
       { link: '/real-indirect', text: 'Real InDirect Effective' },
@@ -28,7 +27,7 @@ const Sidebar = ({ sidebar }) => {
       { link: `/profile/${userId}`, text: 'Profile' },
       { link: '/export', text: 'Export' },
     ],
-    'super-admin': [
+    'superadmin': [
       { link: '/dashboard', text: 'Dashboard' },
       { link: '/products', text: 'Products' },
       { link: '/users', text: 'Users' },
@@ -36,7 +35,6 @@ const Sidebar = ({ sidebar }) => {
       { link: '/addconstantSystem', text: 'Add System Constant' },
       { link: '/direct', text: 'Direct Effective Standard' },
       { link: '/indirect', text: 'InDirect Effective Standard' },
-      { link: '/posts', text: 'Add posts' },
       { link: '/chains', text: 'Chains' },
       { link: '/real-direct', text: 'Real Direct Effective' },
       { link: '/real-indirect', text: 'Real InDirect Effective' },
@@ -56,7 +54,6 @@ const Sidebar = ({ sidebar }) => {
       { link: '/addconstantSystem', text: 'Add System Constant' },
       { link: '/direct', text: 'Direct Effective Standard' },
       { link: '/indirect', text: 'InDirect Effective Standard' },
-      { link: '/posts', text: 'Add posts' },
       { link: '/chains', text: 'Chains' },
       { link: '/real-direct', text: 'Real Direct Effective' },
       { link: '/real-indirect', text: 'Real InDirect Effective' },
@@ -77,7 +74,6 @@ const Sidebar = ({ sidebar }) => {
       { link: '/planning', text: 'Planification' },
       { link: '/direct', text: 'Direct Effective Standard' },
       { link: '/indirect', text: 'InDirect Effective Standard' },
-      { link: '/posts', text: 'Add posts' },
       { link: `/profile/${userId}`, text: 'Profile' },
     ],
     'HR': [
@@ -120,7 +116,8 @@ const Sidebar = ({ sidebar }) => {
   };
 
   return (
-    <div className={`w-1/2 md:w-1/6 mt-20 bg-white fixed ${sidebar ? 'left-0 shadow-lg shadow-gray-500' : 'left-[-200%]'} md:left-0 pb-[5rem] min-h-full overflow-y-auto`}>
+<div className="w-1/2 md:w-1/6 mt-20 bg-white fixed h-[calc(100vh-5rem)] pb-[5rem] overflow-y-auto 
+              ${sidebar ? 'left-0 shadow-lg shadow-gray-500' : 'left-[-200%]'} md:left-0">
       {renderLinks()}
     </div>
   );

@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api/axios';
+import Input from '../ui/Input';
 
 const ProductionChain = () => {
   const [models, setModels] = useState([]);
   const [chains, setChains] = useState([]);
   const [selectedModel, setSelectedModel] = useState('');
   const [selectedChain, setSelectedChain] = useState('');
-  const [selectedModelDetails, setSelectedModelDetails] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
-  const [isAddDisabled, setIsAddDisabled] = useState(false);
+
+  const [value, setValue] = useState(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -33,36 +34,59 @@ const ProductionChain = () => {
     fetchChains();
   }, []);
 
+  useEffect(() => {
+    const fetchCoupeProduction = async () => {
+      if (selectedModel) {
+        try {
+          const response = await api.get(`/chain_production/${selectedModel}/${selectedChain}`);
+          setValue(response.data.value);
+        } catch (error) {
+          console.error('Error fetching CoupeProduction data:', error);
+        }
+      }
+    };
+
+    fetchCoupeProduction();
+  }, [selectedModel]);
+
   const handleModelChange = (e) => {
-    const selectedModelId = e.target.value;
-    setSelectedModel(selectedModelId);
-    const modelDetails = models.find((model) => model.id === selectedModelId);
-    setSelectedModelDetails(modelDetails);
+    setSelectedModel(e.target.value);
   };
 
   const handleChainChange = (e) => {
     setSelectedChain(e.target.value);
+  }
+
+  const onChange = (name, value) => {
+    setValue(parseInt(value, 10));
   };
 
-  const handleAddToCart = () => {
-    if (selectedModelDetails && selectedChain) {
-      const item = {
-        ...selectedModelDetails,
-        chain: chains.find((chain) => chain.id === selectedChain).name,
-      };
-      setCartItems([...cartItems, item]);
-      setIsAddDisabled(true);
-      setTimeout(() => setIsAddDisabled(false), 3000); // Disable button for 3 seconds
+  const handleChange = async (direction) => {
+    if (direction === 'next') {
+      const newValue = value + 1;
+      setValue(newValue);
+
+      setIsButtonDisabled(true);
+
+      try {
+        await api.post(`/chain_production/${selectedModel}/${selectedChain}`, { value: newValue });
+      } catch (error) {
+        console.error('Error updating CoupeProduction data:', error);
+      } finally {
+        setTimeout(() => {
+          setIsButtonDisabled(false);
+        }, 3000);
+      }
     }
   };
 
   return (
     <div className='ml-[19%] pt-[6rem]'>
       <div className='flex items-center justify-between'>
-        <h2 className='text-xl font-semibold'>Production</h2>
-        <div className='flex ml-7 mb-4 pr-6'>
+        <h2 className='text-xl font-semibold'>Production Chain</h2>
+        <div className='ml-7 mb-4 pr-6 flex items-center w-[325px] justify-between'>
           <select
-            className="block w-full mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded mr-4"
+            className="block w-fit mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
             value={selectedModel}
             onChange={handleModelChange}
           >
@@ -74,48 +98,41 @@ const ProductionChain = () => {
             ))}
           </select>
           <select
-            className="block w-full mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
+            className="block w-fit mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
             value={selectedChain}
             onChange={handleChainChange}
           >
-            <option value="">Select chain</option>
-            {chains.map((chain) => (
-              <option key={chain.id} value={chain.id}>
+            <option value="">Select Chain</option>
+            {chains.map((chain , index) => (
+              <option key={index} value={chain.name}>
                 {chain.name}
               </option>
             ))}
           </select>
         </div>
       </div>
-      {selectedModelDetails && (
-        <div className='mt-4 p-4 border rounded shadow'>
-          <h3 className='text-lg font-semibold'>{selectedModelDetails.modele}</h3>
-          <p>Category: {selectedModelDetails.category}</p>
-          <img src={selectedModelDetails.image} alt={selectedModelDetails.modele} className='mt-2' />
+      {selectedModel && selectedChain && 
+        <div className='w-full pr-6'>
+          {models.map((model) => (
+            <div key={model.id} className='flex items-center justify-between'>
+              <h3 className='font-semibold'>{model.category}</h3>
+              <h3 className='font-semibold'>{model.client}</h3>
+            </div>
+          ))}
+        </div>
+      }
+      {selectedModel && selectedChain &&   
+        <div className="flex justify-center mx-auto mt-[2rem] items-center mb-4 shadow-md w-fit p-1 rounded border">
+          <Input handleChange={onChange} name={'coupe'} placeholder='Total Coupe' text={value} />
           <button
-            className='mt-4 p-2 bg-blue-500 text-white rounded disabled:opacity-50'
-            onClick={handleAddToCart}
-            disabled={isAddDisabled}
+            className='font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded'
+            onClick={() => handleChange('next')}
+            disabled={isButtonDisabled}
           >
-            Add to Cart
+            +
           </button>
         </div>
-      )}
-      {cartItems.length > 0 && (
-        <div className='mt-4'>
-          <h3 className='text-lg font-semibold'>Cart</h3>
-          <ul>
-            {cartItems.map((item, index) => (
-              <li key={index} className='mt-2 p-2 border rounded shadow'>
-                <p><strong>Model:</strong> {item.modele}</p>
-                <p><strong>Category:</strong> {item.category}</p>
-                <p><strong>Chain:</strong> {item.chain}</p>
-                <img src={item.image} alt={item.modele} className='mt-2' />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      }
     </div>
   );
 }

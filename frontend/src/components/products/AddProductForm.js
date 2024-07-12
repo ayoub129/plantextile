@@ -88,7 +88,7 @@ const AddProductForm = () => {
   // fetch exchange rates for the currency selected now 
   const fetchExchangeRates = async (currency = 'USD') => {
     // url to the exchange rates api endpoint
-    const url = `https://v6.exchangerate-api.com/v6/44567619eec22c4875e3a8c0/latest/${currency}`;
+    const url = `https://v6.exchangerate-api.com/v6/6610059cf4c8cb5955adc828/latest/${currency}`;
 
     try {
       // get the exchange rates and return it

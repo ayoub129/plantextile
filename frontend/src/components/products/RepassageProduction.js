@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import FullCalendar from './FullCalendar';
 import api from '../../api/axios';
+import Input from '../ui/Input';
 
 const RepassageProduction = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState('');
+  const [value, setValue] = useState(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -19,8 +21,46 @@ const RepassageProduction = () => {
     fetchModels();
   }, []);
 
+  useEffect(() => {
+    const fetchCoupeProduction = async () => {
+      if (selectedModel) {
+        try {
+          const response = await api.get(`/repassage_production/${selectedModel}`);
+          setValue(response.data.value);
+        } catch (error) {
+          console.error('Error fetching CoupeProduction data:', error);
+        }
+      }
+    };
+
+    fetchCoupeProduction();
+  }, [selectedModel]);
+
   const handleModelChange = (e) => {
     setSelectedModel(e.target.value);
+  };
+
+  const onChange = (name, value) => {
+    setValue(parseInt(value, 10));
+  };
+
+  const handleChange = async (direction) => {
+    if (direction === 'next') {
+      const newValue = value + 1;
+      setValue(newValue);
+
+      setIsButtonDisabled(true);
+
+      try {
+        await api.post(`/repassage_production/${selectedModel}`, { value: newValue });
+      } catch (error) {
+        console.error('Error updating CoupeProduction data:', error);
+      } finally {
+        setTimeout(() => {
+          setIsButtonDisabled(false);
+        }, 3000);
+      }
+    }
   };
 
   return (
@@ -42,9 +82,28 @@ const RepassageProduction = () => {
           </select>
         </div>
       </div>
-      {selectedModel && (
-        <FullCalendar url={'/coupe-productions'} selectedModel={selectedModel} />
-      )}
+      {selectedModel && 
+        <div className='w-full pr-6'>
+          {models.map((model) => (
+            <div key={model.id} className='flex items-center justify-between'>
+              <h3 className='font-semibold'>{model.category}</h3>
+              <h3 className='font-semibold'>{model.client}</h3>
+            </div>
+          ))}
+        </div>
+      }
+      {selectedModel &&     
+        <div className="flex justify-center mx-auto mt-[2rem] items-center mb-4 shadow-md w-fit p-1 rounded border">
+          <Input handleChange={onChange} name={'coupe'} placeholder='Total Coupe' text={value} />
+          <button
+            className='font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded'
+            onClick={() => handleChange('next')}
+            disabled={isButtonDisabled}
+          >
+            +
+          </button>
+        </div>
+      }
     </div>
   );
 }
