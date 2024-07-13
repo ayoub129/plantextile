@@ -78,6 +78,26 @@ class EffectiveStandardController extends Controller
         return response()->json($effectiveStandard, 201);
     }
 
+    public function getEffectiveData(Request $request, $modelId)
+    {
+        $this->authorize(['developer', 'super-admin', 'admin', 'Method']);
+
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+
+        $effectiveStandard = EffectiveStandard::with(['effectifDirects', 'effectifIndirects'])
+            ->where('model', $modelId)
+            ->whereBetween('start_date', [$startDate, $endDate])
+            ->get();
+
+        if ($effectiveStandard->isEmpty()) {
+            return response()->json(['message' => 'No Effective found for this model and date range'], 404);
+        }
+
+        return response()->json($effectiveStandard);
+    }
+
+
     public function getEffectiveByModel($modelId)
     {
         $this->authorize(['developer', 'super-admin', 'admin', 'Method']);

@@ -31,11 +31,12 @@ class ControlFinalController extends Controller
         $request->validate([
             'value' => 'required|integer',
             'retouch' => 'required|integer',
+            'posts' => 'nullable|string',
         ]);
 
         $controlProduction = ControlProduction::updateOrCreate(
             ['model_id' => $modelId, 'chain_id' => $chainId],
-            ['value' => $request->value, 'retouch' => $request->retouch]
+            ['value' => $request->value, 'retouch' => $request->retouch, 'posts' => $request->posts]
         );
 
         return response()->json($controlProduction, 200);

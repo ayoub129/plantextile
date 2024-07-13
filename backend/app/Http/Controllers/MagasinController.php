@@ -8,34 +8,40 @@ use Illuminate\Support\Facades\Auth;
 
 class MagasinController extends Controller
 {
-    // Fetch the CoupeProduction data for a specific model
+    // Fetch the RepassageProduction data for a specific model
     public function show($modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'production_magasin']);
 
-        $coupeProduction = ControlMagasin::where('model_id', $modelId)->first();
-        if ($coupeProduction) {
-            return response()->json($coupeProduction);
+        $repassageProduction = ControlMagasin::where('model_id', $modelId)->first();
+        if ($repassageProduction) {
+            return response()->json($repassageProduction);
         } else {
             return response()->json(['message' => 'Data not found'], 404);
         }
     }
 
-    // Update the CoupeProduction value for a specific model
+    // Update the RepassageProduction value for a specific model
     public function update(Request $request, $modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'production_magasin']);
 
         $request->validate([
-            'value' => 'required|integer'
+            'value' => 'required|integer',
+            'entre' => 'required|integer',
+            'encore' => 'required|integer'
         ]);
 
-        $coupeProduction = ControlMagasin::updateOrCreate(
+        $repassageProduction = ControlMagasin::updateOrCreate(
             ['model_id' => $modelId],
-            ['value' => $request->value]
+            [
+                'value' => $request->value,
+                'entre' => $request->entre,
+                'encore' => $request->encore
+            ]
         );
 
-        return response()->json($coupeProduction, 200);
+        return response()->json($repassageProduction, 200);
     }
 
     private function authorize(array $roles)
@@ -44,5 +50,4 @@ class MagasinController extends Controller
             abort(403, 'Unauthorized action.');
         }
     }
-
 }

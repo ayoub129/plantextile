@@ -12,6 +12,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProductPlanController;
 use App\Http\Controllers\RepassageProductionController;
 use App\Http\Controllers\SystemConstController;
+use App\Http\Controllers\ChainProductionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -67,6 +68,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('product_plans_single/{id}', [ProductPlanController::class, 'show']);
     // get a single plan by model id
     Route::get('product_plans_model/{modelId}' , [ProductPlanController::class, 'getPlanningByModel']);
+    // get a dashboard plan by model id
+    Route::get('product_plans_model_dash/{modelId}' , [ProductPlanController::class, 'getdashPlanningByModel']);
     // create a new plan
     Route::post('product_plans', [ProductPlanController::class, 'store']);
     // update product plan information
@@ -99,6 +102,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('effective_standard/{id}', [EffectiveStandardController::class, 'destroy']);
     // get the effective standard by model
     Route::get('effective_standard/{modelId}', [EffectiveStandardController::class, 'getEffectiveByModel']);
+    // get the effective standard 
+    Route::get('effective_data/{modelId}', [EffectiveStandardController::class, 'getEffectiveData']);
 
     /**
      * Effective Real
@@ -111,6 +116,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('effective_real/{id}', [EffectiveRealController::class, 'destroy']);
     // get the effective standard by model
     Route::get('effective_real/{modelId}', [EffectiveRealController::class, 'getEffectiveByModel']);
+    // get the effective real 
+    Route::get('effective_real_data/{modelId}', [EffectiveRealController::class, 'getEffectiveData']);
 
     /**
      * System Constant
@@ -132,9 +139,11 @@ Route::middleware('auth:sanctum')->group(function () {
      * Chain Production
      */
     // get chain production
-    Route::get('/chain_production/{modelId}/{chainId}', [CoupeProductionController::class, 'show']);
+    Route::get('/chain_production/{modelId}/{chainId}', [ChainProductionController::class, 'show']);
     // send chain production
-    Route::post('/chain_production/{modelId}/{chainId}', [CoupeProductionController::class, 'update']);
+    Route::post('/chain_production/{modelId}/{chainId}', [ChainProductionController::class, 'update']);
+    // chain retouch
+    Route::post('/chain_production/retouch/{modelId}/{chainId}', [ChainProductionController::class, 'retouch']);
 
     /**
      * repassage Production
@@ -160,23 +169,28 @@ Route::middleware('auth:sanctum')->group(function () {
     // send repassage production
     Route::post('/control_production/{modelId}/{chainId}', [ControlFinalController::class, 'update']);
 
+        /**
+     * Export
+     */
+    // show
+    Route::get('/export/{modelId}' , [ExportProduction::class, 'show']);
+    // add
+     Route::post('/export/{modelId}' , [ExportProduction::class, 'update']);
 
+    /**
+     * Posts
+     */
     Route::get('/posts', [PostController::class,'index']);
 
     Route::get('/posts/{id}', [PostController::class,'show']);
     
     Route::post('/posts', [PostController::class, 'store']);
     
-    Route::put('/posts/{id}', [PostController::class, 'update']);
+    Route::post('/posts/{id}', [PostController::class, 'update']);
     
     Route::delete('/posts/{id}', [PostController::class, 'destroy']);
 
-    // coupe-productions
-    Route::get('/coupe-productions' , [CoupeProductionController::class, 'index']);
-    Route::post('/coupe-productions' , [CoupeProductionController::class,'store']);
-    Route::post('/coupe-productions/search' , [CoupeProductionController::class,'show']);
-    Route::put('/coupe-productions/{id}' , [CoupeProductionController::class,'update']);
-    Route::delete('/coupe-productions/{id}' , [CoupeProductionController::class,'delete']);
+
 });
 
 // the only available route without token is the login

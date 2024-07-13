@@ -8,13 +8,14 @@ use Illuminate\Support\Facades\Auth;
 
 class ChainProductionController extends Controller
 {
-    // Fetch the CoupeProduction data for a specific model
+    // Fetch the production data for a specific model and chain for today
     public function show($modelId, $chainId)
     {
         $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
 
         $chainProduction = ChainProduction::where('model_id', $modelId)
-                                          ->where('chain_id', $chainId)
+                                          ->where('chain', $chainId)
+                                          ->whereDate('created_at', today())
                                           ->first();
 
         if ($chainProduction) {
@@ -24,19 +25,71 @@ class ChainProductionController extends Controller
         }
     }
 
-    // Update the CoupeProduction value for a specific model
+    // Update the production data for a specific model and chain for today
     public function update(Request $request, $modelId, $chainId)
     {
         $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
 
         $request->validate([
-            'value' => 'required|integer'
+            'production' => 'required|integer',
+            'entre' => 'required|integer',
+            'sortie' => 'required|integer'
         ]);
 
-        $chainProduction = ChainProduction::updateOrCreate(
-            ['model_id' => $modelId, 'chain_id' => $chainId],
-            ['value' => $request->value]
-        );
+        $chainProduction = ChainProduction::where('model_id', $modelId)
+                                          ->where('chain', $chainId)
+                                          ->whereDate('created_at', today())
+                                          ->first();
+
+        if ($chainProduction) {
+            // Update the existing record for today
+            $chainProduction->update([
+                'production' => $request->production,
+                'entre' => $request->entre,
+                'sortie' => $request->sortie
+            ]);
+        } else {
+            // Create a new record if no record exists for today
+            $chainProduction = ChainProduction::create([
+                'model_id' => $modelId,
+                'chain' => $chainId,
+                'production' => $request->production,
+                'entre' => $request->entre,
+                'sortie' => $request->sortie
+            ]);
+        }
+
+        return response()->json($chainProduction, 200);
+    }
+
+    // Handle retouch and posts for a specific model and chain for today
+    public function retouch(Request $request, $modelId, $chainId)
+    {
+        $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
+
+        $request->validate([
+            'retouch' => 'required|integer',
+            'posts' => 'required|string',
+        ]);
+
+        $chainProduction = ChainProduction::where('model_id', $modelId)
+                                          ->where('chain', $chainId)
+                                          ->whereDate('created_at', today())
+                                          ->first();
+
+        if ($chainProduction) {
+            $chainProduction->update([
+                'retouch' => $request->retouch,
+                'posts' => $request->posts
+            ]);
+        } else {
+            $chainProduction = ChainProduction::create([
+                'model_id' => $modelId,
+                'chain' => $chainId,
+                'retouch' => $request->retouch,
+                'posts' => $request->posts
+            ]);
+        }
 
         return response()->json($chainProduction, 200);
     }
@@ -47,5 +100,4 @@ class ChainProductionController extends Controller
             abort(403, 'Unauthorized action.');
         }
     }
-
 }

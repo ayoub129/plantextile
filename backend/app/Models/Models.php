@@ -24,8 +24,6 @@ class Models extends Model
         'dateImport',
         'cours_devise_import',
         'dateExport',
-        'consStandardFil',
-        'consoStandardPlastique',
     ];
 
     public function productPlans()

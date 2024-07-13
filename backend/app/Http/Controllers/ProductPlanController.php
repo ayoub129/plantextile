@@ -36,6 +36,39 @@ class ProductPlanController extends Controller
         return ProductPlan::findOrFail($id);
     }
 
+    public function getdashPlanningByModel($modelId)
+    {
+        $this->authorize(['developer', 'Method', 'admin', 'superadmin']);
+    
+        $productPlan = ProductPlan::where('model_id', $modelId)->first();
+    
+        if (!$productPlan) {
+            return response()->json(['message' => 'No planning found for this model'], 404);
+        }
+    
+        $startDate = new \DateTime($productPlan->start_date);
+        $endDate = new \DateTime($productPlan->end_date);
+    
+        $dateInterval = new \DateInterval('P1D');
+        $dateRange = new \DatePeriod($startDate, $dateInterval, $endDate->modify('+1 day'));
+    
+        $dailyPlanning = [];
+        foreach ($dateRange as $date) {
+            $formattedDate = $date->format('Y-m-d');
+            $modelsFinished = ProductPlanHour::where('product_plan_id', $productPlan->id)
+                ->where('date', $formattedDate)
+                ->sum('models_finished');
+            
+            $dailyPlanning[$formattedDate] = $modelsFinished;
+        }
+    
+        return response()->json([
+            'planning' => $dailyPlanning,
+            'start_date' => $productPlan->start_date,
+            'end_date' => $productPlan->end_date,
+        ]);
+    }
+
     public function getPlanningByModel($modelId)
     {
         $this->authorize(['developer', 'Method', 'admin' , 'superadmin']);
@@ -49,6 +82,7 @@ class ProductPlanController extends Controller
         return response()->json($productPlan);
     }
 
+    
     public function update(Request $request, $id)
     {
         $this->authorize(['developer', 'Method', 'admin' , 'superadmin']);
@@ -118,12 +152,14 @@ class ProductPlanController extends Controller
             'hour' => 'required|string',
             'models_finished' => 'required|integer',
             'day' => 'required|string',
+            'date' => 'required|date',
             'product_plan_id' => 'required|integer',  
         ]);
 
         $productPlanHour = ProductPlanHour::create([
             'product_plan_id' => $request->product_plan_id,
             'hour' => $request->hour,
+            'date' =>  $request->date,
             'models_finished' => $request->models_finished,
             'day' => $request->day,  
         ]);

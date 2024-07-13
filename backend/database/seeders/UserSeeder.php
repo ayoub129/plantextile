@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Posts;
 
 class UserSeeder extends Seeder
 {
@@ -23,5 +24,22 @@ class UserSeeder extends Seeder
             'password' => Hash::make('devpassword'),
             'role' => 'developer',
         ]);
+
+        Posts::create([
+            'name' => 'Logistique'
+        ]);
+
+        Posts::create([
+            'name' => 'La coupe'
+        ]);
+
+        Posts::create([
+            'name' => 'production'
+        ]);
+
+        Posts::create([
+            'name' => 'repassage'
+        ]);
+
     }
 }

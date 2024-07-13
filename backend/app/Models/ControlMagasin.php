@@ -12,6 +12,8 @@ class ControlMagasin extends Model
     protected $fillable = [
         'model_id',
         'value',
+        'entre',
+        'encore'
     ];
 
     public function model()

@@ -23,14 +23,11 @@ class CreateModelsTable extends Migration
             $table->decimal('prixMOver', 8, 2);
             $table->string('devise');
             $table->integer('prixFacture');
-            $table->string('photos');
             $table->date('dateEtude')->nullable(); // Renamed from 'date_import'
             $table->decimal('cours_devise_etude', 8, 4)->nullable(); // Added nullable
             $table->date('dateImport');
-            $table->decimal('cours_devise_import', 8, 4);
+            $table->decimal('cours_devise_import', 8, 4)->nullable();
             $table->date('dateExport')->nullable();
-            $table->decimal('consStandardFil', 8, 2)->nullable(); // Adjusted decimal precision
-            $table->decimal('consoStandardPlastique', 8, 2)->nullable(); // Adjusted decimal precision
             $table->timestamps();
         });
     }

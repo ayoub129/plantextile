@@ -32,20 +32,18 @@ class ModelController extends Controller
             'modele' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'client' => 'required|string|max:255',
-            'quantite_demandee' => 'required|integer',
+            'client' => 'nullable|string|max:255',
+            'quantite_demandee' => 'nullable|integer',
             'quantityReceived' => 'nullable|integer',
-            'qte_societe' => 'required|integer',
-            'prixMOver' => 'required|numeric',
-            'devise' => 'required|string|max:255',
-            'prixFacture' => 'required|numeric',
+            'qte_societe' => 'nullable|integer',
+            'prixMOver' => 'nullable|numeric',
+            'devise' => 'nullable|string|max:255',
+            'prixFacture' => 'nullable|numeric',
             'dateEtude' => 'nullable|date',
             'cours_devise_etude' => 'nullable|numeric',
             'dateImport' => 'required|date',
-            'cours_devise_import' => 'required|numeric',
+            'cours_devise_import' => 'nullable|numeric',
             'dateExport' => 'nullable|date',
-            'consStandardFil' => 'nullable|numeric',
-            'consoStandardPlastique' => 'nullable|numeric',
         ]);
     
         // Handle image upload
@@ -71,8 +69,6 @@ class ModelController extends Controller
         $model->dateImport = $request->input('dateImport');
         $model->cours_devise_import = $request->input('cours_devise_import');
         $model->dateExport = $request->input('dateExport');
-        $model->consStandardFil = $request->input('consStandardFil');
-        $model->consoStandardPlastique = $request->input('consoStandardPlastique');
         
         // Save the model
         $model->save();
@@ -107,8 +103,6 @@ class ModelController extends Controller
             'dateImport' => 'sometimes|required|date',
             'cours_devise_import' => 'sometimes|required|numeric',
             'dateExport' => 'nullable|date',
-            'consStandardFil' => 'nullable|numeric',
-            'consoStandardPlastique' => 'nullable|numeric',
         ]);
     
         // Handle image upload

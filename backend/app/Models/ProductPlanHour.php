@@ -12,6 +12,7 @@ class ProductPlanHour extends Model
     protected $fillable = [
         'product_plan_id',
         'day', 
+        'date',
         'hour',
         'models_finished',
     ];

@@ -15,12 +15,7 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->string('logistique')->nullable();
-            $table->string('la_coupe')->nullable();
-            $table->string('production')->nullable();
-            $table->string('repassage')->nullable();
-            $table->string('control_final')->nullable();
-            $table->string('depot')->nullable();
+            $table->string('name');
             $table->timestamps();
         });
     }

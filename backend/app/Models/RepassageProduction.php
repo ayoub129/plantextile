@@ -12,11 +12,12 @@ class RepassageProduction extends Model
     protected $fillable = [
         'model_id',
         'value',
+        'entre',
+        'encore'
     ];
 
     public function model()
     {
         return $this->belongsTo(Models::class);
     }
-
 }

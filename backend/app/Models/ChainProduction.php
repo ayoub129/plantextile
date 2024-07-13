@@ -12,11 +12,20 @@ class ChainProduction extends Model
     protected $fillable = [
         'model_id',
         'chain',
-        'value',
+        'production',
+        'entre',
+        'sortie',
+        'retouch',
+        'posts'
     ];
 
     public function model()
     {
         return $this->belongsTo(Models::class);
+    }
+
+    public function scopeToday($query)
+    {
+        return $query->whereDate('created_at', today());
     }
 }

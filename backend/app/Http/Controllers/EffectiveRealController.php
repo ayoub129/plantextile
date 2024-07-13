@@ -195,6 +195,26 @@
         
             return response()->json(null, 204);
         }
+
+        public function getEffectiveData(Request $request, $modelId)
+        {
+            $this->authorize(['developer', 'super-admin', 'admin', 'HR']);
+    
+            $startDate = $request->query('start_date');
+            $endDate = $request->query('end_date');
+    
+            $effectiveStandard = EffectiveReal::with(['effectifDirects', 'effectifIndirects'])
+                ->where('model', $modelId)
+                ->whereBetween('start_date', [$startDate, $endDate])
+                ->get();
+    
+            if ($effectiveStandard->isEmpty()) {
+                return response()->json(['message' => 'No Effective Real found for this model and date range'], 404);
+            }
+    
+            return response()->json($effectiveStandard);
+        }
+    
     
         private function authorize(array $roles)
         {
