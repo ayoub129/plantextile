@@ -11,7 +11,7 @@ class ProductPlanController extends Controller
 {
     public function store(Request $request)
     {
-        $this->authorize(['developer', 'Method', 'admin' , 'superadmin']);
+        $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
 
         $request->validate([
             'start_date' => 'required|date',
@@ -19,7 +19,6 @@ class ProductPlanController extends Controller
             'qte' => 'required|integer',
             'model_id' => 'required|exists:models,id',
             'chain' => 'required|string',
-            'Quenta' => 'required|string',
             'consummation_standard_fil' => 'required|integer',
             'consummation_standard_plastique' => 'required|integer',
         ]);
@@ -31,14 +30,14 @@ class ProductPlanController extends Controller
 
     public function show($id)
     {
-        $this->authorize(['developer', 'Method', 'admin' , 'superadmin']);
+        $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
 
         return ProductPlan::findOrFail($id);
     }
 
     public function getdashPlanningByModel($modelId)
     {
-        $this->authorize(['developer', 'Method', 'admin', 'superadmin']);
+        $this->authorize(['developer', 'Méthode', 'admin', 'superadmin']);
     
         $productPlan = ProductPlan::where('model_id', $modelId)->first();
     
@@ -71,7 +70,7 @@ class ProductPlanController extends Controller
 
     public function getPlanningByModel($modelId)
     {
-        $this->authorize(['developer', 'Method', 'admin' , 'superadmin']);
+        $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
 
         $productPlan = ProductPlan::where('model_id', $modelId)->first();
 
@@ -82,10 +81,9 @@ class ProductPlanController extends Controller
         return response()->json($productPlan);
     }
 
-    
     public function update(Request $request, $id)
     {
-        $this->authorize(['developer', 'Method', 'admin' , 'superadmin']);
+        $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
         
         $productPlan = ProductPlan::findOrFail($id);
 
@@ -94,7 +92,6 @@ class ProductPlanController extends Controller
             'end_date' => 'sometimes|date',
             'qte' => 'sometimes|integer',
             'model_id' => 'sometimes|exists:models,id',
-            'Quenta' => 'sometimes|string',
             'chain' => 'sometimes|string',
             'consummation_standard_fil' => 'sometimes|integer',
             'consummation_standard_plastique' => 'sometimes|integer',
@@ -107,7 +104,7 @@ class ProductPlanController extends Controller
 
     public function destroy($id)
     {
-        $this->authorize(['developer', 'Method', 'admin' , 'superadmin']);
+        $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
 
         $productPlan = ProductPlan::findOrFail($id);
         
@@ -116,52 +113,59 @@ class ProductPlanController extends Controller
         return response()->json(null, 204);
     }
 
-    public function updateHours(Request $request, $id) {
-        $this->authorize(['developer', 'Method', 'admin' , 'superadmin']);
+    public function updateHours(Request $request, $id)
+    {
+        $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
 
         $productPlanHour = ProductPlanHour::findOrFail($id);
 
         $data = $request->validate([
             'hour' => 'required|string',
             'models_finished' => 'required|integer',
-            'day' => 'required|string',
+            'date' => 'required',
             'product_plan_id' => 'required|integer',  
         ]);
 
         $productPlanHour->update($data);
 
         return response()->json($productPlanHour);
-
     }
 
-    public function deleteHours($id) {
-        $this->authorize(['developer', 'Method', 'admin' , 'superadmin']);
+    public function deleteHours($id)
+    {
+        $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
 
         $productPlanHour = ProductPlanHour::findOrFail($id);
-        
+
         $productPlanHour->delete();
-        
+
         return response()->json(null, 204);
     }
 
     public function setHours(Request $request)
     {
-        $this->authorize(['developer', 'Method', 'admin' , 'superadmin']);
+        $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
 
         $request->validate([
             'hour' => 'required|string',
             'models_finished' => 'required|integer',
-            'day' => 'required|string',
             'date' => 'required|date',
             'product_plan_id' => 'required|integer',  
         ]);
+
+        $productPlan = ProductPlan::findOrFail($request->product_plan_id);
+        $totalModelsFinished = ProductPlanHour::where('product_plan_id', $request->product_plan_id)->sum('models_finished');
+        $newTotal = $totalModelsFinished + $request->models_finished;
+
+        if ($newTotal > $productPlan->qte) {
+            return response()->json(['message' => 'Quantity cannot exceed Quantity Société.'], 400);
+        }
 
         $productPlanHour = ProductPlanHour::create([
             'product_plan_id' => $request->product_plan_id,
             'hour' => $request->hour,
             'date' =>  $request->date,
             'models_finished' => $request->models_finished,
-            'day' => $request->day,  
         ]);
 
         return response()->json($productPlanHour, 201);
@@ -169,9 +173,8 @@ class ProductPlanController extends Controller
 
     public function getHours($id)
     {
-        $this->authorize(['developer', 'Method', 'admin', 'superadmin']);
+        $this->authorize(['developer', 'Méthode', 'admin', 'superadmin']);
     
-        // Fetch all product plan hours for the given product plan id
         $productPlanHours = ProductPlanHour::where('product_plan_id', $id)->get();
     
         if ($productPlanHours->isNotEmpty()) {
@@ -183,17 +186,17 @@ class ProductPlanController extends Controller
     
     public function search(Request $request)
     {
-        $this->authorize(['developer', 'Method', 'admin', 'superadmin']);
+        $this->authorize(['developer', 'Méthode', 'admin', 'superadmin']);
     
         $validatedData = $request->validate([
             'hour' => 'required|string',
             'product_plan_id' => 'required|integer',
-            'day' => 'required|string', 
+            'date' => 'required',
         ]);
-    
+
         $productPlanHour = ProductPlanHour::where('hour', $validatedData['hour'])
             ->where('product_plan_id', $validatedData['product_plan_id'])
-            ->where('day', $validatedData['day'])
+            ->where('date', $validatedData['date'])
             ->get();
     
         if ($productPlanHour->isNotEmpty()) {
@@ -209,5 +212,4 @@ class ProductPlanController extends Controller
             abort(403, 'Unauthorized action.');
         }
     }
-
 }

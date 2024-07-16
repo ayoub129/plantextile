@@ -12,11 +12,11 @@ const Sidebar = ({ sidebar }) => {
       { link: "/products", text: "Produits" },
       { link: "/users", text: "Utilisateurs" },
       { link: "/planning", text: "Planification" },
-      { link: "/addconstantSystem", text: "Ajouter une constante système" },
-      { link: "/direct", text: "Norme Effective Directe" },
-      { link: "/indirect", text: "Norme Effective Indirecte" },
+      { link: "/addconstantSystem", text: "constante système" },
+      { link: "/direct", text: "Effective Standard Directe" },
+      { link: "/indirect", text: "Effective Standard Indirecte" },
       { link: "/chains", text: "Chaînes" },
-      { link: "/post", text: "Posts" },
+      { link: "/posts", text: "Posts" },
       { link: "/real-direct", text: "Effectif Direct Réel" },
       { link: "/real-indirect", text: "Effectif Indirect Réel" },
       { link: "/coupe", text: "La Coupe" },
@@ -25,6 +25,7 @@ const Sidebar = ({ sidebar }) => {
       { link: "/control-final", text: "Contrôle Final" },
       { link: "/magasin", text: "Magasin" },
       { link: "/export", text: "Export" },
+      { link: "/primes", text: "Primes" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
     superadmin: [
@@ -32,11 +33,11 @@ const Sidebar = ({ sidebar }) => {
       { link: "/products", text: "Produits" },
       { link: "/users", text: "Utilisateurs" },
       { link: "/planning", text: "Planification" },
-      { link: "/addconstantSystem", text: "Ajouter une constante système" },
-      { link: "/direct", text: "Norme Effective Directe" },
-      { link: "/indirect", text: "Norme Effective Indirecte" },
+      { link: "/addconstantSystem", text: "constante système" },
+      { link: "/direct", text: "Effective Standard Directe" },
+      { link: "/indirect", text: "Effective Standard Indirecte" },
       { link: "/chains", text: "Chaînes" },
-      { link: "/post", text: "Posts" },
+      { link: "/posts", text: "Posts" },
       { link: "/real-direct", text: "Effectif Direct Réel" },
       { link: "/real-indirect", text: "Effectif Indirect Réel" },
       { link: "/coupe", text: "La Coupe" },
@@ -45,6 +46,7 @@ const Sidebar = ({ sidebar }) => {
       { link: "/control-final", text: "Contrôle Final" },
       { link: "/magasin", text: "Magasin" },
       { link: "/export", text: "Export" },
+      { link: "/primes", text: "Primes" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
     admin: [
@@ -52,11 +54,10 @@ const Sidebar = ({ sidebar }) => {
       { link: "/products", text: "Produits" },
       { link: "/users", text: "Utilisateurs" },
       { link: "/planning", text: "Planification" },
-      { link: "/addconstantSystem", text: "Ajouter une constante système" },
-      { link: "/direct", text: "Norme Effective Directe" },
-      { link: "/indirect", text: "Norme Effective Indirecte" },
+      { link: "/direct", text: "Effective Standard Directe" },
+      { link: "/indirect", text: "Effective Standard Indirecte" },
       { link: "/chains", text: "Chaînes" },
-      { link: "/post", text: "Posts" },
+      { link: "/posts", text: "Posts" },
       { link: "/real-direct", text: "Effectif Direct Réel" },
       { link: "/real-indirect", text: "Effectif Indirect Réel" },
       { link: "/coupe", text: "La Coupe" },
@@ -65,48 +66,57 @@ const Sidebar = ({ sidebar }) => {
       { link: "/control-final", text: "Contrôle Final" },
       { link: "/magasin", text: "Magasin" },
       { link: "/export", text: "Export" },
+      { link: "/primes", text: "Primes" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
     Logistique: [
       { link: "/products", text: "Produits" },
       { link: "/addproducts", text: "Ajouter un produit" },
       { link: `/profile/${userId}`, text: "Profil" },
+      { link: "/export", text: "Export" },
     ],
-    Method: [
+    Méthode: [
       { link: "/planning", text: "Planification" },
-      { link: "/direct", text: "Norme Effective Directe" },
-      { link: "/post", text: "Posts" },
-      { link: "/indirect", text: "Norme Effective Indirecte" },
+      { link: "/direct", text: "Effective Standard Directe" },
+      { link: "/posts", text: "Posts" },
+      { link: "/indirect", text: "Effective Standard Indirecte" },
+      { link: "/primes", text: "Primes" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
-    HR: [
+    RH: [
       { link: "/users", text: "Utilisateurs" },
       { link: "/chains", text: "Chaînes" },
       { link: "/real-direct", text: "Effectif Direct Réel" },
       { link: "/real-indirect", text: "Effectif Indirect Réel" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
-    production_coupe: [
+    Production_coupe: [
       { link: "/coupe", text: "La Coupe" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
-    production_repassage: [
+    Production_repassage: [
       { link: "/repassage", text: "Repassage" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
-    production_chain: [
+    Chaîne_production_entrée: [
       { link: "/production", text: "Production" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
-    production_control: [
+    Chaîne_production_sortie: [
+      { link: "/production", text: "Production" },
+      { link: `/profile/${userId}`, text: "Profil" },
+    ],
+    Contrôle_final: [
       { link: "/control-final", text: "Contrôle Final" },
       { link: `/profile/${userId}`, text: "Profil" },
-      { link: "/export", text: "Export" },
     ],
-    production_magasin: [
+    Magasin_fourniture: [
       { link: "/magasin", text: "Magasin" },
       { link: `/profile/${userId}`, text: "Profil" },
-      { link: "/export", text: "Export" },
+    ],
+    Magasin_final: [
+      { link: "/magasin", text: "Magasin" },
+      { link: `/profile/${userId}`, text: "Profil" },
     ],
   };
 

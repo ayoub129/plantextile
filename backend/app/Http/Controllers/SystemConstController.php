@@ -28,7 +28,6 @@ class SystemConstController extends Controller
             'Coût_énergie_journalier' => 'sometimes|required|numeric',
             'Coût_par_trajet' => 'sometimes|required|numeric',
             'Coût_charges_fixes_journalier' => 'sometimes|required|numeric',
-            'Total_prime_par_modèle' => 'sometimes|required|numeric',
             'effectif_fix' => 'nullable|array',
             'effectif_fix.*.Coupe' => 'nullable|integer',
             'effectif_fix.*.Production' => 'nullable|integer',

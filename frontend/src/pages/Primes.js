@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 // import custom components
 import Header from "../components/ui/Header";
 import Sidebar from "../components/ui/Sidebar";
-import PostTable from "../components/ui/PostTable";
+import PrimTable from "../components/ui/PrimTable";
 
-const Posts = () => {
+const Prims = () => {
   // handle state change for the sidebar and redirect if not autorized
   const [sidebar, setSidebar] = useState(false);
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const Posts = () => {
       navigate("/");
     } else {
       // Check for the role
-      const allowedRoles = ["admin", "superadmin", "developer", "Méthode"];
+      const allowedRoles = ["admin", "superadmin", "developer", "Method"];
       if (!allowedRoles.includes(role)) {
         navigate("/dashboard");
       }
@@ -33,10 +33,10 @@ const Posts = () => {
       <Header sidebar={sidebar} setSidebar={setSidebar} />
       {/* sidebar */}
       <Sidebar sidebar={sidebar} />
-      {/* Posts */}
-      <PostTable />
+      {/* Prims */}
+      <PrimTable />
     </div>
   );
 };
 
-export default Posts;
+export default Prims;

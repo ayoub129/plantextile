@@ -30,4 +30,10 @@ class Models extends Model
     {
         return $this->hasMany(ProductPlan::class);
     }
+
+    public function primes()
+    {
+        return $this->hasMany(Prime::class, 'model_id');
+    }
+
 }

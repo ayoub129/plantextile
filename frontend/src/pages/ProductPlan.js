@@ -1,27 +1,27 @@
 // import the react components and navigation
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 // import custom components
-import ProductPlaning from '../components/products/ProductPlanning'
-import Header from '../components/ui/Header'
-import Sidebar from '../components/ui/Sidebar'
+import ProductPlaning from "../components/products/ProductPlanning";
+import Header from "../components/ui/Header";
+import Sidebar from "../components/ui/Sidebar";
 
 const ProductPlan = () => {
   const [sidebar, setSidebar] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
 
     // redirect to home if not logged in
     if (!token) {
-      navigate('/');
+      navigate("/");
     } else {
       // Check for the role
-      const allowedRoles = ['admin', 'superadmin', 'developer' , 'Method'];
+      const allowedRoles = ["admin", "superadmin", "developer", "Méthode"];
       if (!allowedRoles.includes(role)) {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
     }
   }, [navigate]);
@@ -35,7 +35,7 @@ const ProductPlan = () => {
       {/* product plan */}
       <ProductPlaning />
     </div>
-  )
-}
+  );
+};
 
-export default ProductPlan
+export default ProductPlan;

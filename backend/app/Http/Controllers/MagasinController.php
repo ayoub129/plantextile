@@ -11,7 +11,7 @@ class MagasinController extends Controller
     // Fetch the RepassageProduction data for a specific model
     public function show($modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_magasin']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Magasin_fourniture' , 'Magasin_final']);
 
         $repassageProduction = ControlMagasin::where('model_id', $modelId)->first();
         if ($repassageProduction) {
@@ -24,7 +24,7 @@ class MagasinController extends Controller
     // Update the RepassageProduction value for a specific model
     public function update(Request $request, $modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_magasin']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Magasin_fourniture' , 'Magasin_final']);
 
         $request->validate([
             'value' => 'required|integer',

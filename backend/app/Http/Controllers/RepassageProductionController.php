@@ -11,7 +11,7 @@ class RepassageProductionController extends Controller
     // Fetch the RepassageProduction data for a specific model
     public function show($modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_repassage']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Production_repassage']);
 
         $repassageProduction = RepassageProduction::where('model_id', $modelId)->first();
         if ($repassageProduction) {
@@ -24,7 +24,7 @@ class RepassageProductionController extends Controller
     // Update the RepassageProduction value for a specific model
     public function update(Request $request, $modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_repassage']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Production_repassage']);
 
         $request->validate([
             'value' => 'required|integer',

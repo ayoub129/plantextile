@@ -13,6 +13,7 @@ use App\Http\Controllers\ProductPlanController;
 use App\Http\Controllers\RepassageProductionController;
 use App\Http\Controllers\SystemConstController;
 use App\Http\Controllers\ChainProductionController;
+use App\Http\Controllers\PrimeController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -104,20 +105,24 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('effective_standard/{modelId}', [EffectiveStandardController::class, 'getEffectiveByModel']);
     // get the effective standard 
     Route::get('effective_data/{modelId}', [EffectiveStandardController::class, 'getEffectiveData']);
+    // get the effective indirect
+    Route::get('effective_indirect_standard', [EffectiveStandardController::class, 'getEffectiveIndirect']);
 
     /**
      * Effective Real
      */
-    // create an effective standard 
+    // create an effective real 
     Route::post('effective_real', [EffectiveRealController::class, 'store']);
-    // update effective standard 
+    // update effective real 
     Route::post('effective_real/{id}', [EffectiveRealController::class, 'update']);
-    // delete effective standard 
+    // delete effective real 
     Route::delete('effective_real/{id}', [EffectiveRealController::class, 'destroy']);
-    // get the effective standard by model
+    // get the effective real by model
     Route::get('effective_real/{modelId}', [EffectiveRealController::class, 'getEffectiveByModel']);
     // get the effective real 
     Route::get('effective_real_data/{modelId}', [EffectiveRealController::class, 'getEffectiveData']);
+    // get the effective indirect
+    Route::get('effective_indirect_real', [EffectiveRealController::class, 'getEffectiveIndirect']);
 
     /**
      * System Constant
@@ -190,6 +195,17 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::delete('/posts/{id}', [PostController::class, 'destroy']);
 
+    /**
+     * Prime Controller
+     */
+    // Get all primes
+    Route::get('/primes', [PrimeController::class, 'index']);
+    // Create a new prime
+    Route::post('/primes', [PrimeController::class, 'store']);
+    // Update a prime
+    Route::post('/primes/{id}', [PrimeController::class, 'update']);
+    // Delete a prime
+    Route::delete('/primes/{id}', [PrimeController::class, 'destroy']);
 
 });
 

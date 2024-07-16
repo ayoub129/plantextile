@@ -11,7 +11,7 @@ class ControlFinalController extends Controller
     // Fetch the ControlProduction data for a specific model and chain
     public function show($modelId, $chainId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Contrôle_final']);
 
         $controlProduction = ControlProduction::where('model_id', $modelId)
                                                ->where('chain_id', $chainId)
@@ -26,7 +26,7 @@ class ControlFinalController extends Controller
     // Update the ControlProduction value for a specific model and chain
     public function update(Request $request, $modelId, $chainId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Contrôle_final']);
 
         $request->validate([
             'value' => 'required|integer',

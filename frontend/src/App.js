@@ -23,11 +23,13 @@ import Magasin from "./pages/Magasin";
 import Profile from "./pages/Profile";
 import UpdatePassword from "./pages/UpdatePassword";
 import Posts from "./pages/Posts";
+import Primes from "./pages/Primes";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/planning" element={<ProductPlan />} />
         <Route path="/" element={<Login />} />
         <Route path="/users" element={<Users />} />
         <Route path="/adduser" element={<AddUser />} />
@@ -39,7 +41,6 @@ const App = () => {
         <Route path="/chains" element={<Chains />} />
         <Route path="/users/:id" element={<AddUser />} />
         <Route path="/direct" element={<StandardEffectiveDirect />} />
-        <Route path="/planning" element={<ProductPlan />} />
         <Route path="/indirect" element={<StandardEffectiveInDirect />} />
         <Route path="/real-direct" element={<RealEffectiveDirect />} />
         <Route path="/real-indirect" element={<RealEffectiveInDirect />} />
@@ -50,7 +51,8 @@ const App = () => {
         <Route path="/control-final" element={<ControlFinal />} />
         <Route path="/magasin" element={<Magasin />} />
         <Route path="/export" element={<Export />} />
-        <Route path="/post" element={<Posts />} />
+        <Route path="/posts" element={<Posts />} />
+        <Route path="/primes" element={<Primes />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>

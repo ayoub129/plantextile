@@ -22,7 +22,6 @@ class SystemConstant extends Model
         'Coût_énergie_journalier' ,
         'Coût_par_trajet',
         'Coût_charges_fixes_journalier' ,
-        'Total_prime_par_modèle',
 ];
 
     public function effectifFix()

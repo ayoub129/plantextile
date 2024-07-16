@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import Input from "../ui/Input";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const LaCoupe = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState("");
   const [value, setValue] = useState(0);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-
-  console.log(models);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -42,20 +41,23 @@ const LaCoupe = () => {
     setSelectedModel(e.target.value);
   };
 
-  const onChange = (name, value) => {
-    setValue(parseInt(value, 10));
-  };
+  const onChange = async (name, value) => {
+    const newValue = value === "" ? 0 : parseInt(value, 10);
 
-  const handleChange = async (direction) => {
-    let newValue = value;
-    if (direction === "next") {
-      newValue += 1;
-    } else if (direction === "prev" && value > 0) {
-      newValue -= 1;
+    if (isNaN(newValue)) {
+      setValue(0);
+      return;
+    }
+
+    const selectedModelData = models.find((model) => model.id == selectedModel);
+    const encour = selectedModelData.qte_societe - newValue;
+
+    if (encour < 0) {
+      toast.error("Total Coupe can't be more than the encour");
+      return;
     }
 
     setValue(newValue);
-    setIsButtonDisabled(true);
 
     try {
       await api.post(`/coupe_production/${selectedModel}`, {
@@ -63,17 +65,14 @@ const LaCoupe = () => {
       });
     } catch (error) {
       console.error("Error updating CoupeProduction data:", error);
-    } finally {
-      setIsButtonDisabled(false);
     }
   };
 
   const selectedModelData = models.find((model) => model.id == selectedModel);
-  console.log("Selected Model:", selectedModel);
-  console.log("Selected Model Data:", selectedModelData);
 
   return (
     <div className="ml-[19%] pt-[6rem]">
+      <ToastContainer />
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">La coupe</h2>
         <div className="ml-7 mb-4 pr-6">
@@ -94,36 +93,26 @@ const LaCoupe = () => {
       {selectedModelData && (
         <div className="w-full pr-6">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">{selectedModelData.category}</h3>
-            <h3 className="font-semibold">{selectedModelData.client}</h3>
+            <h3 className="font-semibold text-xl">
+              {selectedModelData.category}
+            </h3>
+            <h3 className="font-semibold text-xl">
+              {selectedModelData.client}
+            </h3>
           </div>
-          <h3 className="font-semibold">
+          <h3 className="font-semibold text-xl">
             encour: {selectedModelData.qte_societe - value}
           </h3>
         </div>
       )}
       {selectedModel && (
-        <div className="flex justify-center mx-auto mt-[2rem] items-center mb-4 shadow-md w-fit p-1 rounded border">
-          <button
-            className="font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded"
-            onClick={() => handleChange("prev")}
-            disabled={isButtonDisabled}
-          >
-            -
-          </button>
+        <div className="flex p-5 mt-[2rem] mb-4 shadow-md w-fit p-1 rounded border">
           <Input
             handleChange={onChange}
             name={"coupe"}
-            placeholder="Total Coupe"
+            label="Total Coupe"
             text={value}
           />
-          <button
-            className="font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded"
-            onClick={() => handleChange("next")}
-            disabled={isButtonDisabled}
-          >
-            +
-          </button>
         </div>
       )}
     </div>

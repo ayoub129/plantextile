@@ -13,14 +13,14 @@
     {
         public function store(Request $request)
         {
-            $this->authorize(['developer', 'super-admin', 'admin', 'HR']);
+            $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
     
             $request->validate([
-                'chain' => 'required|string|max:255',
-                'model' => 'required|string|max:255',
-                'start_date' => 'required|date',
-                'end_date' => 'required|date',
-                'cointa' => 'required',
+                'chain' => 'nullable|string|max:255',
+                'model' => 'nullable|string|max:255',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date',
+                'cointa' => 'nullable',
                 'price_by_part' => 'nullable|numeric',
                 'effectif_directs' => 'nullable|array',
                 'effectif_directs.*.machinistes' => 'nullable|integer',
@@ -80,7 +80,7 @@
     
         public function getEffectiveByModel($modelId)
         {
-            $this->authorize(['developer', 'super-admin', 'admin', 'HR']);
+            $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
         
             $effectivereal = EffectiveReal::with(['effectifDirects', 'effectifIndirects'])
                 ->where('model', $modelId)
@@ -95,16 +95,16 @@
         
         public function update(Request $request, $id)
         {
-            $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
+            $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
     
             $effectivereal = EffectiveReal::findOrFail($id);
     
             $request->validate([
-                'chain' => 'sometimes|string|max:255',
-                'model' => 'required|string|max:255',
-                'start_date' => 'sometimes|date',
-                'end_date' => 'sometimes|date',
-                'cointa' => 'sometimes',
+                'chain' => 'nullable|string|max:255',
+                'model' => 'nullable|string|max:255',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date',
+                'cointa' => 'nullable',
                 'price_by_part' => 'nullable|numeric',
                 'effectif_directs' => 'nullable|array',
                 'effectif_directs.*.machinistes' => 'nullable|integer',
@@ -188,7 +188,7 @@
         
         public function destroy($id)
         {
-            $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
+            $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
         
             $effectivereal = EffectiveReal::findOrFail($id);
             $effectivereal->delete();
@@ -198,7 +198,7 @@
 
         public function getEffectiveData(Request $request, $modelId)
         {
-            $this->authorize(['developer', 'super-admin', 'admin', 'HR']);
+            $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
     
             $startDate = $request->query('start_date');
             $endDate = $request->query('end_date');
@@ -214,12 +214,26 @@
     
             return response()->json($effectiveStandard);
         }
+
+        public function getEffectiveIndirect()
+        {
+            $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
+    
+            $effectiveIndirect = EffectifIndirect::whereNotNull('effective_real_id')->with('coupes')->first();
+    
+            if (!$effectiveIndirect) {
+                return response()->json(['message' => 'No Effective Indirect found for this Effective Standard ID'], 404);
+            }
+    
+            return response()->json($effectiveIndirect);
+        }
+    
     
     
         private function authorize(array $roles)
         {
             if (!in_array(Auth::user()->role, $roles)) {
-                abort(403, "Unauthorized action. hh");
+                abort(403, "Unauthorized action. ");
             }
         }
     

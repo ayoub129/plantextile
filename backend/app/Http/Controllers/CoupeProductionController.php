@@ -11,7 +11,7 @@ class CoupeProductionController extends Controller
     // Fetch the CoupeProduction data for a specific model
     public function show($modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Production_coupe']);
 
         $coupeProduction = CoupeProduction::where('model_id', $modelId)->first();
         if ($coupeProduction) {
@@ -24,7 +24,7 @@ class CoupeProductionController extends Controller
     // Update the CoupeProduction value for a specific model
     public function update(Request $request, $modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Production_coupe']);
 
         $request->validate([
             'value' => 'required|integer'

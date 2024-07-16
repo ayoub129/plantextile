@@ -13,14 +13,14 @@ class EffectiveStandardController extends Controller
 {
     public function store(Request $request)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'Method']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
 
         $request->validate([
-            'chain' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'cointa' => 'required',
+            'chain' => 'nullable|string|max:255',
+            'model' => 'nullable|string|max:255',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+            'cointa' => 'nullable',
             'price_by_part' => 'nullable|numeric',
             'effectif_directs' => 'nullable|array',
             'effectif_directs.*.machinistes' => 'nullable|integer',
@@ -80,7 +80,7 @@ class EffectiveStandardController extends Controller
 
     public function getEffectiveData(Request $request, $modelId)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'Method']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
 
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
@@ -100,7 +100,7 @@ class EffectiveStandardController extends Controller
 
     public function getEffectiveByModel($modelId)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'Method']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
     
         $effectifStandard = EffectiveStandard::with(['effectifDirects', 'effectifIndirects'])
             ->where('model', $modelId)
@@ -115,16 +115,16 @@ class EffectiveStandardController extends Controller
     
     public function update(Request $request, $id)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'Method']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
 
         $effectiveStandard = EffectiveStandard::findOrFail($id);
 
         $request->validate([
-            'chain' => 'sometimes|string|max:255',
-            'model' => 'required|string|max:255',
-            'start_date' => 'sometimes|date',
-            'end_date' => 'sometimes|date',
-            'cointa' => 'sometimes',
+            'chain' => 'nullable|string|max:255',
+            'model' => 'nullable|string|max:255',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+            'cointa' => 'nullable',
             'price_by_part' => 'nullable|numeric',
             'effectif_directs' => 'nullable|array',
             'effectif_directs.*.machinistes' => 'nullable|integer',
@@ -208,13 +208,27 @@ class EffectiveStandardController extends Controller
     
     public function destroy($id)
     {
-        $this->authorize(['developer', 'super-admin', 'admin', 'Method']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
     
         $effectiveStandard = EffectiveStandard::findOrFail($id);
         $effectiveStandard->delete();
     
         return response()->json(null, 204);
     }
+
+    public function getEffectiveIndirect()
+    {
+        $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
+
+        $effectiveIndirect = EffectifIndirect::whereNotNull('effective_standard_id')->with('coupes')->first();
+
+        if (!$effectiveIndirect) {
+            return response()->json(['message' => 'No Effective Indirect found for this Effective Standard ID'], 404);
+        }
+
+        return response()->json($effectiveIndirect);
+    }
+
 
     private function authorize(array $roles)
     {

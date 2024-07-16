@@ -27,7 +27,6 @@ class SystemConstantSeeder extends Seeder
             'Coût_énergie_journalier' => 0,
             'Coût_par_trajet' => 65,
             'Coût_charges_fixes_journalier' => 0,
-            'Total_prime_par_modèle' => 0,
         ]);
 
         EffectifFix::create([

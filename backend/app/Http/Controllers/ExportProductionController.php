@@ -10,7 +10,7 @@ class ExportProductionController extends Controller
 {
     public function update(Request $request, $modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_magasin']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Logistique']);
 
         $request->validate([
             'value' => 'required|integer',
@@ -35,7 +35,7 @@ class ExportProductionController extends Controller
      */
     public function show($modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_magasin']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Logistique']);
 
         $repassageProduction = ExportProduction::where('model_id', $modelId)->first();
         if ($repassageProduction) {
@@ -44,5 +44,13 @@ class ExportProductionController extends Controller
             return response()->json(['message' => 'Data not found'], 404);
         }
     }
+
+    private function authorize(array $roles)
+    {
+        if (!in_array(Auth::user()->role, $roles)) {
+            abort(403, 'Unauthorized action.');
+        }
+    }
+
 
 }

@@ -254,6 +254,9 @@ const EffectiveDirect = ({ url = "effective_standard" }) => {
     <div className="ml-[16.66%] mr-5 pt-[6rem]">
       <ToastContainer />
       <form className="ml-7" onSubmit={handleSubmit}>
+        <h2 className="text-2xl font-semibold my-5 mb-[3rem]">
+          Effective Standard InDirect
+        </h2>
         <div className="mb-4">
           <label className="block font-semibold">Chain</label>
           <select

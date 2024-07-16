@@ -10,11 +10,11 @@ return new class extends Migration
     {
         Schema::create('effective_reals', function (Blueprint $table) {
             $table->id();
-            $table->string('chain');
-            $table->string('model');
-            $table->date('start_date');
-            $table->date('end_date');
-            $table->string('cointa');
+            $table->string('chain')->nullable();
+            $table->string('model')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->string('cointa')->nullable();
             $table->decimal('price_by_part', 8, 2)->nullable();
             $table->timestamps();
         });

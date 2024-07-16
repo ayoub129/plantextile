@@ -22,7 +22,6 @@ return new class extends Migration
             $table->double('Masse_salariale_17_50');
             $table->double('Capacité_par_unité_transport');
             $table->double('cotisation_entroprise_trans');
-            $table->double('Total_prime_par_modèle');
             $table->double('Coût_par_trajet');
             $table->double('Coût_énergie_journalier');
             $table->double('Coût_charges_fixes_journalier');

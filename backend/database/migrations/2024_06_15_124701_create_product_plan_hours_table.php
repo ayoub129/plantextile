@@ -12,7 +12,6 @@ class CreateProductPlanHoursTable extends Migration
             $table->id();
             $table->unsignedBigInteger('product_plan_id');
             $table->string('hour');
-            $table->string('day');
             $table->date('date');
             $table->integer('models_finished');
             $table->timestamps();
