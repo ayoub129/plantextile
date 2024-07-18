@@ -53,7 +53,7 @@ function ProductPlanning() {
 
   useEffect(() => {
     const fetchPlanning = async () => {
-      if (data.model_id) {
+      if (data.model_id && data.chain) {
         setLoading(true);
         const selectedModel = models.find(
           (model) => model.id === parseInt(data.model_id)
@@ -63,7 +63,7 @@ function ProductPlanning() {
         }
         try {
           const response = await api.get(
-            `/product_plans_model/${data.model_id}`
+            `/product_plans_model/${data.model_id}/${data.chain}`
           );
           setPlanningDataId(response.data.id);
           setPlanningData(response.data);
@@ -84,7 +84,7 @@ function ProductPlanning() {
     if (!isEditing) {
       fetchPlanning();
     }
-  }, [data.model_id, models]);
+  }, [data.model_id, data.chain, models]);
 
   const handleSubmit = async (event) => {
     setSubLoading(true);
@@ -145,7 +145,7 @@ function ProductPlanning() {
     };
 
     try {
-      await api.post(`/product_plans/${data.id}`, formattedData); // Use PUT for update
+      await api.post(`/product_plans/${data.id}`, formattedData);
       resetForm();
       setIsEditing(false);
       setPlanningData(null); // Ensure the form view is shown
@@ -262,6 +262,21 @@ function ProductPlanning() {
           ))}
         </select>
       </div>
+      <div className="ml-7 mb-4">
+        <label className="block font-semibold">Chaîne</label>
+        <select
+          className="block w-full mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
+          value={data.chain}
+          onChange={(e) => onChange("chain", e.target.value)}
+        >
+          <option value="">Sélectionnez la chaîne</option>
+          {chains.map((chain) => (
+            <option key={chain.id} value={chain.id}>
+              {chain.name}
+            </option>
+          ))}
+        </select>
+      </div>
       {loading && <p className="text-center font-semibold">Chargement...</p>}
 
       {!loading && !planningData && (
@@ -269,22 +284,6 @@ function ProductPlanning() {
           className="ml-7"
           onSubmit={isEditing ? handleUpdateSubmit : handleSubmit}
         >
-          <div className="mb-4">
-            <label className="block font-semibold">Chaîne</label>
-            <select
-              className="block w-full mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
-              value={data.chain}
-              onChange={(e) => onChange("chain", e.target.value)}
-            >
-              <option value="">Sélectionnez la chaîne</option>
-              {chains.map((chain) => (
-                <option key={chain.id} value={chain.id}>
-                  {chain.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
           <div className="mb-4">
             <label className="block font-semibold">Date de début</label>
             <DatePicker

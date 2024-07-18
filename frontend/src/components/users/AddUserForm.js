@@ -1,4 +1,6 @@
+// import React components
 import React, { useEffect, useState } from "react";
+// import routers
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../api/axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -21,30 +23,26 @@ const AddUserForm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkRoleAndFetchUser = async () => {
-      const userRoles = ["RH", "superadmin", "admin", "developer"];
-      if (userRoles.indexOf(currentUserRole) === -1) {
-        navigate("/dashboard");
-        return;
-      }
-
+    const fetchUser = async () => {
       if (id) {
         try {
           const response = await api.get(`/users/${id}`);
           setUser(response.data);
         } catch (error) {
-          toast.error(`Failed to fetch user data: ${error}`);
+          toast.error(
+            `Échec de la récupération des données de l'utilisateur: ${error}`
+          );
         }
       }
     };
 
-    checkRoleAndFetchUser();
-  }, [currentUserRole, navigate, id]);
+    fetchUser();
+  }, [navigate, id]);
 
   const roles =
-    currentUserRole === "RH"
+    currentUserRole === "HR"
       ? [
-          "RH",
+          "HR",
           "Logistique",
           "Méthode",
           "Chaîne_production_entrée",
@@ -77,23 +75,23 @@ const AddUserForm = () => {
     const { name, email, password, password_confirmation } = user;
 
     if (!name) {
-      toast.error("Name is required");
+      toast.error("Le nom est obligatoire");
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast.error("Invalid email address");
+      toast.error("Adresse e-mail invalide");
       return false;
     }
 
     if (password.length < 5) {
-      toast.error("Password must be at least 5 characters long");
+      toast.error("Le mot de passe doit contenir au moins 5 caractères");
       return false;
     }
 
     if (password !== password_confirmation) {
-      toast.error("Passwords do not match");
+      toast.error("Les mots de passe ne correspondent pas");
       return false;
     }
 
@@ -117,7 +115,10 @@ const AddUserForm = () => {
         navigate("/users");
       } catch (error) {
         setLoading(false);
-        toast.error("There was an error updating the user!" + error);
+        toast.error(
+          "Une erreur s'est produite lors de la mise à jour de l'utilisateur!" +
+            error
+        );
       }
     } else {
       try {
@@ -126,7 +127,10 @@ const AddUserForm = () => {
         navigate("/users");
       } catch (error) {
         setLoading(false);
-        toast.error("There was an error creating the user!" + error);
+        toast.error(
+          "Une erreur s'est produite lors de la création de l'utilisateur!" +
+            error
+        );
       }
     }
   };
@@ -138,12 +142,12 @@ const AddUserForm = () => {
         <div className="mb-4">
           <Input
             container=""
-            label="Name"
+            label="Nom"
             id="name"
             name="name"
             handleChange={onChange}
             text={user.name}
-            placeholder="Enter user name"
+            placeholder="Entrez le nom de l'utilisateur"
             order=""
           />
         </div>
@@ -155,19 +159,19 @@ const AddUserForm = () => {
             name="email"
             handleChange={onChange}
             text={user.email}
-            placeholder="Enter user email"
+            placeholder="Entrez l'email de l'utilisateur"
             order=""
           />
         </div>
         <div className="mb-4">
           <Input
             container=""
-            label="Password"
+            label="Mot de passe"
             id="password"
             name="password"
             handleChange={onChange}
             text={user.password}
-            placeholder="Enter password"
+            placeholder="Entrez le mot de passe"
             type="password"
             order=""
           />
@@ -175,19 +179,19 @@ const AddUserForm = () => {
         <div className="mb-4">
           <Input
             container=""
-            label="Confirm Password"
+            label="Confirmer le mot de passe"
             id="password_confirmation"
             name="password_confirmation"
             handleChange={onChange}
             text={user.password_confirmation}
-            placeholder="Confirm password"
+            placeholder="Confirmez le mot de passe"
             type="password"
             order=""
           />
         </div>
         <div className="mb-4">
           <label className="block font-semibold" htmlFor="role">
-            Role
+            Rôle
           </label>
           <select
             id="role"
@@ -196,7 +200,7 @@ const AddUserForm = () => {
             onChange={(e) => onChange("role", e.target.value)}
             className="block w-full mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
           >
-            <option value="">Select role</option>
+            <option value="">Sélectionnez le rôle</option>
             {roles.map((role, index) => (
               <option key={index} value={role}>
                 {role}
@@ -207,11 +211,11 @@ const AddUserForm = () => {
         <Button classes="bg-blue-500" type="submit">
           {loading
             ? id
-              ? "Updating User ..."
-              : "Adding User ..."
+              ? "Mise à jour de l'utilisateur en cours ..."
+              : "Ajout de l'utilisateur en cours ..."
             : id
-            ? "Update User"
-            : "Add User"}
+            ? "Mettre à jour l'utilisateur"
+            : "Ajouter l'utilisateur"}
         </Button>
       </form>
     </div>

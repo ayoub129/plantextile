@@ -72,18 +72,6 @@ function FullCalendar({ url, planningData }) {
   const handleEventBlur = async () => {
     const { date, hour } = editingEvent;
     const eventValue = parseInt(events[`${date}-${hour}`], 10) || 0;
-    const newTotal =
-      totalModelsFinished - (events[`${date}-${hour}`] || 0) + eventValue;
-    setTotalModelsFinished(newTotal);
-
-    if (newTotal > planningData.qte) {
-      toast.error(
-        "La quantité ne peut pas être supérieure à Quantité Société de modèle."
-      );
-      setEvents({ ...events, [`${date}-${hour}`]: 0 }); // Reset to 0 or previous value
-      setEditingEvent(null);
-      return;
-    }
 
     try {
       const existingEventResponse = await api.post(`${url}/search`, {
@@ -100,10 +88,37 @@ function FullCalendar({ url, planningData }) {
             hour: hour,
             models_finished: eventValue,
           });
+          const newTotal =
+            totalModelsFinished -
+            existingEventResponse.data[0].models_finished +
+            eventValue;
+          setTotalModelsFinished(newTotal);
+
+          if (newTotal > planningData.qte) {
+            toast.error(
+              "La quantité ne peut pas être supérieure à Quantité Société de modèle."
+            );
+            setEvents({ ...events, [`${date}-${hour}`]: 0 }); // Reset to 0 or previous value
+            setEditingEvent(null);
+            return;
+          }
         } else {
           await api.delete(`${url}/${existingEventResponse.data[0].id}`);
           const newEvents = { ...events };
           delete newEvents[`${date}-${hour}`];
+          const newTotal =
+            totalModelsFinished - existingEventResponse.data[0].models_finished;
+          setTotalModelsFinished(newTotal);
+
+          if (newTotal > planningData.qte) {
+            toast.error(
+              "La quantité ne peut pas être supérieure à Quantité Société de modèle."
+            );
+            setEvents({ ...events, [`${date}-${hour}`]: 0 }); // Reset to 0 or previous value
+            setEditingEvent(null);
+            return;
+          }
+
           setEvents(newEvents);
         }
       } else if (eventValue) {
@@ -113,6 +128,17 @@ function FullCalendar({ url, planningData }) {
           hour: hour,
           models_finished: eventValue,
         });
+        const newTotal = totalModelsFinished + eventValue;
+        setTotalModelsFinished(newTotal);
+
+        if (newTotal > planningData.qte) {
+          toast.error(
+            "La quantité ne peut pas être supérieure à Quantité Société de modèle."
+          );
+          setEvents({ ...events, [`${date}-${hour}`]: 0 }); // Reset to 0 or previous value
+          setEditingEvent(null);
+          return;
+        }
       }
 
       // Update total models finished

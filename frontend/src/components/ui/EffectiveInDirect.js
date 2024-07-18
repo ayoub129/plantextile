@@ -44,7 +44,6 @@ const EffectiveIndirect = ({
       try {
         const response = await api.get(getIndirect);
         if (response.data) {
-          console.log(response.data.coupes);
           const effectiveStandardData = response.data;
           if (effectiveStandardData) {
             setData({
@@ -75,7 +74,6 @@ const EffectiveIndirect = ({
           setEffectiveStandardId(null);
         }
       } catch (error) {
-        console.error("Error:", error);
         setEffectiveStandardId(null);
       } finally {
         setIsLoading(false);
@@ -83,7 +81,7 @@ const EffectiveIndirect = ({
     };
 
     checkExisted();
-  }, []);
+  }, [getIndirect]);
 
   const handleSubmit = async (event) => {
     setLoading(true);
@@ -117,13 +115,8 @@ const EffectiveIndirect = ({
     };
 
     try {
-      if (effectiveStandardId) {
-        await api.post(`/${url}/${effectiveStandardId}`, formattedData);
-        toast.success("Data updated successfully.");
-      } else {
-        await api.post(`/${url}`, formattedData);
-        toast.success("Data saved successfully.");
-      }
+      await api.post(`/${url}`, formattedData);
+      toast.success("Données enregistrées avec succès.");
       setData({
         cointa: "",
         price_by_part: "",
@@ -144,8 +137,7 @@ const EffectiveIndirect = ({
       });
       setEffectiveStandardId(null);
     } catch (error) {
-      toast.error("Error saving data.");
-      console.error("Error:", error);
+      toast.error("Erreur lors de l'enregistrement des données.");
     } finally {
       setLoading(false);
     }
@@ -154,7 +146,7 @@ const EffectiveIndirect = ({
   const handleDelete = async () => {
     try {
       await api.delete(`/${url}/${effectiveStandardId}`);
-      toast.success("Data deleted successfully.");
+      toast.success("Données supprimées avec succès.");
       setData({
         cointa: "",
         price_by_part: "",
@@ -175,8 +167,7 @@ const EffectiveIndirect = ({
       });
       setEffectiveStandardId(null);
     } catch (error) {
-      console.error("Error:", error);
-      toast.error("Error deleting data.");
+      toast.error("Erreur lors de la suppression des données.");
     }
   };
 
@@ -184,16 +175,18 @@ const EffectiveIndirect = ({
     <div className="ml-[16.66%] mr-5 pt-[6rem]">
       <ToastContainer />
       {isLoading ? (
-        <div className="text-center text-2xl">Loading...</div>
+        <div className="text-center text-2xl">Chargement...</div>
       ) : (
         <form className="ml-7" onSubmit={handleSubmit}>
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold my-5 mb-[3rem]">
-              Effective Standard Indirect
+              {url === "effective_real"
+                ? "Effectif Réel Indirect"
+                : "Effectif Standard Indirect"}
             </h2>
             {effectiveStandardId && (
               <Button classes="bg-red-500 my-5 mb-8" onClick={handleDelete}>
-                Delete Effective Indirect
+                Supprimer l'Effectif Indirect
               </Button>
             )}
           </div>
@@ -262,7 +255,7 @@ const EffectiveIndirect = ({
 
           <Input
             container="mb-4"
-            label="Preparation Stagieres"
+            label="Préparation Stagiaires"
             type="number"
             name="preparation_stagieres"
             text={data.preparation_stagieres}
@@ -271,7 +264,7 @@ const EffectiveIndirect = ({
 
           <Input
             container="mb-4"
-            label="Preparation"
+            label="Préparation"
             type="number"
             name="preparation"
             text={data.preparation}
@@ -280,7 +273,7 @@ const EffectiveIndirect = ({
 
           <Input
             container="mb-4"
-            label="Preparation Elastique"
+            label="Préparation Élastique"
             type="number"
             name="preparation_elastique"
             text={data.preparation_elastique}
@@ -335,7 +328,7 @@ const EffectiveIndirect = ({
                     onChange("cointa", e.target.value === "true")
                   }
                 />
-                Yes
+                Oui
               </label>
               <label className="mr-4">
                 <input
@@ -345,7 +338,7 @@ const EffectiveIndirect = ({
                   checked={data.cointa === false}
                   onChange={(e) => onChange("cointa", e.target.value === 0)}
                 />
-                No
+                Non
               </label>
             </div>
           </div>
@@ -353,7 +346,7 @@ const EffectiveIndirect = ({
           {data.cointa && (
             <Input
               container="mb-4"
-              label="Price by Part"
+              label="Prix par pièce"
               type="number"
               name="price_by_part"
               text={data.price_by_part}
@@ -362,7 +355,7 @@ const EffectiveIndirect = ({
           )}
 
           <Button classes="bg-blue-500 my-5 mb-8">
-            {loading ? "Saving ..." : "Save Effective Indirect"}
+            {loading ? "Enregistrement ..." : "Enregistrer Effectif Indirect"}
           </Button>
         </form>
       )}

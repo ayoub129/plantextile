@@ -5,18 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ExportProduction extends Model
+class PlastiqueFil extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'model_id',
-        'value',
-        'date'
+        'plastique_real',
+        'fil_real',
     ];
 
     public function model()
     {
-        return $this->belongsTo(Models::class);
+        return $this->belongsTo(Model::class);
     }
-
 }

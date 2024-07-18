@@ -1,26 +1,31 @@
-import React, { useState , useEffect } from 'react'
-import Header from '../components/ui/Header'
-import Sidebar from '../components/ui/Sidebar'
-import { useNavigate } from 'react-router-dom'
-import RepassageProduction from '../components/products/RepassageProduction'
+import React, { useState, useEffect } from "react";
+import Header from "../components/ui/Header";
+import Sidebar from "../components/ui/Sidebar";
+import { useNavigate } from "react-router-dom";
+import RepassageProduction from "../components/products/RepassageProduction";
 
 const Repassage = () => {
   // handle state change for the sidebar and redirect if not autorized
   const [sidebar, setSidebar] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
 
     // redirect to home if not logged in
     if (!token) {
-      navigate('/');
+      navigate("/");
     } else {
       // Check for the role
-      const allowedRoles = ['admin', 'superadmin', 'developer' , 'production_repassage'];
+      const allowedRoles = [
+        "admin",
+        "superadmin",
+        "developer",
+        "Production_repassage",
+      ];
       if (!allowedRoles.includes(role)) {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
     }
   }, [navigate]);
@@ -34,7 +39,7 @@ const Repassage = () => {
       {/* Repassage production  */}
       <RepassageProduction />
     </div>
-  )
-}
+  );
+};
 
-export default Repassage
+export default Repassage;

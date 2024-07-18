@@ -22,7 +22,7 @@ const Magasin = () => {
         "admin",
         "superadmin",
         "developer",
-        "production_magasin",
+        "Magasin_final",
       ];
       if (!allowedRoles.includes(role)) {
         navigate("/dashboard");

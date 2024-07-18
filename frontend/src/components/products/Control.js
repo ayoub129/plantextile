@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import Input from "../ui/Input";
+import { toast, ToastContainer } from "react-toastify";
+import Button from "../ui/Button";
 
 const ControlProduction = () => {
   const [models, setModels] = useState([]);
-  const [chains, setChains] = useState([]);
   const [posts, setPosts] = useState([]);
   const [selectedModel, setSelectedModel] = useState("");
-  const [selectedChain, setSelectedChain] = useState("");
   const [selectedPost, setSelectedPost] = useState("");
-
   const [production, setProduction] = useState(0);
   const [retouch, setRetouch] = useState(0);
-
+  const [entre, setEntre] = useState(0);
+  const [encore, setEncore] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   useEffect(() => {
@@ -22,15 +22,6 @@ const ControlProduction = () => {
         setModels(response.data);
       } catch (error) {
         console.error("Error fetching models:", error);
-      }
-    };
-
-    const fetchChains = async () => {
-      try {
-        const response = await api.get("/chains");
-        setChains(response.data);
-      } catch (error) {
-        console.error("Error fetching chains:", error);
       }
     };
 
@@ -44,45 +35,45 @@ const ControlProduction = () => {
     };
 
     fetchModels();
-    fetchChains();
     fetchPosts();
   }, []);
 
   useEffect(() => {
     const fetchProductionData = async () => {
-      if (selectedModel && selectedChain) {
+      if (selectedModel) {
         try {
-          const response = await api.get(
-            `/control_production/${selectedModel}/${selectedChain}`
+          const productionResponse = await api.get(
+            `/control_production/${selectedModel}`
           );
-          const { production, retouch, posts } = response.data;
-          setProduction(production);
+          const { value, retouch } = productionResponse.data;
+          setProduction(value);
           setRetouch(retouch);
-          setSelectedPost(posts);
         } catch (error) {
           console.error("Error fetching production data:", error);
+        }
+
+        try {
+          const repassageResponse = await api.get(
+            `/repassage_production/${selectedModel}`
+          );
+          const { value: entreValue } = repassageResponse.data;
+          setEntre(entreValue);
+          setEncore(entreValue - production);
+        } catch (error) {
+          console.error("Error fetching repassage data:", error);
         }
       }
     };
 
     fetchProductionData();
-  }, [selectedModel, selectedChain]);
+  }, [selectedModel, production]);
 
   const handleModelChange = (e) => {
     setSelectedModel(e.target.value);
   };
 
-  const handleChainChange = (e) => {
-    setSelectedChain(e.target.value);
-  };
-
   const handlePostChange = (e) => {
     setSelectedPost(e.target.value);
-  };
-
-  const onChange = (name, value) => {
-    if (name === "production") setProduction(parseInt(value, 10));
-    if (name === "retouch") setRetouch(parseInt(value, 10));
   };
 
   const handleChange = async (direction, type) => {
@@ -90,23 +81,52 @@ const ControlProduction = () => {
     if (type === "production") {
       newValue = direction === "next" ? production + 1 : production - 1;
       if (newValue < 0) newValue = 0;
+      const newEncore = entre - newValue;
+      if (newEncore < 0) {
+        toast.error("Encore cannot be less than 0");
+        return;
+      }
       setProduction(newValue);
+      setEncore(newEncore);
+      await updateProduction(newValue);
     } else if (type === "retouch") {
       newValue = direction === "next" ? retouch + 1 : retouch - 1;
       if (newValue < 0) newValue = 0;
       setRetouch(newValue);
     }
+  };
 
+  const updateProduction = async (newProduction) => {
     setIsButtonDisabled(true);
-
     try {
-      await api.post(`/control_production/${selectedModel}/${selectedChain}`, {
-        value: type === "production" ? newValue : production,
-        retouch: type === "retouch" ? newValue : retouch,
-        posts: selectedPost,
+      await api.post(`/control_production/${selectedModel}`, {
+        value: newProduction,
       });
     } catch (error) {
       console.error("Error updating production data:", error);
+    } finally {
+      setIsButtonDisabled(false);
+    }
+  };
+
+  const handleRetouchSubmit = async () => {
+    if (!selectedPost) {
+      toast.error("Please select a post before submitting retouch.");
+      return;
+    }
+
+    setIsButtonDisabled(true);
+    try {
+      await api.post(`/retouch`, {
+        model_id: selectedModel,
+        value: retouch,
+        post_id: selectedPost,
+      });
+
+      setRetouch(0);
+      setSelectedPost("");
+    } catch (error) {
+      console.error("Error updating retouch data:", error);
     } finally {
       setIsButtonDisabled(false);
     }
@@ -116,9 +136,10 @@ const ControlProduction = () => {
 
   return (
     <div className="ml-[19%] pt-[6rem]">
+      <ToastContainer />
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Control Final</h2>
-        <div className="ml-7 mb-4 pr-6 flex items-center w-[325px] justify-between">
+        <div className="ml-7 mb-4 pr-6 flex items-center justify-between">
           <select
             className="block w-fit mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
             value={selectedModel}
@@ -131,21 +152,9 @@ const ControlProduction = () => {
               </option>
             ))}
           </select>
-          <select
-            className="block w-fit mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
-            value={selectedChain}
-            onChange={handleChainChange}
-          >
-            <option value="">Select Chain</option>
-            {chains.map((chain, index) => (
-              <option key={index} value={chain.id}>
-                {chain.name}
-              </option>
-            ))}
-          </select>
         </div>
       </div>
-      {selectedModelData && selectedChain && (
+      {selectedModelData && (
         <div className="w-full pr-6">
           <div
             key={selectedModelData.id}
@@ -156,8 +165,16 @@ const ControlProduction = () => {
           </div>
         </div>
       )}
+      <div className="w-full pr-6">
+        {selectedModelData && (
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">Encore: {encore}</h3>
+          </div>
+        )}
+      </div>
+
       <div className="flex justify-between items-center">
-        {selectedModel && selectedChain && (
+        {selectedModel && (
           <div className="flex flex-col items-center mx-auto mt-[2rem] mb-4 shadow-md w-fit p-3 rounded border">
             <h3 className="font-semibold">Total Production</h3>
             <div className="flex items-center">
@@ -169,10 +186,11 @@ const ControlProduction = () => {
                 -
               </button>
               <Input
-                handleChange={(name, value) => onChange("production", value)}
+                handleChange={() => {}}
                 name={"production"}
+                disabled
                 placeholder="Total Production"
-                text={production}
+                text={production ? production.toString() : "0"}
               />
               <button
                 className="font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded"
@@ -184,7 +202,7 @@ const ControlProduction = () => {
             </div>
           </div>
         )}
-        {selectedModel && selectedChain && (
+        {selectedModel && (
           <div className="flex flex-col items-center mx-auto mt-[2rem] mb-4 shadow-md w-fit p-3 rounded border">
             <h3 className="font-semibold">Total Retouch</h3>
             <div className="flex items-center">
@@ -196,10 +214,11 @@ const ControlProduction = () => {
                 -
               </button>
               <Input
-                handleChange={(name, value) => onChange("retouch", value)}
+                handleChange={() => {}}
                 name={"retouch"}
+                disabled
                 placeholder="Total Retouch"
-                text={retouch}
+                text={retouch ? retouch.toString() : "0"}
               />
               <button
                 className="font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded"
@@ -208,20 +227,30 @@ const ControlProduction = () => {
               >
                 +
               </button>
+              <div>
+                <select
+                  id="select"
+                  className="block w-fit mt-4 mr-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
+                  value={selectedPost}
+                  onChange={handlePostChange}
+                  disabled={retouch === 0}
+                >
+                  <option value="">Select Post</option>
+                  {posts.map((post, index) => (
+                    <option key={index} value={post.id}>
+                      {post.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Button
+                classes={"bg-blue-500 mt-4"}
+                handlePress={handleRetouchSubmit}
+                disabled={isButtonDisabled}
+              >
+                Submit
+              </Button>
             </div>
-            <select
-              className="block w-fit mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
-              value={selectedPost}
-              onChange={handlePostChange}
-              disabled={retouch === 0}
-            >
-              <option value="">Select Post</option>
-              {posts.map((post, index) => (
-                <option key={index} value={post.id}>
-                  {post.name}
-                </option>
-              ))}
-            </select>
           </div>
         )}
       </div>

@@ -3,7 +3,7 @@ import api from "../../api/axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const MagasinProduction = () => {
+const MagasinFournitureProduction = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState("");
   const [production, setProduction] = useState(0);
@@ -26,11 +26,11 @@ const MagasinProduction = () => {
   }, []);
 
   useEffect(() => {
-    const fetchMagasinProduction = async () => {
+    const fetchMagasinFournitureProduction = async () => {
       if (selectedModel) {
         try {
           const response = await api.get(
-            `/magasin_production/${selectedModel}`
+            `/magasin_fourniture_production/${selectedModel}`
           );
           setProduction(response.data.value);
           setEntre(response.data.entre || 0);
@@ -38,19 +38,20 @@ const MagasinProduction = () => {
           calculateEncore(response.data.value);
         } catch (error) {
           calculateEncore(0);
-          console.error("Error fetching Magasin Production data:", error);
+          console.error(
+            "Error fetching Magasin Fourniture Production data:",
+            error
+          );
         }
       }
     };
 
-    fetchMagasinProduction();
+    fetchMagasinFournitureProduction();
   }, [selectedModel]);
 
   const calculateEncore = async (magasinValue) => {
     try {
-      const response = await api.get(
-        `/magasin_fourniture_production/${selectedModel}`
-      );
+      const response = await api.get(`/control_production/${selectedModel}`);
       const totalSortie = response.data.value;
       setTotalSortie(totalSortie);
 
@@ -83,7 +84,9 @@ const MagasinProduction = () => {
     }
 
     if (newValue > totalSortie) {
-      toast.error("Total Magasin can't be more than the total Control final");
+      toast.error(
+        "Total Magasin Fourniture can't be more than the total Control final"
+      );
       return;
     }
 
@@ -96,12 +99,15 @@ const MagasinProduction = () => {
     setIsButtonDisabled(true);
 
     try {
-      await api.post(`/magasin_production/${selectedModel}`, {
+      await api.post(`/magasin_fourniture_production/${selectedModel}`, {
         value: type === "production" ? newValue : production,
       });
       calculateEncore(newValue);
     } catch (error) {
-      console.error("Error updating Magasin Production data:", error);
+      console.error(
+        "Error updating Magasin Fourniture Production data:",
+        error
+      );
     } finally {
       setIsButtonDisabled(false);
     }
@@ -113,7 +119,7 @@ const MagasinProduction = () => {
     <div className="ml-[19%] pt-[6rem]">
       <ToastContainer />
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Magasin Final</h2>
+        <h2 className="text-xl font-semibold">Magasin Fourniture</h2>
         <div className="ml-7 mb-4 pr-6">
           <select
             className="block w-full mt-4 outline-0 p-[.5rem] border border-[#b3b3b3] focus:border-2 focus:border-[#2684ff] rounded"
@@ -153,7 +159,7 @@ const MagasinProduction = () => {
           </button>
           <div className="flex flex-col items-center">
             <label className="font-semibold text-[18px]">
-              Total Magasin Final
+              Total Magasin Fourniture
             </label>
             <input
               type="number"
@@ -175,4 +181,4 @@ const MagasinProduction = () => {
   );
 };
 
-export default MagasinProduction;
+export default MagasinFournitureProduction;

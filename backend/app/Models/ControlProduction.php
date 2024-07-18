@@ -11,7 +11,6 @@ class ControlProduction extends Model
 
     protected $fillable = [
         'model_id',
-        'chain_id',
         'value',
         'retouch',
         'posts'
@@ -20,10 +19,5 @@ class ControlProduction extends Model
     public function model()
     {
         return $this->belongsTo(Models::class);
-    }
-
-    public function chain()
-    {
-        return $this->belongsTo(Chains::class);
     }
 }

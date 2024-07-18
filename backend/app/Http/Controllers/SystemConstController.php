@@ -64,6 +64,25 @@ class SystemConstController extends Controller
         return response()->json($systemConstant);
     }
 
+    public function salaries()
+    {
+        $this->authorize(['developer', 'admin', 'superadmin']);
+    
+        $systemConstant = SystemConstant::with('effectifFix')->latest()->firstOrFail();
+    
+        $totalSalaries = [
+            'Taux_horaire_SMIG_16_29' => $systemConstant->Taux_horaire_SMIG_16_29 ?? 0,
+            'Taux_horaire_17_00' => $systemConstant->Taux_horaire_17_00 ?? 0,
+            'Taux_horaire_17_50' => $systemConstant->Taux_horaire_17_50 ?? 0,
+            'Masse_salariale_16_29' => $systemConstant->Masse_salariale_16_29 ?? 0,
+            'Masse_salariale_17_00' => $systemConstant->Masse_salariale_17_00 ?? 0,
+            'Masse_salariale_17_50' => $systemConstant->Masse_salariale_17_50 ?? 0,
+        ];
+    
+        return response()->json($totalSalaries);
+    }
+    
+
     private function authorize(array $roles)
     {
         if (!in_array(Auth::user()->role, $roles)) {

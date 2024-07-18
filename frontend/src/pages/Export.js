@@ -18,12 +18,7 @@ const Export = () => {
       navigate("/");
     } else {
       // Check for the role
-      const allowedRoles = [
-        "admin",
-        "superadmin",
-        "developer",
-        "production_magasin",
-      ];
+      const allowedRoles = ["admin", "superadmin", "developer", "Logistique"];
       if (!allowedRoles.includes(role)) {
         navigate("/dashboard");
       }

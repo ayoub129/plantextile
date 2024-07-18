@@ -20,7 +20,8 @@ const Sidebar = ({ sidebar }) => {
       { link: "/real-direct", text: "Effectif Direct Réel" },
       { link: "/real-indirect", text: "Effectif Indirect Réel" },
       { link: "/coupe", text: "La Coupe" },
-      { link: "/production", text: "Production" },
+      { link: "/production_entre", text: "Production Entre" },
+      { link: "/production_sortie", text: "Production Sortie" },
       { link: "/repassage", text: "Repassage" },
       { link: "/control-final", text: "Contrôle Final" },
       { link: "/magasin", text: "Magasin" },
@@ -41,7 +42,8 @@ const Sidebar = ({ sidebar }) => {
       { link: "/real-direct", text: "Effectif Direct Réel" },
       { link: "/real-indirect", text: "Effectif Indirect Réel" },
       { link: "/coupe", text: "La Coupe" },
-      { link: "/production", text: "Production" },
+      { link: "/production_entre", text: "Production Entre" },
+      { link: "/production_sortie", text: "Production Sortie" },
       { link: "/repassage", text: "Repassage" },
       { link: "/control-final", text: "Contrôle Final" },
       { link: "/magasin", text: "Magasin" },
@@ -61,7 +63,8 @@ const Sidebar = ({ sidebar }) => {
       { link: "/real-direct", text: "Effectif Direct Réel" },
       { link: "/real-indirect", text: "Effectif Indirect Réel" },
       { link: "/coupe", text: "La Coupe" },
-      { link: "/production", text: "Production" },
+      { link: "/production_entre", text: "Production Entre" },
+      { link: "/production_sortie", text: "Production Sortie" },
       { link: "/repassage", text: "Repassage" },
       { link: "/control-final", text: "Contrôle Final" },
       { link: "/magasin", text: "Magasin" },
@@ -72,18 +75,18 @@ const Sidebar = ({ sidebar }) => {
     Logistique: [
       { link: "/products", text: "Produits" },
       { link: "/addproducts", text: "Ajouter un produit" },
-      { link: `/profile/${userId}`, text: "Profil" },
       { link: "/export", text: "Export" },
+      { link: `/profile/${userId}`, text: "Profil" },
     ],
     Méthode: [
-      { link: "/planning", text: "Planification" },
       { link: "/direct", text: "Effective Standard Directe" },
-      { link: "/posts", text: "Posts" },
       { link: "/indirect", text: "Effective Standard Indirecte" },
+      { link: "/planning", text: "Planification" },
+      { link: "/posts", text: "Posts" },
       { link: "/primes", text: "Primes" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
-    RH: [
+    HR: [
       { link: "/users", text: "Utilisateurs" },
       { link: "/chains", text: "Chaînes" },
       { link: "/real-direct", text: "Effectif Direct Réel" },
@@ -99,11 +102,11 @@ const Sidebar = ({ sidebar }) => {
       { link: `/profile/${userId}`, text: "Profil" },
     ],
     Chaîne_production_entrée: [
-      { link: "/production", text: "Production" },
+      { link: "/production_entre", text: "Production Entre" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
     Chaîne_production_sortie: [
-      { link: "/production", text: "Production" },
+      { link: "/production_sortie", text: "Production Sortie" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
     Contrôle_final: [
@@ -111,7 +114,8 @@ const Sidebar = ({ sidebar }) => {
       { link: `/profile/${userId}`, text: "Profil" },
     ],
     Magasin_fourniture: [
-      { link: "/magasin", text: "Magasin" },
+      { link: "/magasin_fourniture", text: "Magasin Fourniture" },
+      { link: "/plastique_file", text: "Plastique and Fil" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
     Magasin_final: [

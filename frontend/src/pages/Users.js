@@ -1,27 +1,27 @@
 // import custom components
-import { useEffect, useState } from 'react';
-import Header from '../components/ui/Header'
-import Sidebar from '../components/ui/Sidebar'
-import UsersTable from '../components/users/UsersTable'
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import Header from "../components/ui/Header";
+import Sidebar from "../components/ui/Sidebar";
+import UsersTable from "../components/users/UsersTable";
+import { useNavigate } from "react-router-dom";
 
 // get the users screen
 const Users = () => {
   const [sidebar, setSidebar] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
 
     // redirect to home if not logged in
     if (!token) {
-      navigate('/');
+      navigate("/");
     } else {
       // Check for the role
-      const allowedRoles = ['admin', 'superadmin', 'developer' , 'HR'];
+      const allowedRoles = ["admin", "superadmin", "developer", "HR"];
       if (!allowedRoles.includes(role)) {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
     }
   }, [navigate]);
@@ -35,7 +35,7 @@ const Users = () => {
       {/* Users Table */}
       <UsersTable />
     </div>
-  )
-}
+  );
+};
 
-export default Users
+export default Users;

@@ -17,42 +17,49 @@ import RealEffectiveDirect from "./pages/RealEffectiveDirect";
 import Coupe from "./pages/Coupe";
 import Repassage from "./pages/Repassage";
 import ControlFinal from "./pages/ControlFinal";
-import Production from "./pages/Production";
+import ProductionEntre from "./pages/ProductionEntre";
+import ProductionSortie from "./pages/ProductionSortie";
 import Export from "./pages/Export";
 import Magasin from "./pages/Magasin";
 import Profile from "./pages/Profile";
 import UpdatePassword from "./pages/UpdatePassword";
 import Posts from "./pages/Posts";
 import Primes from "./pages/Primes";
+import MagasinFrourniture from "./pages/MagasinFrourniture";
+import PlastiqueFile from "./pages/PlastiqueFile";
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/planning" element={<ProductPlan />} />
         <Route path="/" element={<Login />} />
         <Route path="/users" element={<Users />} />
         <Route path="/adduser" element={<AddUser />} />
+        <Route path="/users/:id" element={<AddUser />} />
+        <Route path="/chains" element={<Chains />} />
         <Route path="/products" element={<Products />} />
         <Route path="/addproducts" element={<AddProducts />} />
         <Route path="/products/:id" element={<AddProducts />} />
-        <Route path="/profile/:id" element={<Profile />} />
-        <Route path="/update-password" element={<UpdatePassword />} />
-        <Route path="/chains" element={<Chains />} />
-        <Route path="/users/:id" element={<AddUser />} />
-        <Route path="/direct" element={<StandardEffectiveDirect />} />
-        <Route path="/indirect" element={<StandardEffectiveInDirect />} />
         <Route path="/real-direct" element={<RealEffectiveDirect />} />
         <Route path="/real-indirect" element={<RealEffectiveInDirect />} />
-        <Route path="/addconstantSystem" element={<ConstantSystem />} />
-        <Route path="/coupe" element={<Coupe />} />
-        <Route path="/production" element={<Production />} />
-        <Route path="/repassage" element={<Repassage />} />
-        <Route path="/control-final" element={<ControlFinal />} />
-        <Route path="/magasin" element={<Magasin />} />
-        <Route path="/export" element={<Export />} />
+        <Route path="/direct" element={<StandardEffectiveDirect />} />
+        <Route path="/indirect" element={<StandardEffectiveInDirect />} />
+        <Route path="/planning" element={<ProductPlan />} />
         <Route path="/posts" element={<Posts />} />
         <Route path="/primes" element={<Primes />} />
+        <Route path="/coupe" element={<Coupe />} />
+        <Route path="/production_entre" element={<ProductionEntre />} />
+        <Route path="/production_sortie" element={<ProductionSortie />} />
+        <Route path="/profile/:id" element={<Profile />} />
+        <Route path="/update-password" element={<UpdatePassword />} />
+        <Route path="/repassage" element={<Repassage />} />
+        <Route path="/control-final" element={<ControlFinal />} />
+        <Route path="/magasin_fourniture" element={<MagasinFrourniture />} />
+        <Route path="/plastique_file" element={<PlastiqueFile />} />
+        <Route path="/magasin" element={<Magasin />} />
+        <Route path="/export" element={<Export />} />
+
+        <Route path="/addconstantSystem" element={<ConstantSystem />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </BrowserRouter>

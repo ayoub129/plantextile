@@ -11,11 +11,10 @@ class ChainProductionController extends Controller
     // Fetch the production data for a specific model and chain for today
     public function show($modelId, $chainId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Chaîne_production_entrée', 'Chaîne_production_sortie']);
 
         $chainProduction = ChainProduction::where('model_id', $modelId)
                                           ->where('chain', $chainId)
-                                          ->whereDate('created_at', today())
                                           ->first();
 
         if ($chainProduction) {
@@ -28,32 +27,28 @@ class ChainProductionController extends Controller
     // Update the production data for a specific model and chain for today
     public function update(Request $request, $modelId, $chainId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Chaîne_production_entrée', 'Chaîne_production_sortie']);
 
         $request->validate([
-            'production' => 'required|integer',
-            'entre' => 'required|integer',
-            'sortie' => 'required|integer'
+            'entre' => 'nullable|integer',
+            'sortie' => 'nullable|integer'
         ]);
 
         $chainProduction = ChainProduction::where('model_id', $modelId)
                                           ->where('chain', $chainId)
-                                          ->whereDate('created_at', today())
                                           ->first();
 
         if ($chainProduction) {
             // Update the existing record for today
-            $chainProduction->update([
-                'production' => $request->production,
+            $chainProduction->update(array_filter([
                 'entre' => $request->entre,
                 'sortie' => $request->sortie
-            ]);
+            ]));
         } else {
             // Create a new record if no record exists for today
             $chainProduction = ChainProduction::create([
                 'model_id' => $modelId,
                 'chain' => $chainId,
-                'production' => $request->production,
                 'entre' => $request->entre,
                 'sortie' => $request->sortie
             ]);
@@ -62,10 +57,28 @@ class ChainProductionController extends Controller
         return response()->json($chainProduction, 200);
     }
 
+    // Calculate the total sortie for a specific model
+    public function calculateSortie($modelId)
+    {
+        $totalSortie = ChainProduction::where('model_id', $modelId)
+                                      ->sum('sortie');
+    
+        return response()->json(['totalSortie' => $totalSortie], 200);
+    }
+
+    // Calculate the total sortie for a specific model
+    public function calculateEntre($modelId)
+    {
+        $totalEntre = ChainProduction::where('model_id', $modelId)
+                                      ->sum('entre');
+       return response()->json(['totalEntre' => $totalEntre], 200);
+    }
+    
+
     // Handle retouch and posts for a specific model and chain for today
     public function retouch(Request $request, $modelId, $chainId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'production_chain']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'Chaîne_production_entrée', 'Chaîne_production_sortie']);
 
         $request->validate([
             'retouch' => 'required|integer',
@@ -74,7 +87,6 @@ class ChainProductionController extends Controller
 
         $chainProduction = ChainProduction::where('model_id', $modelId)
                                           ->where('chain', $chainId)
-                                          ->whereDate('created_at', today())
                                           ->first();
 
         if ($chainProduction) {

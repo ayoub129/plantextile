@@ -10,8 +10,6 @@ class PostController extends Controller
 {
     public function index()
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
-
         $posts = Posts::all();
         return response()->json($posts);
     }
@@ -30,8 +28,6 @@ class PostController extends Controller
 
     public function show($id)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
-
         $post = Posts::findOrFail($id);
         return response()->json($post);
     }

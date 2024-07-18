@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\ExportProduction;
 use App\Http\Requests\StoreExportProductionRequest;
 use App\Http\Requests\UpdateExportProductionRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class ExportProductionController extends Controller
 {
@@ -13,17 +15,15 @@ class ExportProductionController extends Controller
         $this->authorize(['developer', 'superadmin', 'admin', 'Logistique']);
 
         $request->validate([
-            'value' => 'required|integer',
-            'entre' => 'required|integer',
-            'encore' => 'required|integer'
+            'value' => 'nullable|integer',
+            'date' => 'nullable|date'
         ]);
 
         $repassageProduction = ExportProduction::updateOrCreate(
             ['model_id' => $modelId],
             [
                 'value' => $request->value,
-                'entre' => $request->entre,
-                'encore' => $request->encore
+                'date' => $request->date
             ]
         );
 
@@ -44,6 +44,19 @@ class ExportProductionController extends Controller
             return response()->json(['message' => 'Data not found'], 404);
         }
     }
+
+    /**
+     * Get the sum of all values.
+     */
+    public function getTotalValue()
+    {
+        $this->authorize(['developer', 'superadmin', 'admin', 'Logistique']);
+
+        $totalValue = ExportProduction::sum('value');
+        
+        return response()->json(['total_value' => $totalValue], 200);
+    }
+
 
     private function authorize(array $roles)
     {

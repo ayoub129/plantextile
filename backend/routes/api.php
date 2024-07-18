@@ -14,7 +14,12 @@ use App\Http\Controllers\RepassageProductionController;
 use App\Http\Controllers\SystemConstController;
 use App\Http\Controllers\ChainProductionController;
 use App\Http\Controllers\PrimeController;
+use App\Http\Controllers\ExportProductionController;
+use App\Http\Controllers\ChainProductionRetouchController;
+use App\Http\Controllers\MagasinFournitureProductionController;
+use App\Http\Controllers\PlastiqueFilController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -61,6 +66,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chains', [ChainsController::class, 'store']);
     // Delete a chains
     Route::delete('/chains/{id}', [ChainsController::class, 'destroy']);
+    // total chain
+    Route::get('/total_chain', [ChainsController::class, 'total_chain']);
 
     /**
      * Product plan
@@ -68,7 +75,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // get a single plan 
     Route::get('product_plans_single/{id}', [ProductPlanController::class, 'show']);
     // get a single plan by model id
-    Route::get('product_plans_model/{modelId}' , [ProductPlanController::class, 'getPlanningByModel']);
+    Route::get('product_plans_model/{modelId}/{chainId}' , [ProductPlanController::class, 'getPlanningByModel']);
     // get a dashboard plan by model id
     Route::get('product_plans_model_dash/{modelId}' , [ProductPlanController::class, 'getdashPlanningByModel']);
     // create a new plan
@@ -107,6 +114,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('effective_data/{modelId}', [EffectiveStandardController::class, 'getEffectiveData']);
     // get the effective indirect
     Route::get('effective_indirect_standard', [EffectiveStandardController::class, 'getEffectiveIndirect']);
+    // get the effective real by model and date
+    Route::get('effective_real_date/{modelId}', [EffectiveStandardController::class, 'getEffectiveByModelAndDate']);
 
     /**
      * Effective Real
@@ -121,8 +130,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('effective_real/{modelId}', [EffectiveRealController::class, 'getEffectiveByModel']);
     // get the effective real 
     Route::get('effective_real_data/{modelId}', [EffectiveRealController::class, 'getEffectiveData']);
+
     // get the effective indirect
     Route::get('effective_indirect_real', [EffectiveRealController::class, 'getEffectiveIndirect']);
+    // get the total effectif indirect
+    Route::get('effective_indirect', [EffectiveRealController::class, 'totalEffectifIndirect']);
+    // get the total effectif direct
+    Route::get('effective_direct_real/{modelId}', [EffectiveRealController::class, 'totalEffectifDirect']);
 
     /**
      * System Constant
@@ -131,6 +145,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/system_constants_latest', [SystemConstController::class, 'show']); 
     // Update System Constants
     Route::post('/system_constants/{id}', [SystemConstController::class, 'update']);
+    // get salaries
+    Route::get('/salaries', [SystemConstController::class, 'salaries']); 
+    
+    
 
     /**
      * Coupe Production
@@ -148,7 +166,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // send chain production
     Route::post('/chain_production/{modelId}/{chainId}', [ChainProductionController::class, 'update']);
     // chain retouch
-    Route::post('/chain_production/retouch/{modelId}/{chainId}', [ChainProductionController::class, 'retouch']);
+    Route::post('/chain_production_retouch/{modelId}/{chainId}', [ChainProductionController::class, 'retouch']);
+    // Calculate total sortie for a model
+    Route::get('/production_chains/{modelId}/sortie', [ChainProductionController::class, 'calculateSortie']);
+    // Calculate total entre for a model
+    Route::get('/production_chains/{modelId}/entre', [ChainProductionController::class, 'calculateEntre']);
 
     /**
      * repassage Production
@@ -167,20 +189,30 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/magasin_production/{modelId}', [MagasinController::class, 'update']);
 
     /**
+     * magasin Production
+     */
+    // get magasin production
+    Route::get('/magasin_fourniture_production/{modelId}', [MagasinFournitureProductionController::class, 'show']);
+    // send repassage production
+    Route::post('/magasin_fourniture_production/{modelId}', [MagasinFournitureProductionController::class, 'update']);
+
+    /**
      * control Production
      */
     // get magasin production
-    Route::get('/control_production/{modelId}/{chainId}', [ControlFinalController::class, 'show']);
+    Route::get('/control_production/{modelId}', [ControlFinalController::class, 'show']);
     // send repassage production
-    Route::post('/control_production/{modelId}/{chainId}', [ControlFinalController::class, 'update']);
+    Route::post('/control_production/{modelId}', [ControlFinalController::class, 'update']);
 
         /**
      * Export
      */
     // show
-    Route::get('/export/{modelId}' , [ExportProduction::class, 'show']);
+    Route::get('/export/{modelId}' , [ExportProductionController::class, 'show']);
     // add
-     Route::post('/export/{modelId}' , [ExportProduction::class, 'update']);
+     Route::post('/export/{modelId}' , [ExportProductionController::class, 'update']);
+    //  getTotalValue
+    Route::get('/export_total' , [ExportProductionController::class , 'getTotalValue']);
 
     /**
      * Posts
@@ -206,6 +238,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/primes/{id}', [PrimeController::class, 'update']);
     // Delete a prime
     Route::delete('/primes/{id}', [PrimeController::class, 'destroy']);
+
+    /**
+     * Retouches
+     */
+    // get all retouches
+    Route::get("/retouch" , [ChainProductionRetouchController::class, 'index']);
+    // create a new retouches
+    Route::post("/retouch" , [ChainProductionRetouchController::class, 'store']);
+
+    /**
+     * plastique and fil
+     */
+
+     Route::get('/plastique_fil/{model_id}', [PlastiqueFilController::class, 'show']);
+    
+     Route::post('/plastique_fil/{model_id}', [PlastiqueFilController::class, 'store']);
+
 
 });
 

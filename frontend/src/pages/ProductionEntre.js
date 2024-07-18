@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 // import custom components
 import Header from "../components/ui/Header";
 import Sidebar from "../components/ui/Sidebar";
-import PrimTable from "../components/ui/PrimTable";
+import ProductionChainEntre from "../components/products/ProductionChainEntre";
 
-const Prims = () => {
+const ProductionEntre = () => {
   // handle state change for the sidebar and redirect if not autorized
   const [sidebar, setSidebar] = useState(false);
   const navigate = useNavigate();
@@ -20,7 +20,12 @@ const Prims = () => {
       navigate("/");
     } else {
       // Check for the role
-      const allowedRoles = ["admin", "superadmin", "developer", "Méthode"];
+      const allowedRoles = [
+        "admin",
+        "superadmin",
+        "developer",
+        "Chaîne_production_entrée",
+      ];
       if (!allowedRoles.includes(role)) {
         navigate("/dashboard");
       }
@@ -33,10 +38,10 @@ const Prims = () => {
       <Header sidebar={sidebar} setSidebar={setSidebar} />
       {/* sidebar */}
       <Sidebar sidebar={sidebar} />
-      {/* Prims */}
-      <PrimTable />
+      {/* production chain */}
+      <ProductionChainEntre />
     </div>
   );
 };
 
-export default Prims;
+export default ProductionEntre;

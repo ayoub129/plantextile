@@ -1,23 +1,23 @@
-// Import React components and Routers from React
+// Importer les composants React et les routeurs de React
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-// Import Custom components
+// Importer des composants personnalisés
 import Input from "../ui/Input";
 import ImageInput from "../ui/ImageInput";
 import Button from "../ui/Button";
-// import API and toasts
+// Importer l'API et les toasts
 import api from "../../api/axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import DatePicker
+// Importer DatePicker
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const AddProductForm = () => {
-  // handle navigation and get the id parameter
+  // Gérer la navigation et obtenir le paramètre id
   const navigate = useNavigate();
   const { id } = useParams();
-  // handle loading, product and isEditable states
+  // Gérer les états de chargement, de produit et d'édition
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState({
     modele: "",
@@ -38,20 +38,20 @@ const AddProductForm = () => {
     dateExport: "",
   });
   const [isEdit, setIsEdit] = useState(false);
-  // handle conversion rates
+  // Gérer les taux de conversion
   const [conversionRate, setConversionRate] = useState(1);
 
   useEffect(() => {
     const updateModel = async () => {
-      // if the id exist then edit
+      // Si l'identifiant existe, alors modifier
       if (id) {
-        // set isEdit to true and get a single model
+        // Définir isEdit à true et obtenir un seul modèle
         try {
           setIsEdit(true);
           const response = await api.get(`/models/${id}`);
           setProducts(response.data);
         } catch (error) {
-          toast.error("Error fetching product:", error);
+          toast.error("Erreur lors de la récupération du produit :", error);
         }
       }
     };
@@ -59,7 +59,7 @@ const AddProductForm = () => {
     updateModel();
   }, [id]);
 
-  // handle change of the input field
+  // Gérer les modifications du champ de saisie
   const onChange = (name, value) => {
     setProducts({
       ...products,
@@ -67,7 +67,7 @@ const AddProductForm = () => {
     });
   };
 
-  // handle file change event for the image input field
+  // Gérer l'événement de changement de fichier pour le champ de saisie d'image
   const handleFileChange = (e) => {
     setProducts({
       ...products,
@@ -75,7 +75,7 @@ const AddProductForm = () => {
     });
   };
 
-  // handle date change event for the date fields
+  // Gérer l'événement de changement de date pour les champs de date
   const handleDateChange = (date, key) => {
     setProducts({
       ...products,
@@ -83,26 +83,26 @@ const AddProductForm = () => {
     });
   };
 
-  // fetch exchange rates for the currency selected now
+  // Récupérer les taux de change pour la devise sélectionnée
   const fetchExchangeRates = async (currency = "USD") => {
-    // url to the exchange rates api endpoint
+    // URL de l'API des taux de change
     const url = `https://v6.exchangerate-api.com/v6/6610059cf4c8cb5955adc828/latest/${currency}`;
 
     try {
-      // get the exchange rates and return it
+      // Obtenir les taux de change et les retourner
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error(`HTTP status ${response.status}`);
+        throw new Error(`Statut HTTP ${response.status}`);
       }
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Failed to fetch exchange rates:", error);
+      console.error("Échec de la récupération des taux de change :", error);
     }
   };
 
   useEffect(() => {
-    // check if product devise is available and not equal to MAD also the price and quantity society is available
+    // Vérifier si la devise du produit est disponible et différente de MAD, et si le prix et la quantité de l'entreprise sont disponibles
     if (
       products.devise &&
       products.devise !== "MAD" &&
@@ -110,53 +110,53 @@ const AddProductForm = () => {
       products.qte_societe
     ) {
       fetchExchangeRates(products.devise).then((data) => {
-        setConversionRate(data.conversion_rates.MAD); // Set conversion rate state
+        setConversionRate(data.conversion_rates.MAD); // Définir l'état du taux de conversion
       });
     }
   }, [products.devise, products.prixMOver, products.qte_societe]);
 
   useEffect(() => {
-    // calculate the prix facture if conversionRate is available
+    // Calculer le prix facture si le taux de conversion est disponible
     if (products.prixMOver && products.qte_societe) {
       const prixFacture =
         products.prixMOver * conversionRate * products.qte_societe;
-      // assign the prix facture
+      // Assigner le prix facture
       setProducts((prevProducts) => ({ ...prevProducts, prixFacture }));
     }
   }, [conversionRate, products.prixMOver, products.qte_societe]);
 
-  // create or update product
+  // Créer ou mettre à jour un produit
   const handleSubmit = async (e) => {
-    // start loading state while saving the product
+    // Commencer l'état de chargement lors de la sauvegarde du produit
     setLoading(true);
     e.preventDefault();
 
-    // create FormData to send as request body with file data if exist
+    // Créer un FormData à envoyer comme corps de la requête avec les données du fichier si elles existent
     const formData = new FormData();
     Object.keys(products).forEach((key) => {
       if (products[key] instanceof Date) {
-        // Format date as 'YYYY-MM-DD'
+        // Formater la date comme 'YYYY-MM-DD'
         formData.append(key, products[key].toISOString().split("T")[0]);
       } else if (
         products[key] &&
         typeof products[key] === "object" &&
         "toISOString" in products[key]
       ) {
-        // Format date as 'YYYY-MM-DD'
+        // Formater la date comme 'YYYY-MM-DD'
         formData.append(key, products[key].toISOString().split("T")[0]);
       } else if (key === "image" && products[key]) {
-        // append an image to the backend
+        // Ajouter une image au backend
         if (products.image instanceof File) {
           formData.append("image", products.image);
         }
       } else {
-        // append any other text
+        // Ajouter tout autre texte
         formData.append(key, products[key]);
       }
     });
 
     try {
-      // check if edited then update if not then create a new model and after that navigate to the products page
+      // Vérifier si l'édition est activée, sinon créer un nouveau modèle et après cela, naviguer vers la page des produits
       if (isEdit) {
         await api.post(`/models/${id}`, formData, {
           headers: {
@@ -172,10 +172,10 @@ const AddProductForm = () => {
       }
       navigate("/products");
     } catch (error) {
-      // show error message
-      toast.error("Error saving product.");
+      // Afficher un message d'erreur
+      toast.error("Erreur lors de l'enregistrement du produit.");
     } finally {
-      // set the loading to false
+      // Définir l'état de chargement à faux
       setLoading(false);
     }
   };
@@ -185,7 +185,7 @@ const AddProductForm = () => {
       <ToastContainer />
       <form className="ml-7" onSubmit={handleSubmit}>
         <h4 className="mb-5 text-[#4E4A4A] font-bold pt-7 text-xl">
-          Créer un produit
+          {isEdit ? "Mettre à jour le produit" : "Créer un produit"}
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="mb-4">
@@ -245,7 +245,7 @@ const AddProductForm = () => {
           <div className="mb-4">
             <Input
               type="number"
-              label="Qte enterprise"
+              label="Quantité entreprise"
               id="qte_societe"
               name={"qte_societe"}
               handleChange={(name, value) => onChange(name, value)}
@@ -357,7 +357,11 @@ const AddProductForm = () => {
           </div>
         </div>
         <Button type="submit" classes={"bg-blue-400	mb-5"}>
-          {loading ? "creating ..." : isEdit ? "Update Product" : "Add Product"}
+          {loading
+            ? "Création en cours ..."
+            : isEdit
+            ? "Mettre à jour le produit"
+            : "Ajouter le produit"}
         </Button>
       </form>
     </div>

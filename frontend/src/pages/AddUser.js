@@ -1,27 +1,27 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 // import my custom components
-import Header from '../components/ui/Header'
-import Sidebar from '../components/ui/Sidebar'
-import AddUserForm from '../components/users/AddUserForm'
+import Header from "../components/ui/Header";
+import Sidebar from "../components/ui/Sidebar";
+import AddUserForm from "../components/users/AddUserForm";
 
 // add user
 const AddUser = () => {
   const [sidebar, setSidebar] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const role = localStorage.getItem('role');
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
 
     // redirect to home if not logged in
     if (!token) {
-      navigate('/');
+      navigate("/");
     } else {
       // Check for the role
-      const allowedRoles = ['admin', 'superadmin', 'developer' , 'HR'];
+      const allowedRoles = ["admin", "superadmin", "developer", "HR"];
       if (!allowedRoles.includes(role)) {
-        navigate('/dashboard');
+        navigate("/dashboard");
       }
     }
   }, [navigate]);
@@ -35,7 +35,7 @@ const AddUser = () => {
       {/* Add User Form */}
       <AddUserForm />
     </div>
-  )
-}
+  );
+};
 
-export default AddUser
+export default AddUser;

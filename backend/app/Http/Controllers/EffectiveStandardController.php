@@ -205,6 +205,28 @@ class EffectiveStandardController extends Controller
         }
             return response()->json($effectiveStandard, 200);
     }
+
+    public function getEffectiveByModelAndDate(Request $request, $modelId)
+    {
+        $this->authorize(['developer', 'superadmin', 'admin', 'Méthode' ]);
+
+        $startDate = $request->query('start_date');
+        $endDate = $request->query('end_date');
+        $chain = $request->query('chain');
+
+        $effectiveReal = EffectiveStandard::with(['effectifDirects', 'effectifIndirects'])
+            ->where('model', $modelId)
+            ->where('chain', $chain)
+            ->whereBetween('start_date', [$startDate, $endDate])
+            ->first();
+
+        if (!$effectiveReal) {
+            return response()->json(['message' => 'Aucun effectif trouvé pour ce modèle et cette période'], 404);
+        }
+
+        return response()->json($effectiveReal);
+    }
+
     
     public function destroy($id)
     {
@@ -219,17 +241,20 @@ class EffectiveStandardController extends Controller
     public function getEffectiveIndirect()
     {
         $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
-
-        $effectiveIndirect = EffectifIndirect::whereNotNull('effective_standard_id')->with('coupes')->first();
-
+    
+        // Retrieve the most recent effective indirect record
+        $effectiveIndirect = EffectifIndirect::whereNotNull('effective_standard_id')
+            ->with('coupes')
+            ->orderBy('created_at', 'desc')
+            ->first();
+    
         if (!$effectiveIndirect) {
             return response()->json(['message' => 'No Effective Indirect found for this Effective Standard ID'], 404);
         }
-
+    
         return response()->json($effectiveIndirect);
     }
-
-
+    
     private function authorize(array $roles)
     {
         if (!in_array(Auth::user()->role, $roles)) {

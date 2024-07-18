@@ -68,11 +68,11 @@ class ProductPlanController extends Controller
         ]);
     }
 
-    public function getPlanningByModel($modelId)
+    public function getPlanningByModel($modelId , $chainId)
     {
         $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
 
-        $productPlan = ProductPlan::where('model_id', $modelId)->first();
+        $productPlan = ProductPlan::where('model_id', $modelId)->where('chain' , $chainId)->first();
 
         if (!$productPlan) {
             return response()->json(['message' => 'No planning found for this model'], 404);

@@ -24,7 +24,6 @@ const PostTable = () => {
       const response = await api.get("/posts");
       setPosts(response.data);
     } catch (error) {
-      console.log(error);
       toast.error("Error fetching posts.");
     } finally {
       setLoading(false);

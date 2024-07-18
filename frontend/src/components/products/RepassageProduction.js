@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
-import Input from "../ui/Input";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const RepassageProduction = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState("");
-  const [production, setProduction] = useState(0);
-  const [entre, setEntre] = useState(0);
+  const [value, setValue] = useState(0);
+  const [totalSortie, setTotalSortie] = useState(0);
   const [encore, setEncore] = useState(0);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -30,10 +30,10 @@ const RepassageProduction = () => {
           const response = await api.get(
             `/repassage_production/${selectedModel}`
           );
-          setProduction(response.data.value);
-          setEntre(response.data.entre || 0);
-          setEncore(response.data.encore || 0);
+          calculateEncore(selectedModel, response.data.value);
+          setValue(response.data.value);
         } catch (error) {
+          calculateEncore(selectedModel, 0);
           console.error("Error fetching RepassageProduction data:", error);
         }
       }
@@ -42,48 +42,55 @@ const RepassageProduction = () => {
     fetchRepassageProduction();
   }, [selectedModel]);
 
-  useEffect(() => {
-    setEncore(-(production - entre));
-  }, [production, entre]);
-
   const handleModelChange = (e) => {
     setSelectedModel(e.target.value);
   };
 
-  const onChange = (name, value) => {
-    if (name === "production") {
-      setProduction(parseInt(value, 10));
-    } else if (name === "entre") {
-      setEntre(parseInt(value, 10));
-    }
-  };
-
-  const handleChange = async (direction, type) => {
-    let newValue = type === "production" ? production : entre;
+  const handleChange = async (direction) => {
+    let newValue = value;
     if (direction === "next") {
-      newValue += 1;
-    } else if (direction === "prev" && newValue > 0) {
-      newValue -= 1;
+      newValue = value + 1;
+    } else if (direction === "prev") {
+      newValue = value - 1;
     }
 
-    if (type === "production") {
-      setProduction(newValue);
-    } else if (type === "entre") {
-      setEntre(newValue);
+    if (newValue < 0) {
+      newValue = 0;
     }
 
-    setIsButtonDisabled(true);
+    if (newValue > totalSortie) {
+      toast.error("Total Repassage can't be more than the total sortie");
+      return;
+    }
+
+    setValue(newValue);
 
     try {
       await api.post(`/repassage_production/${selectedModel}`, {
-        value: production,
-        entre: entre,
-        encore: -(production - entre),
+        value: newValue,
       });
+      calculateEncore(selectedModel, newValue);
     } catch (error) {
       console.error("Error updating RepassageProduction data:", error);
-    } finally {
-      setIsButtonDisabled(false);
+    }
+  };
+
+  const calculateEncore = async (modelId, repassageValue) => {
+    try {
+      const response = await api.get(`/production_chains/${modelId}/sortie`);
+      console.log(response);
+      const totalSortie = response.data.totalSortie;
+      setTotalSortie(totalSortie);
+
+      const encore = totalSortie - repassageValue;
+      if (encore < 0) {
+        toast.error("Encore cannot be less than 0");
+        setEncore(0);
+      } else {
+        setEncore(encore);
+      }
+    } catch (error) {
+      console.error("Error calculating encore:", error);
     }
   };
 
@@ -91,6 +98,7 @@ const RepassageProduction = () => {
 
   return (
     <div className="ml-[19%] pt-[6rem]">
+      <ToastContainer />
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Repassage</h2>
         <div className="ml-7 mb-4 pr-6">
@@ -111,80 +119,41 @@ const RepassageProduction = () => {
       {selectedModelData && (
         <div className="w-full pr-6">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">{selectedModelData.category}</h3>
-            <h3 className="font-semibold">{selectedModelData.client}</h3>
+            <h3 className="font-semibold text-xl">
+              {selectedModelData.category}
+            </h3>
+            <h3 className="font-semibold text-xl">
+              {selectedModelData.client}
+            </h3>
           </div>
+          <h3 className="font-semibold text-xl">encore: {encore}</h3>
         </div>
       )}
-      <div className="flex items-center justify-between">
-        {selectedModel && (
-          <div className="flex flex-col items-center mx-auto mt-[2rem] mb-4 shadow-md w-fit p-3 rounded border">
-            <h3 className="font-semibold">Entre</h3>
-            <div className="flex items-center">
-              <button
-                className="font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded"
-                onClick={() => handleChange("prev", "entre")}
-                disabled={isButtonDisabled}
-              >
-                -
-              </button>
-              <Input
-                handleChange={(name, value) => onChange("entre", value)}
-                name={"entre"}
-                placeholder="Total Entre"
-                text={entre}
-              />
-              <button
-                className="font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded"
-                onClick={() => handleChange("next", "entre")}
-                disabled={isButtonDisabled}
-              >
-                +
-              </button>
-            </div>
+      {selectedModel && (
+        <div className="flex p-5 mt-[2rem] mb-4 shadow-md w-fit p-1 rounded border">
+          <button
+            className="font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded mt-9"
+            onClick={() => handleChange("prev")}
+          >
+            -
+          </button>
+          <div className="flex flex-col items-center">
+            <label className="font-semibold text-[18px]">Total Repassage</label>
+            <input
+              type="number"
+              className="block w-full mt-1 outline-0 p-[.5rem] border border-[#b3b3b3] rounded text-center"
+              value={value}
+              readOnly
+            />
           </div>
-        )}
-        {selectedModel && (
-          <div className="flex flex-col items-center mx-auto mt-[2rem] mb-4 shadow-md w-fit p-3 rounded border">
-            <h3 className="font-semibold">Production</h3>
-            <div className="flex items-center">
-              <button
-                className="font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded"
-                onClick={() => handleChange("prev", "production")}
-                disabled={isButtonDisabled}
-              >
-                -
-              </button>
-              <Input
-                handleChange={(name, value) => onChange("production", value)}
-                name={"production"}
-                placeholder="Total Production"
-                text={production}
-              />
-              <button
-                className="font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded"
-                onClick={() => handleChange("next", "production")}
-                disabled={isButtonDisabled}
-              >
-                +
-              </button>
-            </div>
-          </div>
-        )}
-        {selectedModel && (
-          <div className="flex flex-col items-center mx-auto mt-[2rem] mb-4 shadow-md w-fit p-3 rounded border">
-            <h3 className="font-semibold">Encore</h3>
-            <div className="flex items-center">
-              <Input
-                name={"encore"}
-                placeholder="Total Encore"
-                text={encore}
-                readOnly
-              />
-            </div>
-          </div>
-        )}
-      </div>
+          <button
+            className="font-semibold text-[18px] hover:bg-gray-200 p-2 transition duration-300 rounded mt-9"
+            onClick={() => handleChange("next")}
+          >
+            +
+          </button>
+        </div>
+      )}
     </div>
   );
 };

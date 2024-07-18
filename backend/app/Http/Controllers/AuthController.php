@@ -41,13 +41,13 @@ class AuthController extends Controller
         if ($user->image) {
             return response()->json(['image' => $user->image]);
         } else {
-            return response()->json(['message' => 'No profile picture found'], 404);
+            return response()->json(['message' => 'No profile picture found'], 202);
         }
     }
 
     public function index()
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
         $excludedRoles = ['developer', 'superadmin', 'admin'];
 
         $users = User::whereNotIn('role', $excludedRoles)->get();
@@ -62,7 +62,7 @@ class AuthController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -116,7 +116,7 @@ class AuthController extends Controller
 
     public function destroy($id)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
 
         $user = User::findOrFail($id);
         $user->delete();

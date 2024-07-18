@@ -1,12 +1,10 @@
-// import React components and Routes
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-// import custom components
 import Header from "../components/ui/Header";
 import Sidebar from "../components/ui/Sidebar";
-import PrimTable from "../components/ui/PrimTable";
+import { useNavigate } from "react-router-dom";
+import PlastiqueAndFile from "../components/products/PlastiqueAndFile";
 
-const Prims = () => {
+const PlastiqueFile = () => {
   // handle state change for the sidebar and redirect if not autorized
   const [sidebar, setSidebar] = useState(false);
   const navigate = useNavigate();
@@ -20,7 +18,12 @@ const Prims = () => {
       navigate("/");
     } else {
       // Check for the role
-      const allowedRoles = ["admin", "superadmin", "developer", "Méthode"];
+      const allowedRoles = [
+        "admin",
+        "superadmin",
+        "developer",
+        "Magasin_fourniture",
+      ];
       if (!allowedRoles.includes(role)) {
         navigate("/dashboard");
       }
@@ -33,10 +36,10 @@ const Prims = () => {
       <Header sidebar={sidebar} setSidebar={setSidebar} />
       {/* sidebar */}
       <Sidebar sidebar={sidebar} />
-      {/* Prims */}
-      <PrimTable />
+      {/* Magasin production  */}
+      <PlastiqueAndFile />
     </div>
   );
 };
 
-export default Prims;
+export default PlastiqueFile;

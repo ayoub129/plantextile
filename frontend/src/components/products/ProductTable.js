@@ -1,53 +1,49 @@
-// Import React components and some Routers
+// Importer les composants React et certains routeurs
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-// import api and Toast
+// Importer l'API et Toast
 import api from "../../api/axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ProductTables = () => {
-  // products and loading state
+  // États des produits et du chargement
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  // show modal and remove it
+  // Afficher et masquer la modal
   const [showModal, setShowModal] = useState(false);
-  // choose a user to delete
+  // Choisir un produit à supprimer
   const [productToDelete, setProductToDelete] = useState(null);
 
-  const role = localStorage.getItem("role");
-  const allowedRoles = ["admin", "superadmin", "developer", "Logistique"];
-
   useEffect(() => {
-    // fetch products from the backend
+    // Récupérer les produits depuis le backend
     const fetchProducts = async () => {
-      // set the loading state to true
+      // Définir l'état de chargement à vrai
       setLoading(true);
       try {
-        // get the products or the models from the backend
+        // Obtenir les produits ou les modèles depuis le backend
         const response = await api.get("/models");
-        console.log(response.data);
         setProducts(response.data);
       } catch (error) {
-        // Show error message
-        toast.error("Error fetching products.", error);
+        // Afficher un message d'erreur
+        toast.error("Erreur lors de la récupération des produits.", error);
       } finally {
-        // set the loading state to false
+        // Définir l'état de chargement à faux
         setLoading(false);
       }
     };
-    // call the callback
+    // Appeler la fonction fetchProducts
     fetchProducts();
   }, []);
 
   const handleDelete = async () => {
     try {
-      // delete a user from the database
+      // Supprimer un produit de la base de données
       await api.delete(`/models/${productToDelete}`);
       setProducts(products.filter((product) => product.id !== productToDelete));
-      toast.success("Model deleted successfully");
+      toast.success("Modèle supprimé avec succès");
     } catch (error) {
-      toast.error("Error deleting Model.");
+      toast.error("Erreur lors de la suppression du modèle.");
     } finally {
       setShowModal(false);
     }
@@ -57,17 +53,13 @@ const ProductTables = () => {
     <>
       <ToastContainer />
       <div className="flex ml-0 md:ml-[16.67%] items-center justify-between pt-[6rem]">
-        <h4 className="text-[#4E4A4A] font-bold ml-7 ">Products</h4>
-        {allowedRoles.includes(role) ? (
-          <Link
-            to="/addproducts"
-            className="text-[#fff] font-bold flex items-center justify-center mr-7  bg-blue-400 h-[30px] w-[30px] rounded"
-          >
-            <i className="fa-solid fa-plus"></i>
-          </Link>
-        ) : (
-          ""
-        )}
+        <h4 className="text-[#4E4A4A] font-bold ml-7 ">Produits</h4>
+        <Link
+          to="/addproducts"
+          className="text-[#fff] font-bold flex items-center justify-center mr-7  bg-blue-400 h-[30px] w-[30px] rounded"
+        >
+          <i className="fa-solid fa-plus"></i>
+        </Link>
       </div>
       <div className="ml-0 md:ml-[16.67%]">
         <div className=" ml-7 mr-7 overflow-x-auto">
@@ -93,7 +85,7 @@ const ProductTables = () => {
                   Quantité reçue
                 </th>
                 <th className="px-6 text-center py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-[#4E4A4A] uppercase tracking-wider min-w-[200px]">
-                  Qte Enterprise
+                  Quantité entreprise
                 </th>
                 <th className="px-6 text-center py-3 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-[#4E4A4A] uppercase tracking-wider min-w-[200px]">
                   Prix M' OVR
@@ -128,7 +120,7 @@ const ProductTables = () => {
               {loading ? (
                 <tr>
                   <td colSpan="18" className="text-center text-xl my-5">
-                    Loading ...
+                    Chargement ...
                   </td>
                 </tr>
               ) : (
@@ -187,21 +179,14 @@ const ProductTables = () => {
                       <Link to={`${product.id}`}>
                         <i className="fa-solid fa-pen text-yellow-400"></i>{" "}
                       </Link>
-                      {[
-                        "superadmin",
-                        "admin",
-                        "developer",
-                        "Logistique",
-                      ].includes(role) && (
-                        <button
-                          onClick={() => {
-                            setProductToDelete(product.id);
-                            setShowModal(true);
-                          }}
-                        >
-                          <i className="fa-solid fa-trash text-red-500"></i>
-                        </button>
-                      )}
+                      <button
+                        onClick={() => {
+                          setProductToDelete(product.id);
+                          setShowModal(true);
+                        }}
+                      >
+                        <i className="fa-solid fa-trash text-red-500"></i>
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -212,22 +197,22 @@ const ProductTables = () => {
         {showModal && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <div className="bg-white p-8 rounded shadow-lg">
-              <h2 className="text-xl mb-4">Confirm Deletion</h2>
+              <h2 className="text-xl mb-4">Confirmer la suppression</h2>
               <p className="mb-4">
-                Are you sure you want to delete this Model?
+                Êtes-vous sûr de vouloir supprimer ce modèle ?
               </p>
               <div className="flex justify-end gap-4">
                 <button
                   onClick={() => setShowModal(false)}
                   className="bg-gray-500 text-white py-2 px-4 rounded"
                 >
-                  Cancel
+                  Annuler
                 </button>
                 <button
                   onClick={handleDelete}
                   className="bg-red-500 text-white py-2 px-4 rounded"
                 >
-                  Delete
+                  Supprimer
                 </button>
               </div>
             </div>

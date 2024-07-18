@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('chain_productions', function (Blueprint $table) {
             $table->integer('retouch')->default(0);
-            $table->string('posts');
+            $table->string('posts')->nullable();
         });
     }
 
