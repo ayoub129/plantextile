@@ -112,6 +112,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('effective_standard/{modelId}', [EffectiveStandardController::class, 'getEffectiveByModel']);
     // get the effective standard 
     Route::get('effective_data/{modelId}', [EffectiveStandardController::class, 'getEffectiveData']);
+    // get the effective standard total
+    Route::get('effective_data_total/{modelId}', [EffectiveStandardController::class, 'getEffectiveSumData']);
     // get the effective indirect
     Route::get('effective_indirect_standard', [EffectiveStandardController::class, 'getEffectiveIndirect']);
     // get the effective real by model and date
@@ -130,7 +132,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('effective_real/{modelId}', [EffectiveRealController::class, 'getEffectiveByModel']);
     // get the effective real 
     Route::get('effective_real_data/{modelId}', [EffectiveRealController::class, 'getEffectiveData']);
-
+    // get the effective real total
+    Route::get('effective_real_total/{modelId}', [EffectiveRealController::class, 'getEffectiveSumData']);
     // get the effective indirect
     Route::get('effective_indirect_real', [EffectiveRealController::class, 'getEffectiveIndirect']);
     // get the total effectif indirect
@@ -163,6 +166,8 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     // get chain production
     Route::get('/chain_production/{modelId}/{chainId}', [ChainProductionController::class, 'show']);
+    // getchainData
+    Route::get('/chain_production_data/{modelId}', [ChainProductionController::class, 'getChainData']);
     // send chain production
     Route::post('/chain_production/{modelId}/{chainId}', [ChainProductionController::class, 'update']);
     // chain retouch
@@ -204,7 +209,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // send repassage production
     Route::post('/control_production/{modelId}', [ControlFinalController::class, 'update']);
 
-        /**
+    /**
      * Export
      */
     // show
@@ -213,6 +218,8 @@ Route::middleware('auth:sanctum')->group(function () {
      Route::post('/export/{modelId}' , [ExportProductionController::class, 'update']);
     //  getTotalValue
     Route::get('/export_total' , [ExportProductionController::class , 'getTotalValue']);
+    // get Total Export By Model
+    Route::get('/export_total/{modelId}' , [ExportProductionController::class , 'getTotalExportByModel']);
 
     /**
      * Posts

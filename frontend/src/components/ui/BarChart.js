@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,8 +7,8 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
@@ -19,13 +19,12 @@ ChartJS.register(
   Legend
 );
 
-const BarChart = ({data , options}) => {
+const BarChart = ({ data, options }) => {
   return (
     <div>
-      <Bar options={options} data={data} />;    
+      <Bar options={options} data={data} />
     </div>
   );
 };
 
 export default BarChart;
-  

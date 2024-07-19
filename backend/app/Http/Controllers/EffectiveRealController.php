@@ -279,6 +279,106 @@ class EffectiveRealController extends Controller
 
         return response()->json(['total_effectif_direct' => $totalDirect]);
     }
+    public function getEffectiveSumData(Request $request, $modelId)
+    {
+        $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
+
+        // Fetch the effective standard data for the given model
+        $effectiveStandard = EffectiveReal::with(['effectifDirects', 'effectifIndirects.coupes'])
+            ->where('model', $modelId)
+            ->get();
+    
+        if ($effectiveStandard->isEmpty()) {
+            return response()->json(['message' => 'No Effective found for this model'], 404);
+        }
+    
+        // Fetch all indirect effective data
+        $allIndirectEffective = EffectifIndirect::with('coupes')
+            ->orderBy('created_at')
+            ->get();
+    
+        // Get the date range from the effective standard data
+        $startDate = new \DateTime($effectiveStandard->first()->start_date);
+        $endDate = new \DateTime($effectiveStandard->first()->end_date);
+    
+        // Create a date range
+        $dateInterval = new \DateInterval('P1D');
+        $dateRange = new \DatePeriod($startDate, $dateInterval, $endDate->modify('+1 day'));
+    
+        // Organize the data by dates and calculate the sums
+        $effectiveDataByDate = [];
+        foreach ($dateRange as $date) {
+            $formattedDate = $date->format('Y-m-d');
+            $directsSum = 0;
+            $indirectsSum = 0;
+    
+            // Get the effective standard data for the current date
+            foreach ($effectiveStandard as $effective) {
+                $effectiveStartDate = new \DateTime($effective->start_date);
+                $effectiveEndDate = new \DateTime($effective->end_date);
+    
+                if ($date >= $effectiveStartDate && $date <= $effectiveEndDate) {
+                    $directsSum += $effective->effectifDirects->sum(function($direct) {
+                        return array_sum([
+                            $direct->machinistes,
+                            $direct->machinistes_stagiaires,
+                            $direct->repassage_preparation,
+                            $direct->trassage,
+                            $direct->transport,
+                            $direct->chef,
+                            $direct->machines_speciales,
+                            $direct->trassage_special,
+                            $direct->controle_table,
+                            $direct->controle_final,
+                            $direct->machinistes_retouche,
+                            $direct->repassage_final,
+                            $direct->finition,
+                            $direct->transp_fin
+                        ]);
+                    });
+                }
+            }
+    
+            // Get the latest indirect effective data for the current date
+            foreach ($allIndirectEffective as $indirect) {
+                if ($date >= new \DateTime($indirect->created_at)) {
+                    $indirectsSum = array_sum([
+                        $indirect->mag_four,
+                        $indirect->mag_fin,
+                        $indirect->machines_sp_manuelle,
+                        $indirect->cont_fin,
+                        $indirect->mach_retouche,
+                        $indirect->repassage,
+                        $indirect->gabaret,
+                        $indirect->preparation_stagieres,
+                        $indirect->preparation,
+                        $indirect->preparation_elastique
+                    ]);
+    
+                    // Add the sum of coupe data
+                    $coupeSum = $indirect->coupes->sum(function($coupe) {
+                        return array_sum([
+                            $coupe->matlasseurs,
+                            $coupe->coupeurs,
+                            $coupe->tiquitage,
+                            $coupe->vesline
+                        ]);
+                    });
+    
+                    $indirectsSum += $coupeSum;
+                }
+            }
+    
+            $effectiveDataByDate[$formattedDate] = [
+                'total' => $directsSum + $indirectsSum,
+                'effectifDirects' => $directsSum,
+                'effectifIndirects' => $indirectsSum
+            ];
+        }
+    
+        return response()->json($effectiveDataByDate);
+    }
+
 
     private function authorize(array $roles)
     {

@@ -37,8 +37,6 @@ class ProductPlanController extends Controller
 
     public function getdashPlanningByModel($modelId)
     {
-        $this->authorize(['developer', 'Méthode', 'admin', 'superadmin']);
-    
         $productPlan = ProductPlan::where('model_id', $modelId)->first();
     
         if (!$productPlan) {

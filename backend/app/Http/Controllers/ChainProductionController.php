@@ -57,6 +57,27 @@ class ChainProductionController extends Controller
         return response()->json($chainProduction, 200);
     }
 
+    public function getChainData(Request $request, $modelId)
+    {
+        $this->authorize(['developer', 'superadmin', 'admin', 'Chaîne_production_entrée', 'Chaîne_production_sortie']);
+        $chain = $request->query('chain');
+
+        if ($chain) {
+            $chainProduction = ChainProduction::where('model_id', $modelId)
+                                              ->where('chain_id', $chain)
+                                              ->get();
+        } else {
+            $chainProduction = ChainProduction::where('model_id', $modelId)
+                                              ->get();
+        }
+
+        if ($chainProduction->isNotEmpty()) {
+            return response()->json($chainProduction);
+        } else {
+            return response()->json(['message' => 'Data not found'], 404);
+        }
+    }
+
     // Calculate the total sortie for a specific model
     public function calculateSortie($modelId)
     {
