@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\EffectifFix;
 use App\Models\SystemConstant;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -24,25 +23,9 @@ class SystemConstantSeeder extends Seeder
             'Masse_salariale_17_50' => 10,
             'Capacité_par_unité_transport' => 20,
             'cotisation_entroprise_trans' => 80,
-            'Coût_énergie_journalier' => 0,
             'Coût_par_trajet' => 65,
+            'Coût_énergie_journalier' => 0,
             'Coût_charges_fixes_journalier' => 0,
-        ]);
-
-        EffectifFix::create([
-            'Coupe' => 12,
-            'Production' => 12,
-            'Repassage_final' => 12,
-            'Contrôle_final' => 12,
-            'Magasin_final' => 12,
-            'Magasin_fournitures' => 12,
-            'Achats_Logistique' => 12,
-            'Transit' => 12,
-            'Comptabilité_Finances' => 12,
-            'RH' => 12,
-            'Ménage' => 12,
-            'Autres' => 12,
-            'system_constant_id' => 1
         ]);
     }
 }
