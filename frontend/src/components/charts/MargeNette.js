@@ -22,21 +22,17 @@ const MargeNette = () => {
   });
   const [chargeDirect, setChargeDirect] = useState(null);
 
-  const [barChartData , setBarChartData] =useState({
+  const [barChartData, setBarChartData] = useState({
     labels: ["Production dépôt en valeur", "Coût de revient", "La marge nette"],
     datasets: [
       {
-        data: [0, 0, 0], 
-        backgroundColor: [
-          "rgba(75,192,192,0.2)",
-        ],
-        borderColor: [
-          "rgba(75,192,192,1)",
-        ],
+        data: [0, 0, 0],
+        backgroundColor: ["rgba(75,192,192,0.2)"],
+        borderColor: ["rgba(75,192,192,1)"],
         borderWidth: 1,
       },
     ],
-  }) 
+  });
 
   const barChartOptions = {
     responsive: true,
@@ -61,7 +57,6 @@ const MargeNette = () => {
     },
   };
 
-
   useEffect(() => {
     const fetchModels = async () => {
       try {
@@ -72,9 +67,9 @@ const MargeNette = () => {
           const { id, created_at, updated_at, effectif_fix, ...filteredData } =
             systemResponse.data;
 
-            setSystemConstant({
-              ...filteredData,
-            });
+          setSystemConstant({
+            ...filteredData,
+          });
         }
       } catch (error) {
         console.error("Error fetching models:", error);
@@ -89,16 +84,47 @@ const MargeNette = () => {
     fetchData(e.target.value);
   };
 
-  const fetchData = async (modelId) => { 
+  const fetchData = async (modelId) => {
     try {
       setError(null);
+      const response = await api.get(`/export/${modelId}`);
+      const exportData = response.data;
 
+      const modelData = models.find((model) => {
+        return model.id == modelId;
+      });
+
+      // Assuming modelData contains the required values for the chart
+      setBarChartData({
+        labels: [
+          "Production dépôt en valeur",
+          "Coût de revient",
+          "La marge nette",
+        ],
+        datasets: [
+          {
+            data: [
+              (
+                modelData.prixMOver *
+                (modelData.prixFacture /
+                  (modelData.prixMOver * modelData.qte_societe)) *
+                exportData.value
+              ).toFixed(2),
+            ],
+            backgroundColor: ["rgba(75,192,192,0.2)"],
+            borderColor: ["rgba(75,192,192,1)"],
+            borderWidth: 1,
+          },
+        ],
+      });
     } catch (error) {
       console.error(error);
       setError(error.response?.data?.message || "An error occurred");
     }
-  }
-  return <div className="ml-7">
+  };
+
+  return (
+    <div className="ml-7">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">La Marge Nette</h2>
         <div className="ml-7 mb-4 pr-6">
@@ -123,7 +149,8 @@ const MargeNette = () => {
           <BarChart data={barChartData} options={barChartOptions} />
         )}
       </div>
-  </div>
+    </div>
+  );
 };
 
 export default MargeNette;
