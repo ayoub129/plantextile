@@ -150,7 +150,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/system_constants/{id}', [SystemConstController::class, 'update']);
     // get salaries
     Route::get('/salaries', [SystemConstController::class, 'salaries']); 
-    
+    // by date range
+    Route::get('/system-constants/by-date-range', [SystemConstController::class, 'getRecordsByDateRange']);
+
     
 
     /**

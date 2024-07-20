@@ -45,6 +45,7 @@ const AddConstantSystem = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true)
         const response = await api.get("/system_constants_latest");
         if (response.data) {
           const { id, created_at, updated_at, effectif_fix, ...filteredData } =
@@ -132,6 +133,8 @@ const AddConstantSystem = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  console.log(formData)
 
   return (
     <form className="ml-[18.5%] mr-5 mx-auto pt-[6rem]" onSubmit={handleSubmit}>

@@ -10,15 +10,18 @@ import MargeNette from "../components/charts/MargeNette";
 import Header from "../components/ui/Header";
 import Sidebar from "../components/ui/Sidebar";
 import CardsData from "../components/ui/CardsData";
-import BarChart from "../components/ui/BarChart";
 
 const Dashboard = () => {
+  // transport 
+  const [transIndirect, setTransIndirect] = useState();
+  const [transDirect, setTransDirect] = useState();
+  const [transport, setTransport] = useState(0);
+
   const [couteDeRevient, setCouteDeRevient] = useState(0);
   const [realFils, setRealFils] = useState(0);
   const [realPlastique, setRealPlastique] = useState(0);
   const [estimationFils, setEstimationFils] = useState(0);
   const [estimationPlastique, setEstimationPlastique] = useState(0);
-  const [transport, setTransport] = useState(0);
   const [massSalaryTotal, setMassSalaryTotal] = useState(0);
 
   const [congeDirect, setCongeDirect] = useState(0);
@@ -45,14 +48,14 @@ const Dashboard = () => {
   const [effectifDirect, setEffectifDirect] = useState(0);
   const [effectifInDirect, setEffectifInDirect] = useState(0);
 
-  const [transIndirect, setTransIndirect] = useState();
-  const [transDirect, setTransDirect] = useState();
   const [totalHour, setTotalHour] = useState(null);
   const [totalHourIndirect, setTotalHourIndirect] = useState(null);
   const [models, setModels] = useState([]);
   const [model, setModel] = useState(null);
 
   const under = model && model.qte_societe * parseInt(model.prixMOver);
+
+
 
   const CalculateEstimation = (type) => {
     if (type == "plastique") {
@@ -179,65 +182,21 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchModels = async () => {
-      try {
-        const response = await api.get("/models");
-        setModels(response.data);
-      } catch (error) {
-        console.error("Error fetching models:", error);
-      }
-    };
-
-    fetchModels();
-  }, []);
-
-  useEffect(() => {
     const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    // redirect to home if not logged in
     if (!token) {
       navigate("/");
+    } else {
+      // Check for the role
+      const allowedRoles = ["admin", "superadmin", "developer"];
+      if (!allowedRoles.includes(role)) {
+        navigate("/");
+      }
     }
-  }, []);
+  }, [navigate]);
 
-  const BarChartData = {
-    labels: ["Category 1", "Category 2", "Category 3"],
-    datasets: [
-      {
-        data: [60, 50, 30], // Replace with actual data
-        backgroundColor: [
-          "rgba(75,192,192,0.2)",
-          "rgba(75,192,192,0.2)",
-          "rgba(0,192,192,0.2)", // Latest bar with different color
-        ],
-        borderColor: [
-          "rgba(75,192,192,1)",
-          "rgba(75,192,192,1)",
-          "rgba(0,192,192,1)", // Latest bar with different color
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const barChartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: "top",
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-        },
-      },
-      y: {
-        title: {
-          display: true,
-        },
-      },
-    },
-  };
 
   return (
     <div>
@@ -260,10 +219,6 @@ const Dashboard = () => {
         </div>
         <div className="my-10">
           <MargeNette />
-        </div>
-        <h2 className="ml-7 my-9 text-2xl font-semibold">La Marge nette</h2>
-        <div className="w-full mr-5">
-          <BarChart data={BarChartData} options={barChartOptions} />
         </div>
       </div>
     </div>

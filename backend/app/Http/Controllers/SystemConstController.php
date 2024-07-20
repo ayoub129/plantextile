@@ -47,23 +47,22 @@ class SystemConstController extends Controller
     
         if ($request->has('effectif_fix')) {
             foreach ($request->effectif_fix as $effectifFixData) {
-                $effectifFix = EffectifFix::updateOrCreate(
-                    ['system_constant_id' => $systemConstant->id], 
-                    $effectifFixData
-                );
+                $effectifFix = new EffectifFix($effectifFixData);
+                $effectifFix->system_constant_id = $systemConstant->id;
+                $effectifFix->save();
             }
         }
     
         return response()->json($systemConstant->load('effectifFix'), 200);
     }
 
-        public function show()
+    public function show()
     {
         $this->authorize(['developer', 'admin', 'superadmin']);
-        $systemConstant = SystemConstant::with('effectifFix')->latest()->firstOrFail();
+        $systemConstant = SystemConstant::firstOrFail();
         return response()->json($systemConstant);
     }
-
+    
     public function salaries()
     {
         $this->authorize(['developer', 'admin', 'superadmin']);
@@ -81,7 +80,48 @@ class SystemConstController extends Controller
     
         return response()->json($totalSalaries);
     }
+
+
+    public function getRecordsByDateRange()
+    {
+        $this->authorize(['developer', 'admin', 'superadmin']);
     
+        $systemConstants = SystemConstant::with('effectifFix')
+            ->orderBy('created_at')
+            ->orderBy('updated_at')
+            ->get();
+    
+        $groupedData = [];
+        $previousDate = null;
+    
+        foreach ($systemConstants as $index => $systemConstant) {
+            $currentDate = $systemConstant->created_at->format('Y-m-d');
+            $nextDate = isset($systemConstants[$index + 1])
+                ? $systemConstants[$index + 1]->created_at->format('Y-m-d')
+                : null;
+    
+            $groupedData[$currentDate] = $systemConstant->toArray();
+    
+            if ($nextDate) {
+                $period = new \DatePeriod(
+                    new \DateTime($currentDate),
+                    new \DateInterval('P1D'),
+                    new \DateTime($nextDate)
+                );
+    
+                foreach ($period as $date) {
+                    $dateString = $date->format('Y-m-d');
+                    $groupedData[$dateString] = $systemConstant->toArray();
+                }
+            } else {
+                $groupedData[$currentDate] = $systemConstant->toArray();
+            }
+    
+            $previousDate = $currentDate;
+        }
+    
+        return response()->json($groupedData, 200);
+    }
 
     private function authorize(array $roles)
     {
