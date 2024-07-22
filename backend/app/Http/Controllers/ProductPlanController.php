@@ -203,6 +203,22 @@ class ProductPlanController extends Controller
             return response()->json(['message' => 'No matching plan hour found'], 200);
         }
     }
+
+    public function getWorkedHours($modelId)
+    {
+        $this->authorize(['developer', 'Méthode', 'admin', 'superadmin']);
+
+        // Get the product plan to ensure it exists
+        $productPlan = ProductPlan::where('model_id' , $modelId);
+
+        // Count the hours with non-zero values
+        $workedHoursCount = ProductPlanHour::where('product_plan_id',  $productPlan->id)
+            ->where('models_finished', '>', 0)
+            ->count();
+
+        return response()->json(['worked_hours_count' => $workedHoursCount]);
+    }
+
     
     private function authorize(array $roles)
     {

@@ -12,7 +12,7 @@ class CreateChainProductionRetouchTable extends Migration
      */
     public function up()
     {
-        Schema::create('chain_production_retouch', function (Blueprint $table) {
+        Schema::create('chain_production_retouches', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('chain_id')->nullable();
             $table->unsignedBigInteger('model_id');
@@ -34,6 +34,6 @@ class CreateChainProductionRetouchTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('chain_production_retouch');
+        Schema::dropIfExists('chain_production_retouches');
     }
 }

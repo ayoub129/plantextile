@@ -59,7 +59,7 @@ class SystemConstController extends Controller
     public function show()
     {
         $this->authorize(['developer', 'admin', 'superadmin']);
-        $systemConstant = SystemConstant::firstOrFail();
+        $systemConstant = SystemConstant::with('effectifFix')->firstOrFail();
         return response()->json($systemConstant);
     }
     

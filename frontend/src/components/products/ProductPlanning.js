@@ -113,6 +113,7 @@ function ProductPlanning() {
       resetForm();
       toast.success("Planification de produit créée avec succès.");
     } catch (error) {
+      console.log(error)
       toast.error(
         "Erreur lors de l'enregistrement du Planification de produit."
       );

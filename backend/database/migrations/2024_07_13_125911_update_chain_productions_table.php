@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('chain_productions', function (Blueprint $table) {
-            $table->integer('entre')->default(0);
-            $table->integer('sortie')->default(0);
-            $table->renameColumn('value', 'production');
+            $table->integer('entre')->nullable()->default(0);
+            $table->integer('sortie')->nullable()->default(0);
         });
     }
 
@@ -25,7 +24,6 @@ return new class extends Migration
     {
         Schema::table('chain_productions', function (Blueprint $table) {
             $table->dropColumn(['entre', 'sortie']);
-            $table->renameColumn('production', 'value');
         });
     }
 };

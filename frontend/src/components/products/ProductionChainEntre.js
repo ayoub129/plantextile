@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import Input from "../ui/Input";
 import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductionChainEntre = () => {
   const [models, setModels] = useState([]);
@@ -10,7 +11,6 @@ const ProductionChainEntre = () => {
   const [selectedChain, setSelectedChain] = useState("");
   const [encour, setEncour] = useState(0);
   const [entre, setEntre] = useState(0);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -36,29 +36,16 @@ const ProductionChainEntre = () => {
   }, []);
 
   useEffect(() => {
-    const fetchProductionData = async () => {
-      if (selectedModel && selectedChain) {
-        try {
-          const response = await api.get(
-            `/chain_production/${selectedModel}/${selectedChain}`
-          );
-          const { entre } = response.data;
-          setEntre(entre);
-        } catch (error) {
-          console.error("Error fetching production data:", error);
-        }
-      }
-    };
-
     const fetchEncoure = async () => {
       if (selectedModel) {
         try {
           const encour = await api.get(`coupe_production/${selectedModel}`);
+          console.log(encour)
           const chainProd = await api.get(
             `/production_chains/${selectedModel}/entre`
           );
 
-          setEncour(encour.data.value - parseInt(chainProd.data.totalEntre));
+          setEncour(encour.data - parseInt(chainProd.data.totalEntre));
         } catch (error) {
           console.log(error);
         }
@@ -66,7 +53,6 @@ const ProductionChainEntre = () => {
     };
 
     fetchEncoure();
-    fetchProductionData();
   }, [selectedModel, selectedChain]);
 
   const handleModelChange = (e) => {
@@ -77,35 +63,35 @@ const ProductionChainEntre = () => {
     setSelectedChain(e.target.value);
   };
 
-  const onChange = async (name, value) => {
-    if (name === "entre") {
-      const newValue = parseInt(value, 10);
-      const validValue = isNaN(newValue) ? 0 : newValue;
-      setEntre(validValue);
+  const onChange = (name, value) => {
+    const newValue = value === "" ? 0 : parseInt(value, 10);
 
-      if (selectedModel && selectedChain) {
-        setIsButtonDisabled(true);
-        try {
-          await api.post(
-            `/chain_production/${selectedModel}/${selectedChain}`,
-            {
-              entre: validValue,
-            }
-          );
-          const newEncour = encour - validValue;
+    if (isNaN(newValue)) {
+      setEntre(0);
+      return;
+    }
 
-          if (newEncour < 0) {
-            toast.error("Encour ne peut pas être inférieur à 0.");
-            return;
-          }
+    setEntre(newValue);
+  };
 
-          setEncour(newEncour);
-        } catch (error) {
-          console.error("Error updating production data:", error);
-        } finally {
-          setIsButtonDisabled(false);
-        }
-      }
+  const handleSave = async () => {
+    const selectedModelData = models.find((model) => model.id == selectedModel);
+    const encourValue = encour - entre;
+
+    if (encourValue < 0) {
+      toast.error("Encour ne peut pas être inférieur à 0.");
+      return;
+    }
+
+    try {
+      await api.post(`/chain_production/${selectedModel}/${selectedChain}`, {
+        entre: entre,
+      });
+      setEncour(encourValue);
+      setEntre(0);  // Reset the input value after saving
+      toast.success("Record saved successfully");
+    } catch (error) {
+      console.error("Error saving production data:", error);
     }
   };
 
@@ -161,14 +147,19 @@ const ProductionChainEntre = () => {
       )}
       <div className="flex justify-between items-center">
         {selectedModel && selectedChain && (
-          <div className="flex justify-center mx-auto mt-[2rem] items-center mb-4 shadow-md w-fit p-3 rounded border">
+          <div className="flex flex-col p-5 mt-[2rem] mb-4 shadow-md w-fit p-1 rounded border">
             <Input
               handleChange={onChange}
               name={"entre"}
-              label={"Entre"}
-              placeholder="Entre"
+              label="Total Entre"
               text={entre}
             />
+            <button
+              onClick={handleSave}
+              className="mt-4 bg-blue-500 text-white p-2 rounded"
+            >
+              Save
+            </button>
           </div>
         )}
       </div>

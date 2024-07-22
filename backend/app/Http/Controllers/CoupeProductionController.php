@@ -11,10 +11,9 @@ class CoupeProductionController extends Controller
     // Fetch the CoupeProduction data for a specific model
     public function show($modelId)
     {
-
-        $coupeProduction = CoupeProduction::where('model_id', $modelId)->first();
-        if ($coupeProduction) {
-            return response()->json($coupeProduction);
+        $totalValue = CoupeProduction::where('model_id', $modelId)->sum('value');
+        if($totalValue) {
+            return response()->json($totalValue);
         } else {
             return response()->json(['message' => 'Data not found'], 404);
         }
@@ -29,12 +28,12 @@ class CoupeProductionController extends Controller
             'value' => 'required|integer'
         ]);
 
-        $coupeProduction = CoupeProduction::updateOrCreate(
-            ['model_id' => $modelId],
-            ['value' => $request->value]
-        );
+        $coupeProduction = CoupeProduction::create([
+            'model_id' => $modelId,
+            'value' => $request->value
+        ]);
 
-        return response()->json($coupeProduction, 200);
+        return response()->json($coupeProduction, 201);
     }
 
     private function authorize(array $roles)

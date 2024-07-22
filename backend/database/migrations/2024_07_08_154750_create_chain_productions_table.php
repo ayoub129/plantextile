@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('model_id')->constrained('models');
             $table->foreignId('chain')->constrained('chains');
-            $table->integer('value');
             $table->timestamps();
         });
     }

@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
 import Input from "../ui/Input";
-import { toast, ToastContainer } from "react-toastify";
 import Button from "../ui/Button";
+import React, { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
 const ProductionChainSortie = () => {
   const [models, setModels] = useState([]);
@@ -57,14 +57,18 @@ const ProductionChainSortie = () => {
       if (selectedModel && selectedChain) {
         try {
           const response = await api.get(
-            `/chain_production/${selectedModel}/${selectedChain}`
+            `/chain_production_sortie/${selectedModel}/${selectedChain}`
           );
-          const { entre, sortie, retouch, posts } = response.data;
+
+          const { entre, sortie, retouch } = response.data;
           setEntre(entre);
-          setSortie(sortie);
+          if(sortie == null) {
+            setSortie(0)
+          } else {
+            setSortie(sortie);
+          }
           setRetouch(retouch);
           setEncour(entre - sortie);
-          setSelectedPost(posts);
         } catch (error) {
           console.error("Error fetching production data:", error);
         }
@@ -106,7 +110,6 @@ const ProductionChainSortie = () => {
         await api.post(`/chain_production/${selectedModel}/${selectedChain}`, {
           sortie: newValue,
         });
-
         setEncour(entre - newValue);
       } catch (error) {
         console.error("Error updating production data:", error);
@@ -134,7 +137,6 @@ const ProductionChainSortie = () => {
         post_id: selectedPost,
       });
 
-      setEncour(entre - retouch);
       setRetouch(0);
       setSelectedPost("");
     } catch (error) {

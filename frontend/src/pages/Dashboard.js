@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
 import CoupeChart from "../components/charts/CoupeChart";
 import PlanningChart from "../components/charts/PlanningChart";
 import EffectiveChart from "../components/charts/EffectiveChart";
@@ -50,7 +49,7 @@ const Dashboard = () => {
         <div className="my-10">
           <AfterChainChart />
         </div>
-        <div className="my-10">
+        <div className="mt-10">
           <MargeNette />
         </div>
       </div>

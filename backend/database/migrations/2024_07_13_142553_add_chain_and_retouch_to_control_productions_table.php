@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('control_productions', function (Blueprint $table) {
-            $table->foreignId('chain_id')->constrained('chains');
-            $table->integer('retouch')->default(0);
+            $table->integer('retouch')->default(0)->nullable();
             $table->string('posts')->nullable();
         });
     }
@@ -24,7 +23,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('control_productions', function (Blueprint $table) {
-            $table->dropColumn('chain_id');
             $table->dropColumn('retouch');
             $table->dropColumn('posts');
         });

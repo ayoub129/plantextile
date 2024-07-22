@@ -36,6 +36,7 @@ const ExportProduction = () => {
             `/magasin_production/${selectedModel}`
           );
           setEntre(controlResponse.data.value);
+          setEncore(controlResponse.data.value);
         } catch (error) {
           console.error("Error fetching controle data:", error);
         }
@@ -44,15 +45,11 @@ const ExportProduction = () => {
           const response = await api.get(`/export/${selectedModel}`);
           setProduction(response.data.value);
           setSelectedDate(new Date(response.data.date));
+          setEncore(entre - parseInt(response.data.value));
         } catch (error) {
           console.error("Error fetching ExportProduction data:", error);
         }
 
-        if (production) {
-          setEncore(entre - parseInt(production));
-        } else {
-          setEncore(entre);
-        }
       }
     };
 

@@ -31,7 +31,6 @@ const AddConstantSystem = () => {
     Ménage: "",
     Autres: "",
   });
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 

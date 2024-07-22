@@ -8,6 +8,8 @@ const LaCoupe = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState("");
   const [value, setValue] = useState(0);
+  const [entreValue , setEntreValue] = useState(0);
+  const [totalValue, setTotalValue] = useState(0);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -27,7 +29,7 @@ const LaCoupe = () => {
       if (selectedModel) {
         try {
           const response = await api.get(`/coupe_production/${selectedModel}`);
-          setValue(response.data.value);
+          setEntreValue(response.data);
         } catch (error) {
           console.error("Error fetching CoupeProduction data:", error);
         }
@@ -41,7 +43,7 @@ const LaCoupe = () => {
     setSelectedModel(e.target.value);
   };
 
-  const onChange = async (name, value) => {
+  const onChange = (name, value) => {
     const newValue = value === "" ? 0 : parseInt(value, 10);
 
     if (isNaN(newValue)) {
@@ -49,22 +51,27 @@ const LaCoupe = () => {
       return;
     }
 
+    setValue(newValue);
+  };
+
+  const handleSave = async () => {
     const selectedModelData = models.find((model) => model.id == selectedModel);
-    const encour = selectedModelData.qte_societe - newValue;
+    const encour = selectedModelData.qte_societe - totalValue - entreValue;
 
     if (encour < 0) {
       toast.error("Total Coupe can't be more than the encour");
       return;
     }
 
-    setValue(newValue);
-
     try {
       await api.post(`/coupe_production/${selectedModel}`, {
-        value: newValue,
+        value: value,
       });
+      setTotalValue(totalValue + value);
+      setValue(0);  // Reset the input value after saving
+      toast.success("Record saved successfully");
     } catch (error) {
-      console.error("Error updating CoupeProduction data:", error);
+      console.error("Error saving CoupeProduction data:", error);
     }
   };
 
@@ -101,18 +108,24 @@ const LaCoupe = () => {
             </h3>
           </div>
           <h3 className="font-semibold text-xl">
-            encour: {selectedModelData.qte_societe - value}
+            encour: {selectedModelData.qte_societe - totalValue - entreValue}
           </h3>
         </div>
       )}
       {selectedModel && (
-        <div className="flex p-5 mt-[2rem] mb-4 shadow-md w-fit p-1 rounded border">
+        <div className="flex flex-col p-5 mt-[2rem] mb-4 shadow-md w-fit p-1 rounded border">
           <Input
             handleChange={onChange}
             name={"coupe"}
             label="Total Coupe"
             text={value}
           />
+          <button
+            onClick={handleSave}
+            className="mt-4 bg-blue-500 text-white p-2 rounded"
+          >
+            Save
+          </button>
         </div>
       )}
     </div>

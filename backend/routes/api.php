@@ -98,7 +98,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('product_plans_hours/{id}', [ProductPlanController::class, 'deleteHours']);
     // create a new product plan hours
     Route::post('product_plans_hours', [ProductPlanController::class, 'setHours']);
-
+    // getWorkedHours
+    Route::get('product_plans_worked_hours/{modelId}', [ProductPlanController::class, 'getWorkedHours']);
+     
     /**
      * Effective Standard  
      */
@@ -168,6 +170,8 @@ Route::middleware('auth:sanctum')->group(function () {
      */
     // get chain production
     Route::get('/chain_production/{modelId}/{chainId}', [ChainProductionController::class, 'show']);
+
+    Route::get('/chain_production_sortie/{modelId}/{chainId}', [ChainProductionController::class, 'showSortie']);
     // getchainData
     Route::get('/chain_production_data/{modelId}', [ChainProductionController::class, 'getChainData']);
     // send chain production

@@ -15,14 +15,24 @@ class ChainProductionController extends Controller
 
         $chainProduction = ChainProduction::where('model_id', $modelId)
                                           ->where('chain', $chainId)
-                                          ->first();
+                                          ->sum('entre');
 
-        if ($chainProduction) {
-            return response()->json($chainProduction);
-        } else {
-            return response()->json(['message' => 'Data not found'], 404);
-        }
+        return response()->json($chainProduction);
     }
+
+        // Fetch the production data for a specific model and chain for today
+        public function showSortie($modelId, $chainId)
+        {
+            $this->authorize(['developer', 'superadmin', 'admin', 'Chaîne_production_entrée', 'Chaîne_production_sortie']);
+        
+            $chainProduction = ChainProduction::where('model_id', $modelId)
+                                              ->where('chain', $chainId)
+                                              ->selectRaw('SUM(entre) as entre, SUM(sortie) as sortie, SUM(retouch) as retouch')
+                                              ->first();
+        
+            return response()->json($chainProduction);
+        }
+            
 
     // Update the production data for a specific model and chain for today
     public function update(Request $request, $modelId, $chainId)
@@ -34,27 +44,14 @@ class ChainProductionController extends Controller
             'sortie' => 'nullable|integer'
         ]);
 
-        $chainProduction = ChainProduction::where('model_id', $modelId)
-                                          ->where('chain', $chainId)
-                                          ->first();
+        $chainProduction = ChainProduction::create([
+            'model_id' => $modelId,
+            'chain' => $chainId,
+            'entre' => $request->entre,
+            'sortie' => $request->sortie
+        ]);
 
-        if ($chainProduction) {
-            // Update the existing record for today
-            $chainProduction->update(array_filter([
-                'entre' => $request->entre,
-                'sortie' => $request->sortie
-            ]));
-        } else {
-            // Create a new record if no record exists for today
-            $chainProduction = ChainProduction::create([
-                'model_id' => $modelId,
-                'chain' => $chainId,
-                'entre' => $request->entre,
-                'sortie' => $request->sortie
-            ]);
-        }
-
-        return response()->json($chainProduction, 200);
+        return response()->json($chainProduction, 201);
     }
 
     public function getChainData(Request $request, $modelId)

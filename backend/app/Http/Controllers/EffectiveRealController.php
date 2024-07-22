@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Coupe;
 use App\Models\EffectifDirect;
 use App\Models\EffectifIndirect;
 use App\Models\EffectiveReal;
@@ -204,7 +203,10 @@ class EffectiveRealController extends Controller
     {
         $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
 
-        $effectiveIndirect = EffectifIndirect::whereNotNull('effective_real_id')->with('coupes')->latest()->first();
+        $effectiveIndirect = EffectifIndirect::whereNotNull('effective_real_id')
+        ->with('coupes')
+        ->orderBy('created_at', 'desc')
+        ->first();
 
         if (!$effectiveIndirect) {
             return response()->json(['message' => 'No Effective Indirect found for this Effective Standard ID'], 404);
