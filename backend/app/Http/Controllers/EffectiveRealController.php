@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EffectifDirect;
 use App\Models\EffectifIndirect;
 use App\Models\EffectiveReal;
+use App\Models\EffectiveStandard;
 use App\Models\Models;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -219,38 +220,40 @@ class EffectiveRealController extends Controller
     public function totalEffectifIndirect()
     {
         $this->authorize(['developer', 'superadmin', 'admin']);
-
-        $effectiveIndirects = EffectifIndirect::whereNotNull('effective_real_id')->with('coupes')->get();
-
-        if ($effectiveIndirects->isEmpty()) {
+    
+        // Get the latest single EffectifIndirect record that has a non-null effective_real_id
+        $effectiveIndirect = EffectifIndirect::whereNotNull('effective_real_id')
+            ->with('coupes')
+            ->latest()
+            ->first();
+    
+        if (!$effectiveIndirect) {
             return response()->json(['message' => 'No Effective Indirect found for this Effective Standard ID'], 404);
         }
-
+    
         $totalIndirect = 0;
-
-        foreach ($effectiveIndirects as $indirect) {
-            $totalIndirect += $indirect->mag_four +
-                $indirect->mag_fin +
-                $indirect->machines_sp_manuelle +
-                $indirect->cont_fin +
-                $indirect->mach_retouche +
-                $indirect->repassage +
-                $indirect->gabaret +
-                $indirect->preparation_stagieres +
-                $indirect->preparation +
-                $indirect->preparation_elastique;
-
-            foreach ($indirect->coupes as $coupe) {
-                $totalIndirect += $coupe->matlasseurs +
-                    $coupe->coupeurs +
-                    $coupe->tiquitage +
-                    $coupe->vesline;
-            }
+    
+        $totalIndirect += $effectiveIndirect->mag_four +
+            $effectiveIndirect->mag_fin +
+            $effectiveIndirect->machines_sp_manuelle +
+            $effectiveIndirect->cont_fin +
+            $effectiveIndirect->mach_retouche +
+            $effectiveIndirect->repassage +
+            $effectiveIndirect->gabaret +
+            $effectiveIndirect->preparation_stagieres +
+            $effectiveIndirect->preparation +
+            $effectiveIndirect->preparation_elastique;
+    
+        foreach ($effectiveIndirect->coupes as $coupe) {
+            $totalIndirect += $coupe->matlasseurs +
+                $coupe->coupeurs +
+                $coupe->tiquitage +
+                $coupe->vesline;
         }
-
+    
         return response()->json(['total_effectif_indirect' => $totalIndirect]);
     }
-
+    
     public function totalEffectifDirect($modelId)
     {
         $this->authorize(['developer', 'superadmin', 'admin']);
@@ -287,20 +290,30 @@ class EffectiveRealController extends Controller
         $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
     
         // Fetch the effective standard data for the given model
+        $effectiveStandard = EffectiveStandard::where('model', $modelId)->first();
+    
+        if (is_null($effectiveStandard)) {
+            return response()->json(['message' => 'No EffectiveStandard found for this model'], 404);
+        }
+    
+        // Fetch all effective real data for the given model
         $effectiveReal = EffectiveReal::with(['effectifDirects', 'effectifIndirects.coupes'])
             ->where('model', $modelId)
             ->get();
     
         if ($effectiveReal->isEmpty()) {
-            return response()->json(['message' => 'No Effective found for this model'], 404);
+            return response()->json(['message' => 'No EffectiveReal found for this model'], 404);
         }
     
-        // Fetch all models data
-        $models = Models::where('id', $modelId)->get();
+        // Fetch all indirect effective data with an effective_real_id
+        $allIndirectEffective = EffectifIndirect::with('coupes')
+            ->whereNotNull('effective_real_id')
+            ->orderBy('created_at')
+            ->get();
     
-        // Get the date range from the models data
-        $startDate = new \DateTime($models->first()->start_date);
-        $endDate = new \DateTime($models->first()->end_date);
+        // Get the date range from the effective standard data
+        $startDate = new \DateTime($effectiveStandard->start_date);
+        $endDate = new \DateTime($effectiveStandard->end_date);
     
         // Create a date range
         $dateInterval = new \DateInterval('P1D');
@@ -308,37 +321,43 @@ class EffectiveRealController extends Controller
     
         // Organize the data by dates and calculate the sums
         $effectiveDataByDate = [];
+        $currentIndirectSum = 0;
+    
         foreach ($dateRange as $date) {
             $formattedDate = $date->format('Y-m-d');
             $directsSum = 0;
-            $indirectsSum = 0;
+            $indirectsSum = $currentIndirectSum; // Start with the last known indirect sum
     
-            // Get the effective Real data for the current date
+            // Get the effective direct data for the current date
             foreach ($effectiveReal as $effective) {
-                $directsSum += $effective->effectifDirects->sum(function($direct) {
-                    return array_sum([
-                        $direct->machinistes,
-                        $direct->machinistes_stagiaires,
-                        $direct->repassage_preparation,
-                        $direct->trassage,
-                        $direct->transport,
-                        $direct->chef,
-                        $direct->machines_speciales,
-                        $direct->trassage_special,
-                        $direct->controle_table,
-                        $direct->controle_final,
-                        $direct->machinistes_retouche,
-                        $direct->repassage_final,
-                        $direct->finition,
-                        $direct->transp_fin
-                    ]);
-                });
+                $effectiveCreatedAt = new \DateTime($effective->created_at);
+                if ($date->format('Y-m-d') == $effectiveCreatedAt->format('Y-m-d')) {
+                    $directsSum += $effective->effectifDirects->sum(function($direct) {
+                        return array_sum([
+                            $direct->machinistes,
+                            $direct->machinistes_stagiaires,
+                            $direct->repassage_preparation,
+                            $direct->trassage,
+                            $direct->transport,
+                            $direct->chef,
+                            $direct->machines_speciales,
+                            $direct->trassage_special,
+                            $direct->controle_table,
+                            $direct->controle_final,
+                            $direct->machinistes_retouche,
+                            $direct->repassage_final,
+                            $direct->finition,
+                            $direct->transp_fin
+                        ]);
+                    });
+                }
             }
     
-            // Get the indirect effective data for the current date
-            foreach ($effectiveReal as $effective) {
-                foreach ($effective->effectifIndirects as $indirect) {
-                    $indirectsSum += array_sum([
+            // Check if there is a new indirect effective record for the current date
+            foreach ($allIndirectEffective as $indirect) {
+                $indirectCreatedAt = new \DateTime($indirect->created_at);
+                if ($date->format('Y-m-d') == $indirectCreatedAt->format('Y-m-d')) {
+                    $indirectSumForDay = array_sum([
                         $indirect->mag_four,
                         $indirect->mag_fin,
                         $indirect->machines_sp_manuelle,
@@ -348,7 +367,7 @@ class EffectiveRealController extends Controller
                         $indirect->gabaret,
                         $indirect->preparation_stagieres,
                         $indirect->preparation,
-                        $indirect->preparation_elastique,
+                        $indirect->preparation_elastique
                     ]);
     
                     // Add the sum of coupe data
@@ -361,20 +380,21 @@ class EffectiveRealController extends Controller
                         ]);
                     });
     
-                    $indirectsSum += $coupeSum;
+                    $currentIndirectSum = $indirectSumForDay + $coupeSum;
+                    break;
                 }
             }
     
             $effectiveDataByDate[$formattedDate] = [
-                'total' => $directsSum + $indirectsSum,
+                'total' => $directsSum + $currentIndirectSum,
                 'effectifDirects' => $directsSum,
-                'effectifIndirects' => $indirectsSum
+                'effectifIndirects' => $currentIndirectSum
             ];
         }
     
         return response()->json($effectiveDataByDate);
     }
-    
+            
     private function authorize(array $roles)
     {
         if (!in_array(Auth::user()->role, $roles)) {

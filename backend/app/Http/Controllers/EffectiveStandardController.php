@@ -100,7 +100,7 @@ class EffectiveStandardController extends Controller
     public function getEffectiveSumData(Request $request, $modelId)
     {
         $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
-
+    
         // Fetch the effective standard data for the given model
         $effectiveStandard = EffectiveStandard::with(['effectifDirects', 'effectifIndirects.coupes'])
             ->where('model', $modelId)
@@ -110,8 +110,9 @@ class EffectiveStandardController extends Controller
             return response()->json(['message' => 'No Effective found for this model'], 404);
         }
     
-        // Fetch all indirect effective data
+        // Fetch all indirect effective data with an effective_standard_id
         $allIndirectEffective = EffectifIndirect::with('coupes')
+            ->whereNotNull('effective_standard_id')
             ->orderBy('created_at')
             ->get();
     
@@ -125,10 +126,11 @@ class EffectiveStandardController extends Controller
     
         // Organize the data by dates and calculate the sums
         $effectiveDataByDate = [];
+        $currentIndirectSum = 0;
+    
         foreach ($dateRange as $date) {
             $formattedDate = $date->format('Y-m-d');
             $directsSum = 0;
-            $indirectsSum = 0;
     
             // Get the effective standard data for the current date
             foreach ($effectiveStandard as $effective) {
@@ -157,10 +159,11 @@ class EffectiveStandardController extends Controller
                 }
             }
     
-            // Get the latest indirect effective data for the current date
+            // Check if there is a new indirect effective record for the current date
             foreach ($allIndirectEffective as $indirect) {
-                if ($date >= new \DateTime($indirect->created_at)) {
-                    $indirectsSum = array_sum([
+                $indirectCreatedAt = new \DateTime($indirect->created_at);
+                if ($date->format('Y-m-d') == $indirectCreatedAt->format('Y-m-d')) {
+                    $currentIndirectSum = array_sum([
                         $indirect->mag_four,
                         $indirect->mag_fin,
                         $indirect->machines_sp_manuelle,
@@ -183,20 +186,21 @@ class EffectiveStandardController extends Controller
                         ]);
                     });
     
-                    $indirectsSum += $coupeSum;
+                    $currentIndirectSum += $coupeSum;
+                    break;
                 }
             }
     
             $effectiveDataByDate[$formattedDate] = [
-                'total' => $directsSum + $indirectsSum,
+                'total' => $directsSum + $currentIndirectSum,
                 'effectifDirects' => $directsSum,
-                'effectifIndirects' => $indirectsSum
+                'effectifIndirects' => $currentIndirectSum
             ];
         }
     
         return response()->json($effectiveDataByDate);
     }
-
+    
     public function getEffectiveByModel($modelId)
     {
         $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);

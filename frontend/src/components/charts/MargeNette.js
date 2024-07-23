@@ -3,6 +3,8 @@ import api from "../../api/axios";
 import BarChart from "../ui/BarChart";
 
 const MargeNette = () => {
+  const [couteTransport, setCouteTransport] = useState(0);
+
   const [selectedModel, setSelectedModel] = useState("");
   const [models, setModels] = useState([]);
   const [error, setError] = useState(null);
@@ -25,7 +27,6 @@ const MargeNette = () => {
   const [effectifInDirect, setEffectifInDirect] = useState(0);
   const [totalChains, setTotalChains] = useState(0);
   const [totalHours, setTotalHours] = useState(0);
-  const [couteTransport, setCouteTransport] = useState(0);
   const [massSalaryDirect, setMassSalaryDirect] = useState(0);
   const [massSalaryInDirect, setMassSalaryInDirect] = useState(0);
   const [totalMassSalary, setTotalMassSalary] = useState(0);
@@ -39,7 +40,12 @@ const MargeNette = () => {
   const [margeBruteDepot, setMargeBruteDepot] = useState(0);
   const [margeNetteDepot, setMargeNetteDepot] = useState(0);
   const [barChartData, setBarChartData] = useState({
-    labels: ["Production dépôt en valeur", "Coût de revient", "Marge brute dépôt", "Marge nette dépôt"],
+    labels: [
+      "Production dépôt en valeur",
+      "Coût de revient",
+      "Marge brute dépôt",
+      "Marge nette dépôt",
+    ],
     datasets: [
       {
         data: [0, 0, 0, 0],
@@ -55,6 +61,7 @@ const MargeNette = () => {
     plugins: {
       legend: {
         position: "top",
+        display: false,
       },
     },
     scales: {
@@ -78,7 +85,7 @@ const MargeNette = () => {
       setError(null);
       const response = await api.get(`/export/${modelId}`);
       const exportData = response.data;
-      setTotalExport(exportData.value);
+      setTotalExport(exportData.total);
 
       const modelData = models.find((model) => {
         return model.id == modelId;
@@ -88,7 +95,7 @@ const MargeNette = () => {
         modelData.prixMOver *
         (modelData.prixFacture /
           (modelData.prixMOver * modelData.qte_societe)) *
-        exportData.value
+        exportData.total
       ).toFixed(2);
 
       setProductionDepotValeur(productionDepotValeur);
@@ -100,35 +107,117 @@ const MargeNette = () => {
 
   const calculateCouteTransport = () => {
     const QP_effectif = effectifInDirect / totalChains;
-    const { Nombre_d_heures_par_jour, Capacité_par_unité_transport, Coût_par_trajet } = systemConstant;
+    const {
+      Nombre_d_heures_par_jour,
+      Capacité_par_unité_transport,
+      Coût_par_trajet,
+      cotisation_entroprise_trans,
+    } = systemConstant;
 
     const Nombre_de_jours_de_production = totalHours / Nombre_d_heures_par_jour;
 
-    const Refacturation_transport_MOD_directe = -((totalHours * effectifDirect) / 26 * 8);
-    const Refacturation_transport_MOD_indirecte = -((totalHours * QP_effectif) / 26 * 8);
+    const Refacturation_transport_MOD_indirecte = -(
+      (cotisation_entroprise_trans *
+        Nombre_de_jours_de_production *
+        QP_effectif) /
+      26
+    );
 
-    const transportCost = (2 * ((QP_effectif + effectifDirect) / Capacité_par_unité_transport) * Nombre_de_jours_de_production * Coût_par_trajet) 
-      + Refacturation_transport_MOD_directe 
-      + Refacturation_transport_MOD_indirecte;
+    const Refacturation_transport_MOD_directe = -(
+      (cotisation_entroprise_trans *
+        Nombre_de_jours_de_production *
+        effectifDirect) /
+      26
+    );
 
-    setCouteTransport(transportCost.toFixed(2));
+    const Nombre_unite_utilise =
+      (QP_effectif + effectifDirect) / Capacité_par_unité_transport;
+
+    const transportCost =
+      2 *
+        Nombre_unite_utilise *
+        Nombre_de_jours_de_production *
+        Coût_par_trajet +
+      (Refacturation_transport_MOD_directe +
+        Refacturation_transport_MOD_indirecte);
+
+    setCouteTransport(transportCost.toFixed(4));
   };
 
   const calculateTotalMasseSalariale = () => {
-    const { Taux_horaire_SMIG_16_29, Masse_salariale_16_29, Masse_salariale_17_00, Masse_salariale_17_50 } = systemConstant;
+    const {
+      Taux_horaire_SMIG_16_29,
+      Taux_horaire_17_00,
+      Taux_horaire_17_50,
+      Masse_salariale_16_29,
+      Masse_salariale_17_00,
+      Masse_salariale_17_50,
+    } = systemConstant;
 
-    const congeAnual = (totalHours * Taux_horaire_SMIG_16_29 * 1.5) / 26;
+    const congeAnual =
+      (totalHours * effectifDirect * Taux_horaire_SMIG_16_29 * 1.5) / 26;
 
-    const masseSalariale1629 = totalHours * Masse_salariale_16_29 * Taux_horaire_SMIG_16_29;
-    const masseSalariale1700 = totalHours * Masse_salariale_17_00 * systemConstant.Taux_horaire_17_00;
-    const masseSalariale1750 = totalHours * Masse_salariale_17_50 * systemConstant.Taux_horaire_17_50;
+    const masseSalariale1629 =
+      totalHours *
+      effectifDirect *
+      Masse_salariale_16_29 *
+      0.01 *
+      Taux_horaire_SMIG_16_29;
 
-    const masseSalarialeIndirecte = masseSalariale1629 + masseSalariale1700 + masseSalariale1750 + congeAnual;
-    const masseSalarialeDirecte = effectifDirect * totalHours * Taux_horaire_SMIG_16_29;
+    const masseSalariale1700 =
+      totalHours *
+      effectifDirect *
+      Masse_salariale_17_00 *
+      0.01 *
+      Taux_horaire_17_00;
 
-    setMassSalaryInDirect(masseSalarialeIndirecte.toFixed(2));
-    setMassSalaryDirect(masseSalarialeDirecte.toFixed(2));
-    setTotalMassSalary((masseSalarialeIndirecte + masseSalarialeDirecte).toFixed(2));
+    const masseSalariale1750 =
+      totalHours *
+      effectifDirect *
+      Masse_salariale_17_50 *
+      0.01 *
+      Taux_horaire_17_50;
+
+    const QP_effectif = effectifInDirect / totalChains;
+
+    const congeAnualIndirect =
+      (totalHours * QP_effectif * Taux_horaire_SMIG_16_29 * 1.5) / 26;
+
+    const masseSalarialeIndirect1629 =
+      totalHours *
+      QP_effectif *
+      Masse_salariale_16_29 *
+      0.01 *
+      Taux_horaire_SMIG_16_29;
+
+    const masseSalarialeIndirect1700 =
+      totalHours *
+      QP_effectif *
+      Masse_salariale_17_00 *
+      0.01 *
+      Taux_horaire_17_00;
+
+    const masseSalarialeIndirect1750 =
+      totalHours *
+      QP_effectif *
+      Masse_salariale_17_50 *
+      0.01 *
+      Taux_horaire_17_50;
+
+    const masseSalarialeDirecte =
+      masseSalariale1629 + masseSalariale1700 + masseSalariale1750 + congeAnual;
+
+    const masseSalarialeInDirecte =
+      masseSalarialeIndirect1700 +
+      masseSalarialeIndirect1629 +
+      masseSalarialeIndirect1750 +
+      congeAnualIndirect;
+
+    setMassSalaryInDirect(masseSalarialeInDirecte.toFixed(4));
+    setMassSalaryDirect(masseSalarialeDirecte.toFixed(4));
+    setTotalMassSalary(
+      (masseSalarialeInDirecte + masseSalarialeDirecte).toFixed(4)
+    );
   };
 
   const calculateCouteFilAndPlastique = () => {
@@ -137,25 +226,30 @@ const MargeNette = () => {
   };
 
   const calculateCoûtEnergie = () => {
-    const { Coût_énergie_journalier } = systemConstant;
-    const Nombre_de_jours_de_production = totalHours / systemConstant.Nombre_d_heures_par_jour;
+    const { Coût_énergie_journalier, Nombre_d_heures_par_jour } =
+      systemConstant;
+    const Nombre_de_jours_de_production = totalHours / Nombre_d_heures_par_jour;
     setCoûtEnergie(Nombre_de_jours_de_production * Coût_énergie_journalier);
   };
 
   const calculateCoûtChargesFixes = () => {
-    const { Coût_charges_fixes_journalier } = systemConstant;
-    const Nombre_de_jours_de_production = totalHours / systemConstant.Nombre_d_heures_par_jour;
-    setCoûtChargesFixes(Nombre_de_jours_de_production * Coût_charges_fixes_journalier);
+    const { Coût_charges_fixes_journalier, Nombre_d_heures_par_jour } =
+      systemConstant;
+    const Nombre_de_jours_de_production = totalHours / Nombre_d_heures_par_jour;
+    setCoûtChargesFixes(
+      Nombre_de_jours_de_production * Coût_charges_fixes_journalier
+    );
   };
 
   const calculateCoûtDeRevient = () => {
-    const totalCost = 
+    const totalCost =
       parseFloat(fils) +
       parseFloat(plastique) +
       parseFloat(totalMassSalary) +
       parseFloat(couteTransport) +
       parseFloat(coûtChargesFixes) +
       parseFloat(coûtEnergie);
+
     setCoûtDeRevient(totalCost.toFixed(2));
     return totalCost;
   };
@@ -169,7 +263,7 @@ const MargeNette = () => {
 
   const calculateMargeNetteDepot = () => {
     const margeBruteDepot = calculateMargeBruteDepot();
-    const margeNette = margeBruteDepot - (margeBruteDepot * 0.2);
+    const margeNette = margeBruteDepot - margeBruteDepot * 0.2;
     setMargeNetteDepot(margeNette.toFixed(2));
     return margeNette;
   };
@@ -192,20 +286,24 @@ const MargeNette = () => {
 
         const systemResponse = await api.get("/system_constants_latest");
         if (systemResponse.data) {
-          const { id, created_at, updated_at, effectif_fix, ...filteredData } = systemResponse.data;
+          const { id, created_at, updated_at, effectif_fix, ...filteredData } =
+            systemResponse.data;
           setSystemConstant({
             ...filteredData,
           });
         }
 
         const responseIndirect = await api.get(`/effective_indirect`);
-        const responseDirect = await api.get(`/effective_direct_real/${selectedModel}`);
+        const responseDirect = await api.get(
+          `/effective_direct_real/${selectedModel}`
+        );
         const responseChains = await api.get(`/total_chain`);
 
-        setEffectifInDirect(parseInt(responseIndirect.data.total_effectif_indirect));
+        setEffectifInDirect(
+          parseInt(responseIndirect.data.total_effectif_indirect)
+        );
         setEffectifDirect(parseInt(responseDirect.data.total_effectif_direct));
         setTotalChains(parseInt(responseChains.data.total_chains));
-
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -215,14 +313,27 @@ const MargeNette = () => {
   }, [selectedModel]);
 
   useEffect(() => {
-    if (totalHours > 0 && effectifDirect > 0 && effectifInDirect > 0 && totalChains > 0 && systemConstant.Nombre_d_heures_par_jour) {
+    if (
+      totalHours > 0 &&
+      effectifDirect > 0 &&
+      effectifInDirect > 0 &&
+      totalChains > 0 &&
+      systemConstant.Nombre_d_heures_par_jour
+    ) {
       calculateCouteTransport();
       calculateTotalMasseSalariale();
-      calculateCouteFilAndPlastique(); 
+      calculateCouteFilAndPlastique();
       calculateCoûtEnergie();
       calculateCoûtChargesFixes();
     }
-  }, [totalHours, effectifDirect, effectifInDirect, totalChains, systemConstant]);
+  }, [
+    totalHours,
+    effectifDirect,
+    effectifInDirect,
+    totalChains,
+    totalExport,
+    systemConstant,
+  ]);
 
   useEffect(() => {
     if (selectedModel) {
@@ -235,6 +346,21 @@ const MargeNette = () => {
     const margeBruteDepot = calculateMargeBruteDepot();
     const margeNetteDepot = calculateMargeNetteDepot();
 
+    const dataValues = [
+      parseInt(productionDepotValeur),
+      coûtDeRevient,
+      margeBruteDepot,
+      margeNetteDepot,
+    ];
+
+    const backgroundColors = dataValues.map((value) =>
+      value < 0 ? "rgba(255,0,0,0.2)" : "rgba(75,192,192,0.2)"
+    );
+
+    const borderColors = dataValues.map((value) =>
+      value < 0 ? "rgba(255,0,0,1)" : "rgba(75,192,192,1)"
+    );
+
     setBarChartData({
       labels: [
         "Production dépôt en valeur",
@@ -244,25 +370,27 @@ const MargeNette = () => {
       ],
       datasets: [
         {
-          data: [
-            productionDepotValeur,
-            coûtDeRevient,
-            margeBruteDepot,
-            margeNetteDepot,
-          ],
-          backgroundColor: ["rgba(75,192,192,0.2)"],
-          borderColor: ["rgba(75,192,192,1)"],
+          data: dataValues,
+          backgroundColor: backgroundColors,
+          borderColor: borderColors,
           borderWidth: 1,
         },
       ],
     });
-  }, [fils, plastique, totalMassSalary, couteTransport, coûtChargesFixes, coûtEnergie]);
+  }, [
+    fils,
+    plastique,
+    totalMassSalary,
+    couteTransport,
+    coûtChargesFixes,
+    coûtEnergie,
+    productionDepotValeur,
+  ]);
 
   const handleSelectChange = (e) => {
     setSelectedModel(e.target.value);
     fetchData(e.target.value);
   };
-
 
   return (
     <div className="ml-7">
@@ -290,18 +418,6 @@ const MargeNette = () => {
           <BarChart data={barChartData} options={barChartOptions} />
         )}
       </div>
-      {/* <div className="mt-4">
-        <h3>Coute Transport: {couteTransport}</h3>
-        <h3>Masse Salariale Directe: {massSalaryDirect}</h3>
-        <h3>Masse Salariale Indirecte: {massSalaryInDirect}</h3>
-        <h3>Total Masse Salariale: {totalMassSalary}</h3>
-        <h3>Worked Hours: {totalHours}</h3>
-        <h3>Coût Energie: {coûtEnergie}</h3>
-        <h3>Coût Charges Fixes: {coûtChargesFixes}</h3>
-        <h3>Coût de Revient: {coûtDeRevient}</h3>
-        <h3>Marge Brute Dépôt: {margeBruteDepot}</h3>
-        <h3>Marge Nette Dépôt: {margeNetteDepot}</h3>
-      </div> */}
     </div>
   );
 };

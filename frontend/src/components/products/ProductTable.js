@@ -164,13 +164,13 @@ const ProductTables = () => {
                       {product.dateEtude}
                     </td>
                     <td className="p-[2rem] text-center text-[#4E4A4A] font-semibold min-w-[200px]">
-                      {product.cours_devise_etude}
+                      {parseInt(product.cours_devise_etude).toFixed(2)}
                     </td>
                     <td className="p-[2rem] text-center text-[#4E4A4A] font-semibold min-w-[200px]">
                       {product.dateImport}
                     </td>
                     <td className="p-[2rem] text-center text-[#4E4A4A] font-semibold min-w-[200px]">
-                      {product.cours_devise_import}
+                      {parseInt(product.cours_devise_import).toFixed(2)}
                     </td>
                     <td className="p-[2rem] text-center text-[#4E4A4A] font-semibold min-w-[200px]">
                       {product.dateExport}

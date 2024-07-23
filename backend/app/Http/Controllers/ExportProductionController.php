@@ -16,34 +16,27 @@ class ExportProductionController extends Controller
         $this->authorize(['developer', 'superadmin', 'admin', 'Logistique']);
 
         $request->validate([
-            'value' => 'nullable|integer',
-            'date' => 'nullable|date'
+            'value' => 'required|integer',
+            'date' => 'required|date'
         ]);
 
-        $repassageProduction = ExportProduction::updateOrCreate(
-            ['model_id' => $modelId],
-            [
-                'value' => $request->value,
-                'date' => $request->date
-            ]
-        );
+        $repassageProduction = ExportProduction::create([
+            'model_id' => $modelId,
+            'value' => $request->value,
+            'date' => $request->date
+        ]);
 
-        return response()->json($repassageProduction, 200);
+        return response()->json($repassageProduction, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($modelId)
     {
         $this->authorize(['developer', 'superadmin', 'admin', 'Logistique']);
 
-        $repassageProduction = ExportProduction::where('model_id', $modelId)->first();
-        if ($repassageProduction) {
-            return response()->json($repassageProduction);
-        } else {
-            return response()->json(['message' => 'Data not found'], 404);
-        }
+        $totalProduction = ExportProduction::where('model_id', $modelId)
+            ->sum('value');
+
+        return response()->json(['total' => $totalProduction], 200);
     }
 
     /**

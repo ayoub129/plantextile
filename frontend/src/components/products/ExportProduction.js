@@ -10,6 +10,7 @@ const ExportProduction = () => {
   const [models, setModels] = useState([]);
   const [selectedModel, setSelectedModel] = useState("");
   const [production, setProduction] = useState(0);
+  const [totalProduction, setTotalProduction] = useState(0);
   const [encore, setEncore] = useState(0);
   const [entre, setEntre] = useState(0);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -36,25 +37,23 @@ const ExportProduction = () => {
             `/magasin_production/${selectedModel}`
           );
           setEntre(controlResponse.data.value);
-          setEncore(controlResponse.data.value);
         } catch (error) {
           console.error("Error fetching controle data:", error);
         }
 
         try {
           const response = await api.get(`/export/${selectedModel}`);
-          setProduction(response.data.value);
-          setSelectedDate(new Date(response.data.date));
-          setEncore(entre - parseInt(response.data.value));
+          setTotalProduction(response.data.total);
         } catch (error) {
           console.error("Error fetching ExportProduction data:", error);
+          setEncore(entre);
         }
-
       }
     };
 
     fetchExportProduction();
-  }, [selectedModel]);
+    setEncore(entre - totalProduction);
+  }, [selectedModel, entre, totalProduction]);
 
   const handleModelChange = (e) => {
     setSelectedModel(e.target.value);

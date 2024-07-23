@@ -225,18 +225,27 @@ class ProductPlanController extends Controller
     public function getWorkedHours($modelId)
     {
         $this->authorize(['developer', 'Méthode', 'admin', 'superadmin']);
-
-        // Get the product plan to ensure it exists
-        $productPlan = ProductPlan::where('model_id' , $modelId);
-
-        // Count the hours with non-zero values
-        $workedHoursCount = ProductPlanHour::where('product_plan_id',  $productPlan->id)
-            ->where('models_finished', '>', 0)
-            ->count();
-
+    
+        // Get all product plans that match the model_id
+        $productPlans = ProductPlan::where('model_id', $modelId)->get();
+    
+        // Check if any product plans exist
+        if ($productPlans->isEmpty()) {
+            return response()->json(['error' => 'No product plans found'], 404);
+        }
+    
+        $workedHoursCount = 0;
+    
+        // Iterate over each product plan and count the worked hours
+        foreach ($productPlans as $productPlan) {
+            $workedHoursCount += ProductPlanHour::where('product_plan_id', $productPlan->id)
+                ->where('models_finished', '>', 0)
+                ->count();
+        }
+    
         return response()->json(['worked_hours_count' => $workedHoursCount]);
     }
-
+    
     
     private function authorize(array $roles)
     {

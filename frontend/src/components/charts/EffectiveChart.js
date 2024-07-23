@@ -126,7 +126,7 @@ const EffectiveChart = () => {
         ],
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setError(error.response?.data?.message || "An error occurred");
     }
   };
@@ -162,7 +162,11 @@ const EffectiveChart = () => {
         )}
       </div>
       <div className="w-full mr-5 mt-5">
-        <DataTable type={"negative"} data={lineChartDataEffective} />
+        <DataTable
+          type={"negative"}
+          noDiffrent={true}
+          data={lineChartDataEffective}
+        />
       </div>
     </div>
   );

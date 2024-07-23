@@ -127,36 +127,39 @@ const AddProductForm = () => {
 
   // Créer ou mettre à jour un produit
   const handleSubmit = async (e) => {
-    // Commencer l'état de chargement lors de la sauvegarde du produit
     setLoading(true);
     e.preventDefault();
 
-    // Créer un FormData à envoyer comme corps de la requête avec les données du fichier si elles existent
     const formData = new FormData();
     Object.keys(products).forEach((key) => {
       if (products[key] instanceof Date) {
-        // Formater la date comme 'YYYY-MM-DD'
-        formData.append(key, products[key].toISOString().split("T")[0]);
+        const localDate = new Date(
+          products[key].getTime() - products[key].getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .split("T")[0];
+        formData.append(key, localDate);
       } else if (
         products[key] &&
         typeof products[key] === "object" &&
         "toISOString" in products[key]
       ) {
-        // Formater la date comme 'YYYY-MM-DD'
-        formData.append(key, products[key].toISOString().split("T")[0]);
+        const localDate = new Date(
+          products[key].getTime() - products[key].getTimezoneOffset() * 60000
+        )
+          .toISOString()
+          .split("T")[0];
+        formData.append(key, localDate);
       } else if (key === "image" && products[key]) {
-        // Ajouter une image au backend
         if (products.image instanceof File) {
           formData.append("image", products.image);
         }
       } else {
-        // Ajouter tout autre texte
         formData.append(key, products[key]);
       }
     });
 
     try {
-      // Vérifier si l'édition est activée, sinon créer un nouveau modèle et après cela, naviguer vers la page des produits
       if (isEdit) {
         await api.post(`/models/${id}`, formData, {
           headers: {
@@ -172,10 +175,8 @@ const AddProductForm = () => {
       }
       navigate("/products");
     } catch (error) {
-      // Afficher un message d'erreur
       toast.error("Erreur lors de l'enregistrement du produit.");
     } finally {
-      // Définir l'état de chargement à faux
       setLoading(false);
     }
   };

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\EffectifFix;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class EffectifFixSeeder extends Seeder
@@ -26,7 +25,7 @@ class EffectifFixSeeder extends Seeder
             'RH' => 12,
             'Ménage' => 12,
             'Autres' => 12,
-            'system_constant_id' => 2
+            'system_constant_id' => 1,
         ]);
     }
 }

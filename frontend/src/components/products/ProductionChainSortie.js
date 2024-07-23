@@ -60,16 +60,13 @@ const ProductionChainSortie = () => {
             `/chain_production_sortie/${selectedModel}/${selectedChain}`
           );
 
-          console.log(response)
-
-          const { entre, sortie, retouch } = response.data;
+          const { entre, sortie } = response.data;
           setEntre(entre);
-          if(sortie == null) {
-            setSortie(0)
+          if (sortie == null) {
+            setSortie(0);
           } else {
             setSortie(sortie);
           }
-          setRetouch(retouch);
           setEncour(entre - sortie);
         } catch (error) {
           console.error("Error fetching production data:", error);
@@ -119,7 +116,8 @@ const ProductionChainSortie = () => {
         setIsButtonDisabled(false);
       }
     } else if (type === "retouch") {
-      newValue = direction === "next" ? retouch + 1 : retouch - 1;
+      newValue =
+        direction === "next" ? parseInt(retouch) + 1 : parseInt(retouch) - 1;
       if (newValue < 0) newValue = 0;
       setRetouch(newValue);
     }
