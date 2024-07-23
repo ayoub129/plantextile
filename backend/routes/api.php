@@ -100,6 +100,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('product_plans_hours', [ProductPlanController::class, 'setHours']);
     // getWorkedHours
     Route::get('product_plans_worked_hours/{modelId}', [ProductPlanController::class, 'getWorkedHours']);
+    // getdashPlanningByModelAndNoHour
+    Route::get('product_plans_worked/{modelId}', [ProductPlanController::class, 'getdashPlanningByModelAndNoHour']);
      
     /**
      * Effective Standard  

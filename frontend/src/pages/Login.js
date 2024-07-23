@@ -27,11 +27,9 @@ const Login = () => {
       if (role === "Logistique") {
         navigate("/products");
       }
-      // redirect the RH to the users page
-      else if (role === "HR") {
+      else if (role == "RH") {
         navigate("/users");
       }
-      // redirect the production guys to there production speciality pages
       else if (role === "Production_coupe") {
         navigate("/coupe");
       } else if (role === "Chaîne_production_entrée") {

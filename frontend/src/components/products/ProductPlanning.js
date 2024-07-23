@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import api from "../../api/axios";
 import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import FullCalendar from "./FullCalendar";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
@@ -27,6 +28,7 @@ function ProductPlanning() {
   const [isEditing, setIsEditing] = useState(false);
   const [qteSociete, setQteSociete] = useState(null);
   const [planningDataId, setPlanningDataId] = useState(null);
+  const [sum , setSum] = useState(null);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -81,8 +83,20 @@ function ProductPlanning() {
       }
     };
 
+    const fetchSum = async () => {
+      try {
+        const response = await api.get(`/product_plans_worked/${data.model_id}`)
+        console.log(response)
+        setSum(response.data.total_finished_models);
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+
     if (!isEditing) {
       fetchPlanning();
+      fetchSum();
     }
   }, [data.model_id, data.chain, models]);
 
@@ -90,7 +104,7 @@ function ProductPlanning() {
     setSubLoading(true);
     event.preventDefault();
 
-    if (parseFloat(data.qte) > parseFloat(qteSociete)) {
+    if (parseFloat(data.qte) + parseFloat(sum) > parseFloat(qteSociete)) {
       toast.error(
         "La quantité ne peut pas être supérieure à Quantité Société de modèle."
       );

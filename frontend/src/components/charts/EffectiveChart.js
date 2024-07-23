@@ -81,9 +81,6 @@ const EffectiveChart = () => {
       const standardIndirectData = Object.values(effectiveData).map(
         (data) => data.effectifIndirects
       );
-      const standardTotalData = Object.values(effectiveData).map(
-        (data) => data.total
-      );
 
       // Fetch real effective data
       const effectiveRealResponse = await api.get(
@@ -96,9 +93,6 @@ const EffectiveChart = () => {
       );
       const realIndirectData = Object.values(effectiveRealData).map(
         (data) => data.effectifIndirects
-      );
-      const realTotalData = Object.values(effectiveRealData).map(
-        (data) => data.total
       );
 
       // Set line chart data
@@ -129,21 +123,10 @@ const EffectiveChart = () => {
             borderColor: "rgba(153,102,75,1)",
             backgroundColor: "rgba(153,102,75,0.2)",
           },
-          {
-            label: "Standard Total",
-            data: standardTotalData,
-            borderColor: "rgba(255,165,0,1)",
-            backgroundColor: "rgba(255,165,0,0.2)",
-          },
-          {
-            label: "Real Total",
-            data: realTotalData,
-            borderColor: "rgba(255,99,132,1)",
-            backgroundColor: "rgba(255,99,132,0.2)",
-          },
         ],
       });
     } catch (error) {
+      console.log(error)
       setError(error.response?.data?.message || "An error occurred");
     }
   };

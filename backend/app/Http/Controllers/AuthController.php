@@ -47,7 +47,7 @@ class AuthController extends Controller
 
     public function index()
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
         $excludedRoles = ['developer', 'superadmin', 'admin'];
 
         $users = User::whereNotIn('role', $excludedRoles)->get();
@@ -62,7 +62,7 @@ class AuthController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -116,7 +116,7 @@ class AuthController extends Controller
 
     public function destroy($id)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
 
         $user = User::findOrFail($id);
         $user->delete();

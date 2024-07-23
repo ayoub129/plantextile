@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\EffectifDirect;
 use App\Models\EffectifIndirect;
 use App\Models\EffectiveReal;
+use App\Models\Models;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,7 +13,7 @@ class EffectiveRealController extends Controller
 {
     public function store(Request $request)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
 
         $request->validate([
             'chain' => 'nullable|string|max:255',
@@ -79,7 +80,7 @@ class EffectiveRealController extends Controller
 
     public function getEffectiveByModel($modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
 
         $effectivereal = EffectiveReal::with(['effectifDirects', 'effectifIndirects'])
             ->where('model', $modelId)
@@ -94,7 +95,7 @@ class EffectiveRealController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
 
         $effectivereal = EffectiveReal::findOrFail($id);
 
@@ -172,7 +173,7 @@ class EffectiveRealController extends Controller
 
     public function destroy($id)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
 
         $effectivereal = EffectiveReal::findOrFail($id);
         $effectivereal->delete();
@@ -182,7 +183,7 @@ class EffectiveRealController extends Controller
 
     public function getEffectiveData(Request $request, $modelId)
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
 
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
@@ -201,7 +202,7 @@ class EffectiveRealController extends Controller
 
     public function getEffectiveIndirect()
     {
-        $this->authorize(['developer', 'superadmin', 'admin', 'HR']);
+        $this->authorize(['developer', 'superadmin', 'admin', 'RH']);
 
         $effectiveIndirect = EffectifIndirect::whereNotNull('effective_real_id')
         ->with('coupes')
@@ -281,27 +282,25 @@ class EffectiveRealController extends Controller
 
         return response()->json(['total_effectif_direct' => $totalDirect]);
     }
-    public function getEffectiveSumData(Request $request, $modelId)
+    public function getEffectiveSumData($modelId)
     {
         $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
-
+    
         // Fetch the effective standard data for the given model
-        $effectiveStandard = EffectiveReal::with(['effectifDirects', 'effectifIndirects.coupes'])
+        $effectiveReal = EffectiveReal::with(['effectifDirects', 'effectifIndirects.coupes'])
             ->where('model', $modelId)
             ->get();
     
-        if ($effectiveStandard->isEmpty()) {
+        if ($effectiveReal->isEmpty()) {
             return response()->json(['message' => 'No Effective found for this model'], 404);
         }
     
-        // Fetch all indirect effective data
-        $allIndirectEffective = EffectifIndirect::with('coupes')
-            ->orderBy('created_at')
-            ->get();
+        // Fetch all models data
+        $models = Models::where('id', $modelId)->get();
     
-        // Get the date range from the effective standard data
-        $startDate = new \DateTime($effectiveStandard->first()->start_date);
-        $endDate = new \DateTime($effectiveStandard->first()->end_date);
+        // Get the date range from the models data
+        $startDate = new \DateTime($models->first()->start_date);
+        $endDate = new \DateTime($models->first()->end_date);
     
         // Create a date range
         $dateInterval = new \DateInterval('P1D');
@@ -314,37 +313,32 @@ class EffectiveRealController extends Controller
             $directsSum = 0;
             $indirectsSum = 0;
     
-            // Get the effective standard data for the current date
-            foreach ($effectiveStandard as $effective) {
-                $effectiveStartDate = new \DateTime($effective->start_date);
-                $effectiveEndDate = new \DateTime($effective->end_date);
-    
-                if ($date >= $effectiveStartDate && $date <= $effectiveEndDate) {
-                    $directsSum += $effective->effectifDirects->sum(function($direct) {
-                        return array_sum([
-                            $direct->machinistes,
-                            $direct->machinistes_stagiaires,
-                            $direct->repassage_preparation,
-                            $direct->trassage,
-                            $direct->transport,
-                            $direct->chef,
-                            $direct->machines_speciales,
-                            $direct->trassage_special,
-                            $direct->controle_table,
-                            $direct->controle_final,
-                            $direct->machinistes_retouche,
-                            $direct->repassage_final,
-                            $direct->finition,
-                            $direct->transp_fin
-                        ]);
-                    });
-                }
+            // Get the effective Real data for the current date
+            foreach ($effectiveReal as $effective) {
+                $directsSum += $effective->effectifDirects->sum(function($direct) {
+                    return array_sum([
+                        $direct->machinistes,
+                        $direct->machinistes_stagiaires,
+                        $direct->repassage_preparation,
+                        $direct->trassage,
+                        $direct->transport,
+                        $direct->chef,
+                        $direct->machines_speciales,
+                        $direct->trassage_special,
+                        $direct->controle_table,
+                        $direct->controle_final,
+                        $direct->machinistes_retouche,
+                        $direct->repassage_final,
+                        $direct->finition,
+                        $direct->transp_fin
+                    ]);
+                });
             }
     
-            // Get the latest indirect effective data for the current date
-            foreach ($allIndirectEffective as $indirect) {
-                if ($date >= new \DateTime($indirect->created_at)) {
-                    $indirectsSum = array_sum([
+            // Get the indirect effective data for the current date
+            foreach ($effectiveReal as $effective) {
+                foreach ($effective->effectifIndirects as $indirect) {
+                    $indirectsSum += array_sum([
                         $indirect->mag_four,
                         $indirect->mag_fin,
                         $indirect->machines_sp_manuelle,
@@ -354,7 +348,7 @@ class EffectiveRealController extends Controller
                         $indirect->gabaret,
                         $indirect->preparation_stagieres,
                         $indirect->preparation,
-                        $indirect->preparation_elastique
+                        $indirect->preparation_elastique,
                     ]);
     
                     // Add the sum of coupe data
@@ -380,8 +374,7 @@ class EffectiveRealController extends Controller
     
         return response()->json($effectiveDataByDate);
     }
-
-
+    
     private function authorize(array $roles)
     {
         if (!in_array(Auth::user()->role, $roles)) {

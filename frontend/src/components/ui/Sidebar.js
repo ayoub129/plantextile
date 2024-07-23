@@ -92,7 +92,7 @@ const Sidebar = ({ sidebar }) => {
       { link: "/primes", text: "Primes" },
       { link: `/profile/${userId}`, text: "Profil" },
     ],
-    HR: [
+    RH: [
       { link: "/users", text: "Utilisateurs" },
       { link: "/chains", text: "Chaînes" },
       { link: "/real-direct", text: "Effectif Direct Réel" },

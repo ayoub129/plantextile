@@ -19,6 +19,6 @@ class ProductPlanHour extends Model
 
     public function productPlan()
     {
-        return $this->belongsTo(ProductPlan::class);
+        return $this->belongsTo(ProductPlan::class, 'product_plan_id');
     }
 }

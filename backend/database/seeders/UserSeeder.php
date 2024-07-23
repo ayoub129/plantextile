@@ -25,21 +25,5 @@ class UserSeeder extends Seeder
             'role' => 'developer',
         ]);
 
-        Posts::create([
-            'name' => 'Logistique'
-        ]);
-
-        Posts::create([
-            'name' => 'La coupe'
-        ]);
-
-        Posts::create([
-            'name' => 'production'
-        ]);
-
-        Posts::create([
-            'name' => 'repassage'
-        ]);
-
     }
 }

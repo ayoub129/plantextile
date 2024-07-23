@@ -29,7 +29,7 @@ class ChainsController extends Controller
     // Create a new chain
     public function store(Request $request)
     {
-        $this->authorize(['HR' , 'developer' , 'admin' , 'superadmin']);
+        $this->authorize(['RH' , 'developer' , 'admin' , 'superadmin']);
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -45,7 +45,7 @@ class ChainsController extends Controller
     // Delete a chain
     public function destroy($id)
     {
-        $this->authorize(['HR' , 'developer' , 'admin' , 'superadmin']);
+        $this->authorize(['RH' , 'developer' , 'admin' , 'superadmin']);
 
         $chain = Chains::find($id);
 

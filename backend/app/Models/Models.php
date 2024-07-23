@@ -36,4 +36,15 @@ class Models extends Model
         return $this->hasMany(Prime::class, 'model_id');
     }
 
+    public function effectiveReals()
+    {
+        return $this->hasMany(EffectiveReal::class);
+    }
+
+    public function effectiveStandards()
+    {
+        return $this->hasMany(EffectiveStandard::class);
+    }
+
+
 }

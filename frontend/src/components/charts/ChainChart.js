@@ -73,34 +73,37 @@ const ChainChart = () => {
     try {
       let response;
       if (selectedChain) {
-        response = await api.get(
-          `/chain_production_data/${selectedModel}/${selectedChain}`
-        );
+        response = await api.get(`/chain_production_data/${selectedModel}?chain=${selectedChain}`);
       } else {
         response = await api.get(`/chain_production_data/${selectedModel}`);
       }
-
+  
+      console.log(response);
+  
       const data = response.data;
-
+  
       const labels = [];
       const entreData = [];
       const sortieData = [];
       const encoursData = [];
-
-      data.forEach((item) => {
-        const chain = chains.find((chain) => chain.id === item.chain);
-        const chainName = chain ? chain.name : item.chain;
+  
+      // Process each chain's data
+      Object.keys(data).forEach((chainId) => {
+        const item = data[chainId];
+        const chain = chains.find((chain) => chain.id === parseInt(chainId));
+        const chainName = chain ? chain.name : chainId;
         labels.push(chainName);
-        entreData.push(item.entre);
-        sortieData.push(item.sortie);
-        encoursData.push(item.entre - item.sortie);
+        entreData.push(item.totalEntre);
+        sortieData.push(item.latestSortie);
+        encoursData.push(item.totalEntre - item.latestSortie);
       });
-
+  
+      // Add totals
       labels.push("Total");
       entreData.push(entreData.reduce((a, b) => a + b, 0));
       sortieData.push(sortieData.reduce((a, b) => a + b, 0));
       encoursData.push(encoursData.reduce((a, b) => a + b, 0));
-
+  
       setBarChartData({
         labels,
         datasets: [
@@ -132,7 +135,7 @@ const ChainChart = () => {
       setError(error.response?.data?.message || "An error occurred");
     }
   };
-
+  
   useEffect(() => {
     if (selectedModel) {
       fetchData();

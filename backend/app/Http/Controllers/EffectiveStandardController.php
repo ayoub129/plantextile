@@ -121,7 +121,7 @@ class EffectiveStandardController extends Controller
     
         // Create a date range
         $dateInterval = new \DateInterval('P1D');
-        $dateRange = new \DatePeriod($startDate, $dateInterval, $endDate->modify('+1 day'));
+        $dateRange = new \DatePeriod($startDate, $dateInterval, $endDate);
     
         // Organize the data by dates and calculate the sums
         $effectiveDataByDate = [];
@@ -196,8 +196,6 @@ class EffectiveStandardController extends Controller
     
         return response()->json($effectiveDataByDate);
     }
-
-
 
     public function getEffectiveByModel($modelId)
     {

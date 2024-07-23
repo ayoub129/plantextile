@@ -19,7 +19,7 @@ const UsersTable = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const allowedRoles = ["admin", "superadmin", "developer", "HR"];
+    const allowedRoles = ["admin", "superadmin", "developer", "RH"];
     if (!allowedRoles.includes(currentUserRole)) {
       navigate("/dashboard");
     }

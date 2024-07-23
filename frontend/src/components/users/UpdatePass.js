@@ -14,6 +14,7 @@ const UpdatePass = () => {
     new_password: '',
     new_password_confirmation: '',
   });
+  const userId = localStorage.getItem("userId");
 
   const onChange = (name, value) => {
     setPasswordData({
@@ -29,7 +30,7 @@ const UpdatePass = () => {
     try {
       await api.post('/update-password', passwordData);
       toast.success('Password updated successfully.');
-      navigate('/profile');
+      navigate(`/profile/${userId}`);
     } catch (error) {
       toast.error('Error updating password.');
     } finally {

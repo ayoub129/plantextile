@@ -60,6 +60,8 @@ const ProductionChainSortie = () => {
             `/chain_production_sortie/${selectedModel}/${selectedChain}`
           );
 
+          console.log(response)
+
           const { entre, sortie, retouch } = response.data;
           setEntre(entre);
           if(sortie == null) {

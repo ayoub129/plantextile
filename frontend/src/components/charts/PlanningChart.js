@@ -102,7 +102,7 @@ const PlanningChart = () => {
   };
 
   return (
-    <div>
+    <div className="pt-[5.5rem]">
       <div className="flex items-center justify-between">
         <h2 className="ml-7 mb-9 text-2xl font-semibold">
           Planning - Production

@@ -108,7 +108,7 @@ const AfterChainChart = () => {
       const exportData = exportResponse.data;
 
       const entreData = [
-        sortie.data.totalSortie || 0,
+        sortie.data.totalSortie.sortie || 0,
         repassageResponse.data.value || 0,
         controlData.value || 0,
         magasinFData.value || 0,

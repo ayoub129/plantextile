@@ -20,7 +20,7 @@ const Chains = () => {
       navigate('/');
     } else {
       // Check for the role
-      const allowedRoles = ['admin', 'superadmin', 'developer' , 'HR'];
+      const allowedRoles = ['admin', 'superadmin', 'developer' , 'RH'];
       if (!allowedRoles.includes(role)) {
         navigate('/dashboard');
       }

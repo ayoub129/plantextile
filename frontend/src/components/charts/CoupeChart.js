@@ -80,9 +80,9 @@ const CoupeChart = () => {
     setError(null);
     try {
       const response = await api.get(`/coupe_production/${model.id}`);
-      const coupeProductionValue = response.data.value;
+      const coupeProductionValue = response.data;
       const entreValue = model.qte_societe;
-      const encoursValue = entreValue - coupeProductionValue;
+      const encoursValue = parseFloat(entreValue) - parseFloat(coupeProductionValue);
       setBarChartData({
         labels: ["Coupe"],
         datasets: [

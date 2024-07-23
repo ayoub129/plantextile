@@ -27,6 +27,6 @@ class ProductPlan extends Model
 
     public function productPlanHours()
     {
-        return $this->hasMany(ProductPlanHour::class);
+        return $this->hasMany(ProductPlanHour::class, 'product_plan_id');
     }
 }

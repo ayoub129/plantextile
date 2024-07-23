@@ -77,11 +77,12 @@ const RepassageProduction = () => {
 
   const calculateEncore = async (modelId, repassageValue) => {
     try {
-      const response = await api.get(`/production_chains/${modelId}/entre`);
-      const totalEntre = response.data.totalEntre;
-      setTotalSortie(totalEntre);
+      const response = await api.get(`/production_chains/${modelId}/sortie`);
+      const totalSortie = response.data.totalSortie.sortie;
+      console.log(totalSortie)
+      setTotalSortie(totalSortie);
 
-      const encore = totalEntre - repassageValue;
+      const encore = totalSortie - repassageValue;
       if (encore < 0) {
         toast.error("Encore cannot be less than 0");
         setEncore(0);

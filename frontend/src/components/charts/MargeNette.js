@@ -290,7 +290,7 @@ const MargeNette = () => {
           <BarChart data={barChartData} options={barChartOptions} />
         )}
       </div>
-      <div className="mt-4">
+      {/* <div className="mt-4">
         <h3>Coute Transport: {couteTransport}</h3>
         <h3>Masse Salariale Directe: {massSalaryDirect}</h3>
         <h3>Masse Salariale Indirecte: {massSalaryInDirect}</h3>
@@ -301,7 +301,7 @@ const MargeNette = () => {
         <h3>Coût de Revient: {coûtDeRevient}</h3>
         <h3>Marge Brute Dépôt: {margeBruteDepot}</h3>
         <h3>Marge Nette Dépôt: {margeNetteDepot}</h3>
-      </div>
+      </div> */}
     </div>
   );
 };

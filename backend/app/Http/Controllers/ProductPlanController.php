@@ -66,6 +66,24 @@ class ProductPlanController extends Controller
         ]);
     }
 
+    public function getdashPlanningByModelAndNoHour($modelId)
+    {
+        // Fetch the sum of 'qte' for all product plans for the given model ID
+        $totalFinishedModels = ProductPlan::where('model_id', $modelId)
+            ->sum('qte');
+    
+        // Check if the total sum is zero
+        if ($totalFinishedModels === 0) {
+            return response()->json(['message' => 'No planning found for this model'], 404);
+        }
+    
+        // Return the total finished models in the JSON response
+        return response()->json([
+            'total_finished_models' => $totalFinishedModels,
+        ]);
+    }
+        
+
     public function getPlanningByModel($modelId , $chainId)
     {
         $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);

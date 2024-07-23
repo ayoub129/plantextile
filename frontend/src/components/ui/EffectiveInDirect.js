@@ -43,7 +43,6 @@ const EffectiveIndirect = ({
     const checkExisted = async () => {
       try {
         const response = await api.get(getIndirect);
-        console.log(response)
         if (response.data) {
           const effectiveStandardData = response.data;
           if (effectiveStandardData) {

@@ -34,7 +34,7 @@ const Dashboard = () => {
     <div>
       <Header sidebar={sidebar} setSidebar={setSidebar} />
       <Sidebar sidebar={sidebar} />
-      <CardsData />
+      {/* <CardsData /> */}
       <div className="bg-slate-200 ml-0 md:ml-[16.67%] items-center pt-[3rem]">
         <PlanningChart />
         <div className="my-10">
