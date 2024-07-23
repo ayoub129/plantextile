@@ -53,7 +53,7 @@ const Header = ({ setSidebar, sidebar }) => {
     <div className="h-20 flex fixed top-0 w-full left-0 z-10">
       <div className="w-1/2 md:w-1/6 bg-blue-400 h-full flex justify-center items-center">
         <Link to={"/"} className="font-bold text-white text-2xl">
-          Plantextile
+          CCP
         </Link>
       </div>
       <div className="w-2/3 md:w-5/6 bg-blue-500 h-full flex justify-between items-center">
