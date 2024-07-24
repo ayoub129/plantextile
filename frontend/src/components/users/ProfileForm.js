@@ -84,7 +84,7 @@ const ProfileForm = () => {
           {profile.image && profile.justEdit ?  (
             <img src={URL.createObjectURL(profile.image)} alt='Profile' className='mt-4' style={{ width: '100px', height: '100px' }} />
           )  :  (
-            <img src={`http://localhost:8000${profile.image}`} alt='Profile' className='mt-4' style={{ width: '100px', height: '100px' }} />
+            <img src={`http://crosscheckprod.com:8000${profile.image}`} alt='Profile' className='mt-4' style={{ width: '100px', height: '100px' }} />
           )}
         </div>
         <div className='flex items-center justify-between'>
