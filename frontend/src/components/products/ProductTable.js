@@ -131,7 +131,7 @@ const ProductTables = () => {
                     </td>
                     <td className="p-[1rem] min-w-[200px]">
                       <img
-                        src={`http://localhost:8000${product.image}`}
+                        src={`http://crosscheckprod.com:8000${product.image}`}
                         alt={product.name}
                         className="h-[100px] w-[100px] mx-auto"
                       />

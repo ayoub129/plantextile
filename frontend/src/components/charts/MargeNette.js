@@ -294,15 +294,17 @@ const MargeNette = () => {
         }
 
         const responseIndirect = await api.get(`/effective_indirect`);
-        const responseDirect = await api.get(
-          `/effective_direct_real/${selectedModel}`
-        );
         const responseChains = await api.get(`/total_chain`);
+        if(selectedModel) {
+          const responseDirect = await api.get(
+            `/effective_direct_real/${selectedModel}`
+          );
+          setEffectifDirect(parseInt(responseDirect.data.total_effectif_direct));
+        }
 
         setEffectifInDirect(
           parseInt(responseIndirect.data.total_effectif_indirect)
         );
-        setEffectifDirect(parseInt(responseDirect.data.total_effectif_direct));
         setTotalChains(parseInt(responseChains.data.total_chains));
       } catch (error) {
         console.error("Error fetching data:", error);

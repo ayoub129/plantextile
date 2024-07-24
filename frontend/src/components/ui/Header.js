@@ -28,7 +28,7 @@ const Header = ({ setSidebar, sidebar }) => {
     try {
       const response = await api.get("/user/profile_picture");
       if (response.data.image) {
-        setProfileImage(`http://localhost:8000${response.data.image}`);
+        setProfileImage(`http://crosscheckprod.com:8000${response.data.image}`);
       }
     } catch (error) {
       console.error("Error fetching profile image:", error);

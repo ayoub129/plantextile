@@ -228,7 +228,7 @@ class EffectiveRealController extends Controller
             ->first();
     
         if (!$effectiveIndirect) {
-            return response()->json(['message' => 'No Effective Indirect found for this Effective Standard ID'], 404);
+            return response()->json(['message' => 'No Effective Indirect found for this Effective Standard ID'], 200);
         }
     
         $totalIndirect = 0;

@@ -104,7 +104,7 @@ const UsersTable = () => {
                     <img
                       src={`${
                         user.image
-                          ? "http://localhost:8000" + user.image
+                          ? "http://crosscheckprod.com:8000" + user.image
                           : "https://via.placeholder.com/40"
                       }`}
                       alt={user.name}
