@@ -11,6 +11,83 @@ use Illuminate\Support\Facades\Auth;
 
 class EffectiveStandardController extends Controller
 {
+
+    public function totalEffectifIndirect() {
+        // Get the latest single EffectifIndirect record that has a non-null effective_real_id
+        $effectiveIndirect = EffectifIndirect::whereNotNull('effective_standard_id')
+            ->with('coupes')
+            ->latest()
+            ->first();
+    
+        if (!$effectiveIndirect) {
+            return response()->json(['message' => 'No Effective Indirect found for this Effective Standard ID'], 200);
+        }
+    
+        $totalIndirect = 0;
+    
+        $totalIndirect += $effectiveIndirect->mag_four +
+            $effectiveIndirect->mag_fin +
+            $effectiveIndirect->machines_sp_manuelle +
+            $effectiveIndirect->cont_fin +
+            $effectiveIndirect->mach_retouche +
+            $effectiveIndirect->repassage +
+            $effectiveIndirect->gabaret +
+            $effectiveIndirect->preparation_stagieres +
+            $effectiveIndirect->preparation +
+            $effectiveIndirect->preparation_elastique;
+    
+        foreach ($effectiveIndirect->coupes as $coupe) {
+            $totalIndirect += $coupe->matlasseurs +
+                $coupe->coupeurs +
+                $coupe->tiquitage +
+                $coupe->vesline;
+        }
+    
+        return response()->json(['total_effectif_indirect' => $totalIndirect]);
+    }
+
+    public function totalEffectifDirect($modelId)
+    {
+        // Fetch EffectiveStandard records with their related effectifDirects
+        $effectiveReal = EffectiveStandard::with(['effectifDirects'])
+            ->where('model', $modelId)
+            ->get();
+    
+        $totalDirect = 0;
+    
+        // Iterate over each EffectiveStandard record
+        foreach ($effectiveReal as $real) {
+            // Initialize an array to track the most recent effectifDirect record for each EffectiveStandard
+            $latestDirects = [];
+    
+            foreach ($real->effectifDirects as $direct) {
+                if (!isset($latestDirects[$direct->id])) {
+                    $latestDirects[$direct->id] = $direct;
+                }
+            }
+    
+            // Sum the values of the latest effectifDirect records
+            foreach ($latestDirects as $latestDirect) {
+                $totalDirect += $latestDirect->machinistes +
+                    $latestDirect->machinistes_stagiaires +
+                    $latestDirect->repassage_preparation +
+                    $latestDirect->trassage +
+                    $latestDirect->transport +
+                    $latestDirect->chef +
+                    $latestDirect->machines_speciales +
+                    $latestDirect->trassage_special +
+                    $latestDirect->controle_table +
+                    $latestDirect->controle_final +
+                    $latestDirect->machinistes_retouche +
+                    $latestDirect->repassage_final +
+                    $latestDirect->finition +
+                    $latestDirect->transp_fin;
+            }
+        }
+    
+        return response()->json(['total_effectif_direct' => $totalDirect]);
+    }
+    
     public function store(Request $request)
     {
         $this->authorize(['developer', 'superadmin', 'admin', 'Méthode']);
@@ -312,24 +389,34 @@ class EffectiveStandardController extends Controller
     public function getEffectiveByModelAndDate(Request $request, $modelId)
     {
         $this->authorize(['developer', 'superadmin', 'admin', 'Méthode' ]);
-
+    
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
         $chain = $request->query('chain');
-
-        $effectiveReal = EffectiveStandard::with(['effectifDirects', 'effectifIndirects'])
+    
+        // Fetch the most recent EffectiveStandard record
+        $effectiveReal = EffectiveStandard::with(['effectifIndirects'])
             ->where('model', $modelId)
             ->where('chain', $chain)
             ->whereBetween('start_date', [$startDate, $endDate])
+            ->orderBy('created_at', 'desc')
             ->first();
-
+    
         if (!$effectiveReal) {
             return response()->json(['message' => 'Aucun effectif trouvé pour ce modèle et cette période'], 404);
         }
-
+    
+        // Fetch the most recent effectifDirects for the found EffectiveStandard record
+        $latestEffectifDirect = $effectiveReal->effectifDirects()
+            ->orderBy('created_at', 'desc')
+            ->first();
+        
+        // Add the most recent effectifDirects to the response
+        $effectiveReal->effectif_directs = $latestEffectifDirect;
+    
         return response()->json($effectiveReal);
     }
-
+    
     
     public function destroy($id)
     {

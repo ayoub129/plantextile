@@ -30,6 +30,7 @@ const Sidebar = ({ sidebar }) => {
       { link: "/primes", text: "Primes" },
       { link: "/plastique_file", text: "Plastique and Fil" },
       { link: `/profile/${userId}`, text: "Profil" },
+      { link: `/admin`, text: "Admin Page" },
     ],
     superadmin: [
       { link: "/dashboard", text: "Tableau de bord" },
@@ -54,6 +55,7 @@ const Sidebar = ({ sidebar }) => {
       { link: "/primes", text: "Primes" },
       { link: "/plastique_file", text: "Plastique and Fil" },
       { link: `/profile/${userId}`, text: "Profil" },
+      { link: `/admin`, text: "Admin Page" },
     ],
     admin: [
       { link: "/dashboard", text: "Tableau de bord" },
@@ -77,6 +79,7 @@ const Sidebar = ({ sidebar }) => {
       { link: "/primes", text: "Primes" },
       { link: "/plastique_file", text: "Plastique and Fil" },
       { link: `/profile/${userId}`, text: "Profil" },
+      { link: `/admin`, text: "Admin Page" },
     ],
     Logistique: [
       { link: "/products", text: "Produits" },

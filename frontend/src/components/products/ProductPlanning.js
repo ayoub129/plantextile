@@ -15,8 +15,8 @@ function ProductPlanning() {
     start_date: null,
     end_date: null,
     qte: "",
-    consummation_standard_fil: "",
-    consummation_standard_plastique: "",
+    consummation_standard_fil: null,
+    consummation_standard_plastique: null,
   });
   const [models, setModels] = useState([]);
   const [chains, setChains] = useState([]);
@@ -29,6 +29,63 @@ function ProductPlanning() {
   const [qteSociete, setQteSociete] = useState(null);
   const [planningDataId, setPlanningDataId] = useState(null);
   const [sum , setSum] = useState(null);
+  const [systemConstant, setSystemConstant] = useState({
+    Nombre_d_heures_par_jour: "",
+    Taux_horaire_SMIG_16_29: "",
+    Taux_horaire_17_00: "",
+    Taux_horaire_17_50: "",
+    Masse_salariale_16_29: "",
+    Masse_salariale_17_00: "",
+    Masse_salariale_17_50: "",
+    Capacité_par_unité_transport: "",
+    cotisation_entroprise_trans: "",
+    Coût_par_trajet: "",
+    Coût_énergie_journalier: "",
+    Coût_charges_fixes_journalier: "",
+  });
+  const [totalChains, setTotalChains] = useState(0);
+  const [effectifInDirect, setEffectifInDirect] = useState(0);
+  const [totalHours, setTotalHours] = useState(0);
+  const [fils, setFils] = useState(0);
+  const [plastique, setPlastique] = useState(0);
+  const [totalExport, setTotalExport] = useState(0);
+  const [effectifDirect, setEffectifDirect] = useState(0);
+  const [modalMessage, setModalMessage] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [taux , setTaux] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const responseChains = await api.get(`/total_chain`);
+        const responseIndirect = await api.get(`/effective_indirect_total`);
+        const systemResponse = await api.get("/system_constants_latest");
+        if(data.model_id) {
+          const responseDirect = await api.get(
+            `/effective_direct_standard/${data.model_id}`
+          );
+          setEffectifDirect(parseInt(responseDirect.data.total_effectif_direct));
+        }
+
+        if (systemResponse.data) {
+          const { id, created_at, updated_at, effectif_fix, ...filteredData } =
+            systemResponse.data;
+          setSystemConstant({
+            ...filteredData,
+          });
+        }
+
+        setEffectifInDirect(
+          parseInt(responseIndirect.data.total_effectif_indirect)
+        );
+        setTotalChains(parseInt(responseChains.data.total_chains));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchData();
+  }, [data.model_id ])
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -86,7 +143,6 @@ function ProductPlanning() {
     const fetchSum = async () => {
       try {
         const response = await api.get(`/product_plans_worked/${data.model_id}`)
-        console.log(response)
         setSum(response.data.total_finished_models);
       } catch (error) {
         console.log(error)
@@ -98,7 +154,7 @@ function ProductPlanning() {
       fetchPlanning();
       fetchSum();
     }
-  }, [data.model_id, data.chain, models]);
+  }, [data.model_id, data.chain, models , isEditing]);
 
   const handleSubmit = async (event) => {
     setSubLoading(true);
@@ -180,8 +236,8 @@ function ProductPlanning() {
       start_date: null,
       end_date: null,
       qte: "",
-      consummation_standard_fil: "",
-      consummation_standard_plastique: "",
+      consummation_standard_fil: null,
+      consummation_standard_plastique: null,
     });
     setPlanningData(null);
   };
@@ -242,9 +298,191 @@ function ProductPlanning() {
     }
   };
 
+  const fetchWorkedHours = async (modelId) => {
+    try {
+      const response = await api.get(`/product_plans_worked_hours/${modelId}`);
+      setTotalHours(response.data.worked_hours_count);
+    } catch (error) {
+      console.error("Error fetching worked hours:", error);
+      setError(error.response?.data?.message || "An error occurred");
+    }
+  };
+
+  const calculateCouteFilAndPlastique = () => {
+    setFils(planningData.consummation_standard_fil);
+    setPlastique(planningData.consummation_standard_plastique);
+  };
+
+  const fetchData = async (modelId) => {
+    try {
+      const response = await api.get(`/export/${modelId}`);
+      const exportData = response.data;
+      setTotalExport(exportData.total);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  useEffect(() => {
+    if (data.model_id) {
+      fetchWorkedHours(data.model_id);
+      fetchData(data.model_id);
+    }
+  }, [data.model_id]);
+
+  useEffect(() => {
+    if (
+      totalHours > 0 &&
+      effectifDirect > 0 &&
+      effectifInDirect > 0 &&
+      totalChains > 0 &&
+      systemConstant.Nombre_d_heures_par_jour
+    ) {
+      calculateCouteFilAndPlastique();
+    }
+  }, [
+    totalHours,
+    effectifDirect,
+    effectifInDirect,
+    totalChains,
+    totalExport,
+    systemConstant,
+  ]);
+
+
+  const handleTest = () => {
+    if (
+      totalHours > 0 &&
+      effectifDirect > 0 &&
+      effectifInDirect > 0 &&
+      totalChains > 0 &&
+      systemConstant.Nombre_d_heures_par_jour
+    ) {
+
+    // Constants from systemConstant
+    const {
+      Nombre_d_heures_par_jour,
+      Capacité_par_unité_transport,
+      Coût_par_trajet,
+      cotisation_entroprise_trans,
+      Taux_horaire_SMIG_16_29,
+      Taux_horaire_17_00,
+      Taux_horaire_17_50,
+      Coût_charges_fixes_journalier,
+      Coût_énergie_journalier
+    } = systemConstant;
+  
+    
+    // QP effectif calculation
+    const QP_effectif = effectifInDirect / totalChains;
+
+    // Nombre de jours de production
+    const Nombre_de_jours_de_production = totalHours / Nombre_d_heures_par_jour;
+
+    // Clès de répartition des charges indirectes
+    const Cles_de_repartition_charges_indirectes = totalHours / (Nombre_d_heures_par_jour * totalChains);
+
+    // Coût de charge fixe
+    const coûtChargesFixes = Coût_charges_fixes_journalier * Nombre_de_jours_de_production * Cles_de_repartition_charges_indirectes;
+
+    // Coût achats consommés journalier
+    const coûtAchatsConsommesJournalier = (parseFloat(fils) + parseFloat(plastique)) / Nombre_de_jours_de_production;
+
+    // Coût d'achat plastique and fils
+    const coûtAchatPlastiqueFils = Nombre_de_jours_de_production * coûtAchatsConsommesJournalier;
+
+    // Coût énergie
+    const coûtEnergie = Coût_énergie_journalier * Nombre_de_jours_de_production * Cles_de_repartition_charges_indirectes;
+
+    // Nombre unités à utiliser
+    const Nombre_unite_utilise = (QP_effectif + effectifDirect) / Capacité_par_unité_transport;
+
+    // Refacturation transport MOD indirecte
+    const Refacturation_transport_MOD_indirecte = -((cotisation_entroprise_trans * Nombre_de_jours_de_production * QP_effectif) / 26);
+
+    // Refacturation transport MOD directe
+    const Refacturation_transport_MOD_directe = -((cotisation_entroprise_trans * Nombre_de_jours_de_production * effectifDirect) / 26);
+
+    // Transport
+    const transportCost = (2 * Nombre_unite_utilise * Nombre_de_jours_de_production * Coût_par_trajet) + (Refacturation_transport_MOD_directe + Refacturation_transport_MOD_indirecte);
+  
+    // Nombre d'heures travaillées (Direct and Indirect)
+    const Nombre_heures_travaillees_direct = totalHours * effectifDirect;
+    const Nombre_heures_travaillees_indirect = totalHours * QP_effectif;
+  
+    // Congé (Direct and Indirect)
+    const conge_direct = (1.5 * Nombre_heures_travaillees_direct * Taux_horaire_SMIG_16_29) / 26;
+    const conge_indirect = (1.5 * Nombre_heures_travaillees_indirect * Taux_horaire_SMIG_16_29) / 26;
+  
+    // Masse salariale (Direct)
+    const masseSalarialeDirect_1629 = Nombre_heures_travaillees_direct * systemConstant.Masse_salariale_16_29 * 0.01 * Taux_horaire_SMIG_16_29;
+    const masseSalarialeDirect_1700 = Nombre_heures_travaillees_direct * systemConstant.Masse_salariale_17_00 * 0.01 * Taux_horaire_17_00;
+    const masseSalarialeDirect_1750 = Nombre_heures_travaillees_direct * systemConstant.Masse_salariale_17_50 * 0.01 * Taux_horaire_17_50;
+    const masseSalarialeDirect = masseSalarialeDirect_1629 + masseSalarialeDirect_1700 + masseSalarialeDirect_1750 + conge_direct;
+  
+    // Masse salariale (Indirect)
+    const masseSalarialeIndirect_1629 = Nombre_heures_travaillees_indirect * systemConstant.Masse_salariale_16_29 * 0.01 * Taux_horaire_SMIG_16_29;
+    const masseSalarialeIndirect_1700 = Nombre_heures_travaillees_indirect * systemConstant.Masse_salariale_17_00 * 0.01 * Taux_horaire_17_00;
+    const masseSalarialeIndirect_1750 = Nombre_heures_travaillees_indirect * systemConstant.Masse_salariale_17_50 * 0.01 * Taux_horaire_17_50;
+    const masseSalarialeIndirect = masseSalarialeIndirect_1629 + masseSalarialeIndirect_1700 + masseSalarialeIndirect_1750 + conge_indirect;
+  
+    // Total mass salary
+    const totalMassSalary = masseSalarialeDirect + masseSalarialeIndirect;
+  
+    // Coût de revient par chaine
+    const coûtDeRevientParChaine = coûtChargesFixes + coûtAchatPlastiqueFils + coûtEnergie + transportCost + totalMassSalary;
+  
+    // Chiffre d'affires par chaine
+    const chiffreAffairesParChaine = planningData.qte * models.find(model => model.id === planningData.model_id).prixFacture;
+  
+    // Marge brute nette
+    const margeBruteNette = chiffreAffairesParChaine - coûtDeRevientParChaine;
+
+    // IS (Impot sur les sociétés)
+    const IS = margeBruteNette * 0.2;
+  
+    // Marge nette de model
+    const margeNetteDeModel = margeBruteNette - IS;
+  
+    // Total primes par model (assume you have a way to get this value)
+    const totalPrimesParModel = 0; // Placeholder
+  
+    // Marge nette
+    const margeNette = margeNetteDeModel - totalPrimesParModel;
+  
+    // Tau
+    setTaux(margeNette / chiffreAffairesParChaine)
+    
+  }
+
+  if (taux > 15) {
+    setModalMessage("Le taux est supérieur à 15%");
+  } else {
+    setModalMessage("Le taux est inférieur ou égal à 15%");
+  }
+  setShowModal(true);
+
+  };
+    
+  // Schmellow101018!!
   const cancelDelete = () => {
     setShowDeleteModal(false);
   };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  const sendToAdmin = async () => {
+    try {
+      await api.post(`/product_plans_admin/${planningDataId}` , {message: "can you accept this plan?" , taux: taux});
+      setShowModal(false);
+    } catch (error) {
+      setModalMessage(error.message);
+      setShowModal(false);
+    }
+  }
 
   return (
     <div className="md:ml-[16.66%] mr-6 pt-[6rem]">
@@ -253,13 +491,20 @@ function ProductPlanning() {
         <h1 className="ml-7 mb-5 text-2xl">
           {isEditing ? "modifier la planification" : "Créer une planification"}
         </h1>
-        <div className="flex items-center w-[320px] justify-between">
-          <Button classes={"bg-yellow-400"} handlePress={handleEdit}>
-            modifier
-          </Button>
-          <Button classes={"bg-red-400"} handlePress={handleDelete}>
-            Supprimer la planification
-          </Button>
+        <div className="flex items-center w-[400px] justify-between">
+        {(isEditing || planningData) && 
+          <>
+            <Button classes={"bg-green-400"} handlePress={handleTest}>
+             Test
+            </Button>
+            <Button classes={"bg-yellow-400"} handlePress={handleEdit}>
+              modifier
+            </Button>
+            <Button classes={"bg-red-400"} handlePress={handleDelete}>
+              Supprimer la planification
+            </Button>
+          </>
+          }
         </div>
       </div>
       <div className="ml-7 mb-4">
@@ -364,6 +609,22 @@ function ProductPlanning() {
           />
         </div>
       )}
+
+    {showModal && (
+        <div className="fixed z-50 inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
+          <div className="bg-white p-6 rounded shadow-lg">
+            <p className="text-xl font-semibold">{modalMessage}</p>
+            <div className="flex items-center justify-end">
+              {
+                taux < 15 && 
+                  <Button classes="bg-green-500 mt-5 " container="mr-[12px]" handlePress={sendToAdmin}>Send To Admin</Button>
+              }
+              <Button classes="bg-red-500 mt-5 " handlePress={handleCloseModal}>Fermer</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {showDeleteModal && (
         <div className="fixed inset-0 bg-gray-600 z-50 bg-opacity-50 flex justify-center items-center">

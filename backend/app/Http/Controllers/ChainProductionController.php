@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChainProduction;
+use App\Models\ProductPlan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -108,6 +109,50 @@ class ChainProductionController extends Controller
         return response()->json(['totalSortie' => $latestChainProduction], 200);
     }
 
+    // Calculate the total sortie for a specific model
+    public function getTotalExportByModel($modelId, $date = null)
+    {
+        $productPlan = ProductPlan::where('model_id', $modelId)->first();
+    
+        if (!$productPlan) {
+            return response()->json(['message' => 'No planning found for this model'], 404);
+        }
+    
+        $startDate = new \DateTime($productPlan->start_date);
+        $endDate = new \DateTime($productPlan->end_date);
+        $endDate->modify('+1 day'); // To include the end date
+    
+        $dateInterval = new \DateInterval('P1D');
+        $dateRange = new \DatePeriod($startDate, $dateInterval, $endDate);
+    
+        $dailyPlanning = [];
+    
+        if ($date !== null) {
+            $sortie = ChainProduction::where('model_id', $modelId)
+                ->whereDate('created_at', $date)
+                ->get();
+
+            $dailyPlanning[$date] = $sortie;
+        } else {
+            // Get daily sum for each date in the range
+            foreach ($dateRange as $dateObj) {
+                $formattedDate = $dateObj->format('Y-m-d');
+    
+                $dailySum = ChainProduction::where('model_id', $modelId)
+                    ->whereDate('created_at', $formattedDate)
+                    ->sum('sortie');
+    
+                $dailyPlanning[$formattedDate] = $dailySum;
+            }
+        }
+    
+        return response()->json([
+            'planning' => $dailyPlanning,
+            'start_date' => $productPlan->start_date,
+            'end_date' => $productPlan->end_date,
+        ]);
+    }
+        
     // Calculate the total sortie for a specific model
     public function calculateEntre($modelId)
     {

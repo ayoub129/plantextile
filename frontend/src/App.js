@@ -27,6 +27,7 @@ import Posts from "./pages/Posts";
 import Primes from "./pages/Primes";
 import MagasinFrourniture from "./pages/MagasinFrourniture";
 import PlastiqueFile from "./pages/PlastiqueFile";
+import AdminAccept from "./pages/AdminAccept";
 
 const App = () => {
   return (
@@ -58,7 +59,7 @@ const App = () => {
         <Route path="/plastique_file" element={<PlastiqueFile />} />
         <Route path="/magasin" element={<Magasin />} />
         <Route path="/export" element={<Export />} />
-
+        <Route path="/admin" element={<AdminAccept />} />
         <Route path="/addconstantSystem" element={<ConstantSystem />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>

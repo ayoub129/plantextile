@@ -77,14 +77,20 @@ Route::middleware('auth:sanctum')->group(function () {
     // get a single plan by model id
     Route::get('product_plans_model/{modelId}/{chainId}' , [ProductPlanController::class, 'getPlanningByModel']);
     // get a dashboard plan by model id
-    Route::get('product_plans_model_dash/{modelId}' , [ProductPlanController::class, 'getdashPlanningByModel']);
+    Route::get('product_plans_model_dash/{modelId}/{date?}', [ProductPlanController::class, 'getdashPlanningByModel']);
     // create a new plan
     Route::post('product_plans', [ProductPlanController::class, 'store']);
     // update product plan information
     Route::post('product_plans/{id}', [ProductPlanController::class, 'update']);
     // delete product plan 
     Route::delete('product_plans/{id}', [ProductPlanController::class, 'destroy']);
-    
+    // get the admin product plan 
+    Route::get('/product_plans_admin', [ProductPlanController::class, 'getAdminData']);
+    // post the admin product plan
+    Route::post('/product_plans_admin/{id}', [ProductPlanController::class, 'sendToAdmin']);
+    // accept and refuse
+    Route::post('/product_plans_admin', [ProductPlanController::class, 'handleAction']);
+
     /**
      * Product plan hours
      */
@@ -120,8 +126,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('effective_data_total/{modelId}', [EffectiveStandardController::class, 'getEffectiveSumData']);
     // get the effective indirect
     Route::get('effective_indirect_standard', [EffectiveStandardController::class, 'getEffectiveIndirect']);
+    // total effective indirect
+    Route::get('effective_indirect_total', [EffectiveStandardController::class, 'totalEffectifIndirect']);
     // get the effective real by model and date
     Route::get('effective_real_date/{modelId}', [EffectiveStandardController::class, 'getEffectiveByModelAndDate']);
+    // get the total effectif direct
+    Route::get('effective_direct_standard/{modelId}', [EffectiveStandardController::class, 'totalEffectifDirect']);
 
     /**
      * Effective Real
@@ -227,7 +237,7 @@ Route::middleware('auth:sanctum')->group(function () {
     //  getTotalValue
     Route::get('/export_total' , [ExportProductionController::class , 'getTotalValue']);
     // get Total Export By Model
-    Route::get('/export_total/{modelId}' , [ExportProductionController::class , 'getTotalExportByModel']);
+    Route::get('/export_total/{modelId}/{date?}' , [ChainProductionController::class , 'getTotalExportByModel']);
 
     /**
      * Posts

@@ -5,7 +5,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://www.crosscheckprod.com/' , 'http://crosscheckprod.com/'],
+    'allowed_origins' => ['http://crosscheckprod.com:3000' , 'http://crosscheckprod.com'],
 
     'allowed_origins_patterns' => [],
 

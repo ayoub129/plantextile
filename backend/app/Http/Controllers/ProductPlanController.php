@@ -11,8 +11,8 @@ class ProductPlanController extends Controller
 {
     public function store(Request $request)
     {
-        $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
-
+        $this->authorize(['developer', 'Méthode', 'admin', 'superadmin']);
+    
         $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date',
@@ -22,12 +22,55 @@ class ProductPlanController extends Controller
             'consummation_standard_fil' => 'required|integer',
             'consummation_standard_plastique' => 'required|integer',
         ]);
-
-        $productPlan = ProductPlan::create($request->all());
-
+    
+        // Adjust the dates by adding one day
+        $startDate = (new \DateTime($request->start_date))->modify('+1 day')->format('Y-m-d');
+        $endDate = (new \DateTime($request->end_date))->modify('+1 day')->format('Y-m-d');
+        
+        $productPlan = ProductPlan::create([
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'qte' => $request->qte,
+            'model_id' => $request->model_id,
+            'chain' => $request->chain,
+            'consummation_standard_fil' => $request->consummation_standard_fil,
+            'consummation_standard_plastique' => $request->consummation_standard_plastique,
+        ]);
+    
         return response()->json($productPlan, 201);
     }
 
+    public function handleAction(Request $request)
+    {
+        $this->authorize(['developer', 'Méthode', 'admin', 'superadmin']);
+        
+        $action = $request->input('action');
+        $id = $request->input('id');
+        
+        // Validate the action
+        if (!in_array($action, ['accept', 'refuse'])) {
+            return response()->json(['message' => 'Invalid action'], 400);
+        }
+        
+        // Find the product plan by ID
+        $productPlan = ProductPlan::find($id);
+        
+        if (!$productPlan) {
+            return response()->json(['message' => 'No data found for this plan'], 404);
+        }
+        
+        // Perform action (accept or refuse)
+        if ($action === 'accept') {
+            $productPlan->status = 'accepted'; // Assuming you have a status column
+        } else {
+            $productPlan->status = 'refused'; // Assuming you have a status column
+        }
+        
+        $productPlan->save();
+        
+        return response()->json(['message' => 'Action successfully recorded']);
+    }
+            
     public function show($id)
     {
         $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
@@ -35,7 +78,7 @@ class ProductPlanController extends Controller
         return ProductPlan::findOrFail($id);
     }
 
-    public function getdashPlanningByModel($modelId)
+    public function getdashPlanningByModel($modelId, $date = null)
     {
         $productPlan = ProductPlan::where('model_id', $modelId)->first();
     
@@ -45,18 +88,31 @@ class ProductPlanController extends Controller
     
         $startDate = new \DateTime($productPlan->start_date);
         $endDate = new \DateTime($productPlan->end_date);
+        $endDate->modify('+1 day'); // To include the end date
     
         $dateInterval = new \DateInterval('P1D');
-        $dateRange = new \DatePeriod($startDate, $dateInterval, $endDate->modify('+1 day'));
+        $dateRange = new \DatePeriod($startDate, $dateInterval, $endDate);
     
         $dailyPlanning = [];
-        foreach ($dateRange as $date) {
-            $formattedDate = $date->format('Y-m-d');
-            $modelsFinished = ProductPlanHour::where('product_plan_id', $productPlan->id)
-                ->where('date', $formattedDate)
-                ->sum('models_finished');
-            
-            $dailyPlanning[$formattedDate] = $modelsFinished;
+    
+        if ($date !== null) {
+            // Get hourly data for the specific date
+            $hoursPlanning = ProductPlanHour::where('product_plan_id', $productPlan->id)
+                ->whereDate('date', $date)
+                ->get();
+    
+            $dailyPlanning[$date] = $hoursPlanning;
+        } else {
+            // Get daily sum for each date in the range
+            foreach ($dateRange as $dateObj) {
+                $formattedDate = $dateObj->format('Y-m-d');
+    
+                $dailySum = ProductPlanHour::where('product_plan_id', $productPlan->id)
+                    ->whereDate('date', $formattedDate)
+                    ->sum('models_finished');
+    
+                $dailyPlanning[$formattedDate] = $dailySum;
+            }
         }
     
         return response()->json([
@@ -65,7 +121,7 @@ class ProductPlanController extends Controller
             'end_date' => $productPlan->end_date,
         ]);
     }
-
+            
     public function getdashPlanningByModelAndNoHour($modelId)
     {
         // Fetch the sum of 'qte' for all product plans for the given model ID
@@ -99,10 +155,10 @@ class ProductPlanController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
-        
+        $this->authorize(['developer', 'Méthode', 'admin', 'superadmin']);
+    
         $productPlan = ProductPlan::findOrFail($id);
-
+    
         $data = $request->validate([
             'start_date' => 'sometimes|date',
             'end_date' => 'sometimes|date',
@@ -112,12 +168,20 @@ class ProductPlanController extends Controller
             'consummation_standard_fil' => 'sometimes|integer',
             'consummation_standard_plastique' => 'sometimes|integer',
         ]);
-
+    
+        // Adjust the dates by adding one day if they are present
+        if (isset($data['start_date'])) {
+            $data['start_date'] = (new \DateTime($data['start_date']))->modify('+1 day')->format('Y-m-d');
+        }
+        if (isset($data['end_date'])) {
+            $data['end_date'] = (new \DateTime($data['end_date']))->modify('+1 day')->format('Y-m-d');
+        }
+        
         $productPlan->update($data);
-
+    
         return response()->json($productPlan);
     }
-
+    
     public function destroy($id)
     {
         $this->authorize(['developer', 'Méthode', 'admin' , 'superadmin']);
@@ -145,6 +209,37 @@ class ProductPlanController extends Controller
         $productPlanHour->update($data);
 
         return response()->json($productPlanHour);
+    }
+
+    public function sendToAdmin(Request $request, $id)
+    {
+        $this->authorize(['developer', 'Méthode', 'admin', 'superadmin']);
+
+        $request->validate([
+            'message' => 'required|string',
+            'taux' => 'required|numeric',
+        ]);
+
+        $productPlan = ProductPlan::findOrFail($id);
+
+        // Save the taux and message (assuming you have columns for them in your ProductPlan model)
+        $productPlan->taux = $request->taux;
+        $productPlan->save();
+
+        return response()->json(['message' => 'Data sent to admin successfully.'], 200);
+    }
+
+    public function getAdminData()
+    {
+        $this->authorize(['developer', 'Méthode', 'admin', 'superadmin']);
+
+        $productPlan = ProductPlan::whereNotNull('taux')->first();
+
+        if (!$productPlan) {
+            return response()->json(['message' => 'No data found for this plan'], 404);
+        }
+    
+        return response()->json($productPlan);
     }
 
     public function deleteHours($id)

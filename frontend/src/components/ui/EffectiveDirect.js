@@ -59,12 +59,35 @@ const EffectiveDirect = ({ url = "effective_standard" }) => {
   }, []);
 
   const onChange = (name, value) => {
+    // Convert numeric fields to numbers
+    const numericFields = [
+      "machinistes",
+      "machinistes_stagiaires",
+      "repassage_preparation",
+      "trassage",
+      "transport",
+      "chef",
+      "machines_speciales",
+      "trassage_special",
+      "controle_table",
+      "controle_final",
+      "machinistes_retouche",
+      "repassage_final",
+      "finition",
+      "transp_fin",
+      "price_by_part",
+    ];
+  
+    const newValue = numericFields.includes(name)
+      ? Number(value) || ""  
+      : value;
+  
     setData({
       ...data,
-      [name]: value,
+      [name]: newValue,
     });
   };
-
+  
   const handleDateChange = (date, name) => {
     const adjustedDate = new Date(date);
     adjustedDate.setHours(12, 0, 0, 0);
@@ -103,7 +126,7 @@ const EffectiveDirect = ({ url = "effective_standard" }) => {
           if (response.data) {
             const effectiveRealData = response.data;
             const effectifDirects =
-              effectiveRealData.effectif_directs[0] || null;
+              effectiveRealData.effectif_directs || null;
 
             if (effectifDirects != null) {
               setData({
@@ -134,13 +157,13 @@ const EffectiveDirect = ({ url = "effective_standard" }) => {
 
               setEffectiveStandardId(effectiveRealData.id);
             } else {
-              setEffectiveStandardId(null);
+              console.log("object");
             }
           } else {
-            setEffectiveStandardId(null);
+            console.log("object");
           }
         } catch (error) {
-          setEffectiveStandardId(null);
+          console.log("object");
         }
       }
     };
@@ -151,37 +174,40 @@ const EffectiveDirect = ({ url = "effective_standard" }) => {
   const handleSubmit = async (event) => {
     setLoading(true);
     event.preventDefault();
-
+  
+    let startDate = new Date(data.start_date);
+    let endDate = new Date(data.end_date);
+  
     const formattedData = {
       start_date: data.start_date
-        ? data.start_date.toISOString().split("T")[0]
+        ? startDate.toISOString().split("T")[0]
         : "",
-      end_date: data.end_date ? data.end_date.toISOString().split("T")[0] : "",
+      end_date: data.end_date ? endDate.toISOString().split("T")[0] : "",
       cointa: data.cointa,
-      price_by_part: data.price_by_part,
+      price_by_part: typeof data.price_by_part === "number" ? data.price_by_part : "",
       chain: data.chain,
       model: data.model,
       effectif_directs: [
         {
-          machinistes: data.machinistes,
-          machinistes_stagiaires: data.machinistes_stagiaires,
-          repassage_preparation: data.repassage_preparation,
-          trassage: data.trassage,
-          transport: data.transport,
-          chef: data.chef,
-          machines_speciales: data.machines_speciales,
-          trassage_special: data.trassage_special,
-          controle_table: data.controle_table,
-          controle_final: data.controle_final,
-          machinistes_retouche: data.machinistes_retouche,
-          repassage_final: data.repassage_final,
-          finition: data.finition,
-          transp_fin: data.transp_fin,
+          machinistes: typeof data.machinistes === "number" ? data.machinistes : "",
+          machinistes_stagiaires: typeof data.machinistes_stagiaires === "number" ? data.machinistes_stagiaires : "",
+          repassage_preparation: typeof data.repassage_preparation === "number" ? data.repassage_preparation : "",
+          trassage: typeof data.trassage === "number" ? data.trassage : "",
+          transport: typeof data.transport === "number" ? data.transport : "",
+          chef: typeof data.chef === "number" ? data.chef : "",
+          machines_speciales: typeof data.machines_speciales === "number" ? data.machines_speciales : "",
+          trassage_special: typeof data.trassage_special === "number" ? data.trassage_special : "",
+          controle_table: typeof data.controle_table === "number" ? data.controle_table : "",
+          controle_final: typeof data.controle_final === "number" ? data.controle_final : "",
+          machinistes_retouche: typeof data.machinistes_retouche === "number" ? data.machinistes_retouche : "",
+          repassage_final: typeof data.repassage_final === "number" ? data.repassage_final : "",
+          finition: typeof data.finition === "number" ? data.finition : "",
+          transp_fin: typeof data.transp_fin === "number" ? data.transp_fin : "",
         },
       ],
       effectif_indirects: [],
     };
-
+  
     try {
       if (effectiveStandardId) {
         await api.post(`/${url}/${effectiveStandardId}`, formattedData);
@@ -219,7 +245,7 @@ const EffectiveDirect = ({ url = "effective_standard" }) => {
       setLoading(false);
     }
   };
-
+  
   const handleDelete = async () => {
     try {
       await api.delete(`/${url}/${effectiveStandardId}`);
@@ -485,7 +511,7 @@ const EffectiveDirect = ({ url = "effective_standard" }) => {
         </Button>
 
         {effectiveStandardId && (
-          <Button classes="bg-red-500 my-5 mb-8" onClick={handleDelete}>
+          <Button classes="bg-red-500 mb-8" onClick={handleDelete}>
             Supprimer Effectif Direct
           </Button>
         )}
