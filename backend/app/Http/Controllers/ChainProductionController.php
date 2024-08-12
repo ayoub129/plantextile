@@ -29,7 +29,7 @@ class ChainProductionController extends Controller
             // Get the sum of 'entre' and 'retouch'
             $sumValues = ChainProduction::where('model_id', $modelId)
                                         ->where('chain', $chainId)
-                                        ->selectRaw('SUM(entre) as entre, SUM(retouch) as retouch')
+                                        ->selectRaw('SUM(entre) as entre, SUM(retouch) as retouch , SUM(sortie) as sortie')
                                         ->first();
         
             // Get the latest 'sortie' value
@@ -41,6 +41,7 @@ class ChainProductionController extends Controller
             return response()->json([
                 'entre' => $sumValues->entre ?? 0, 
                 'retouch' => $sumValues->retouch ?? 0, 
+                'sum_retouch' => $sumValues->sortie ?? 0, 
                 'sortie' => $latestSortie ?? 0,
             ]);
         }
